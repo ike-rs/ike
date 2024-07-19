@@ -2,7 +2,9 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
-use clap::{Arg, Command, Parser, Subcommand};
+use clap::{Arg, ArgAction, Command, Parser, Subcommand};
+
+use crate::resolver::package_json::PackageManager;
 
 use super::{run_command::run_command, style};
 
@@ -10,6 +12,7 @@ use super::{run_command::run_command, style};
 pub struct Cli {
     pub start_timestamp: DateTime<Utc>,
     pub root: Option<PathBuf>,
+    pub pkg: Option<PackageManager>,
 }
 
 impl Cli {
@@ -17,6 +20,7 @@ impl Cli {
         Self {
             start_timestamp: Utc::now(),
             root: None,
+            pkg: None,
         }
     }
 
@@ -37,18 +41,16 @@ impl Cli {
             .author(env!("CARGO_PKG_AUTHORS"))
             .about("Simple JavaScript runtime")
             .subcommand(
-                Command::new("run")
-                    .about("Run a JavaScript file")
-                    .args([Arg::new("entry")
+                Command::new("run").about("Run a JavaScript file").args([
+                    Arg::new("entry")
                         .help("name of the script.")
-                        .required(true)
-                        .num_args(1)]),
-            )
-            .arg(
-                Arg::new("root")
-                    .short('r')
-                    .long("root")
-                    .help("Root directory of the project"),
+                        .required(false)
+                        .num_args(1),
+                    Arg::new("root_folder")
+                        .short('r')
+                        .long("root")
+                        .help("Root directory of the project"),
+                ]),
             )
             .next_display_order(800)
             .allow_external_subcommands(true)
@@ -60,16 +62,24 @@ impl Cli {
         self
     }
 
+    pub fn set_pkg(mut self, pkg: Option<PackageManager>) -> Self {
+        self.pkg = pkg;
+        self
+    }
+
     pub async fn run(self) -> Result<()> {
         let matches = Self::construct_cli().get_matches();
 
-        let root = matches
-            .get_one::<String>("root")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| std::env::current_dir().unwrap());
-
         match matches.subcommand() {
-            Some(("run", sub_matches)) => run_command(self.set_root(root.clone()), sub_matches)?,
+            Some(("run", sub_matches)) => {
+                let root = sub_matches
+                    .get_one::<String>("root_folder")
+                    .map(PathBuf::from)
+                    .unwrap_or_else(|| std::env::current_dir().unwrap());
+                let pkg = PackageManager::find_nearest_from(root.clone());
+
+                run_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?
+            }
             _ => {}
         };
 

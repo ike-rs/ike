@@ -1,13 +1,17 @@
-use logger::{elog, log, pretty_fmt, Logger};
+use logger::{elog, pretty_fmt, Logger};
 
 pub fn setup_panic_handler() {
     let original_panic_handler = std::panic::take_hook();
 
     std::panic::set_hook(Box::new(move |panic_info| {
         let location = panic_info.location().unwrap();
-        let message = panic_info.payload().downcast_ref::<&str>().unwrap();
+        let message = panic_info
+            .payload()
+            .downcast_ref::<&str>()
+            .unwrap_or(&"Unknown error");
 
         elog!("<d>==============================================================<r>");
+        eprintln!("");
         eprintln!("Ike {}", env!("CARGO_PKG_VERSION"),);
         print_sys_info();
         eprint!("Args: ");

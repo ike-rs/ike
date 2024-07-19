@@ -1,11 +1,15 @@
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, path::PathBuf};
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+use crate::fs::{find_nearest_file, read_json};
+
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PackageJson {
-    pub name: String,
-    pub version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -38,7 +42,8 @@ pub struct PackageJson {
     pub directories: Option<PackageDirectories>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repository: Option<PackageRepository>,
-    pub scripts: HashMap<String, String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scripts: Option<HashMap<String, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<HashMap<String, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -76,63 +81,63 @@ pub struct PackageJson {
     pub unknowns: HashMap<String, serde_json::Value>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PackageBugs {
     Url(String),
     Record(PackageBugsRecord),
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct PackageBugsRecord {
     pub url: String,
     pub email: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PackagePeople {
     Literal(String),
     Record(PackagePeopleRecord),
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct PackagePeopleRecord {
     pub name: String,
     pub email: Option<String>,
     pub url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PackageFunding {
     Url(String),
     Record(PackageFundingRecord),
     Slice(Vec<PackageFundingRecord>),
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct PackageFundingRecord {
     pub r#type: String,
     pub url: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PackageBin {
     Literal(String),
     Record(HashMap<String, String>),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum PackageMan {
     Literal(String),
     Slice(Vec<String>),
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct PackageDirectories {
     pub bin: Option<String>,
     pub man: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct PackageRepository {
     pub r#type: String,
     pub url: String,
@@ -142,31 +147,23 @@ pub type PackageDependencies = HashMap<String, String>;
 
 // Manager
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PackageManager {
-    pub package_json: PackageJson,
+    pub json: PackageJson,
     pub file_path: Option<PathBuf>,
 }
 
 impl PackageManager {
     pub fn from_file(file_path: PathBuf) -> Self {
-        let package_json = match std::fs::read_to_string(&file_path) {
-            Ok(content) => match serde_json::from_str(&content) {
-                Ok(package_json) => package_json,
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    std::process::exit(1);
-                }
-            },
-            Err(e) => {
-                eprintln!("Error: {}", e);
-                std::process::exit(1);
-            }
-        };
+        let json = read_json::<PackageJson, _>(&file_path).unwrap();
 
         Self {
-            package_json,
+            json,
             file_path: Some(file_path),
         }
+    }
+
+    pub fn find_nearest_from(dir: PathBuf) -> Option<Self> {
+        find_nearest_file(dir, "package.json").map(Self::from_file)
     }
 }

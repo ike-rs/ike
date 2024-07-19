@@ -3,8 +3,9 @@ use boa_engine::{Context, Source};
 
 use super::cli::Cli;
 
-pub fn run_command(mut cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
-    let _entry = resolve_entry(sub_matches)?;
+pub fn run_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
+    let entry = resolve_entry(cli, sub_matches)?;
+    println!("Running script: {}", entry);
     let mut ctx = Context::default();
     let script = r#"
         const a = 1;
@@ -20,10 +21,11 @@ pub fn run_command(mut cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
     Ok(())
 }
 
-fn resolve_entry(sub_matches: &clap::ArgMatches) -> Result<String> {
+fn resolve_entry(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<String> {
     if let Some(entry) = sub_matches.get_one::<String>("entry") {
         Ok(entry.clone())
     } else {
+        println!("{:?}", cli.pkg);
         Ok("index.js".to_string())
     }
 }

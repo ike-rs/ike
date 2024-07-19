@@ -13,7 +13,6 @@ async fn main() -> Result<()> {
 
     let cli = Cli::new();
 
-    panic!("This is a panic");
     match cli.run().await {
         Ok(_) => {}
         Err(e) => {

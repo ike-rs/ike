@@ -1,0 +1,5 @@
+{
+  "name": "playground",
+  "module": "index.ts",
+  "type": "module"
+}
