@@ -1,0 +1,18 @@
+[package]
+name = "ike"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+clap = { version = "4.5.9", features = ["derive"] }
+serde = { version = "1", features = ["derive", "std"] }
+thiserror = "1.0.63"
+tokio = { version = "1", features = ["full"] }
+logger = { path = "../logger" }
+chrono = "0.4.38"
+boa_engine = "0.19.0"
+anstyle = "1.0.7"
+serde_json = "1.0.120"
+derive_builder = "0.20.0"
+os_info = "3.8.2"
