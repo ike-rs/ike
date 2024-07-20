@@ -1,7 +1,8 @@
 use anyhow::{format_err, Result};
+use regex::Regex;
 use std::{
     fs::File,
-    io::Read,
+    io::{ErrorKind, Read},
     path::{Path, PathBuf},
 };
 
@@ -35,4 +36,27 @@ pub fn find_nearest_file(dir: PathBuf, file_name: &str) -> Option<PathBuf> {
     }
 
     None
+}
+
+pub fn read_to_string(file_path: &PathBuf) -> Result<String> {
+    let mut file = match File::open(file_path) {
+        Ok(file) => file,
+        Err(e) => match e.kind() {
+            ErrorKind::NotFound => {
+                return Err(format_err!("File not found: {:?}", file_path));
+            }
+            _ => {
+                return Err(format_err!("Error opening file: {:?}", e));
+            }
+        },
+    };
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
+}
+
+// Determine if a path is a file using regex
+pub fn is_file(path: &str) -> bool {
+    let re = Regex::new(r"\.[a-zA-Z0-9]+$").unwrap();
+    re.is_match(path)
 }

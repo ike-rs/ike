@@ -11,7 +11,7 @@ use super::{run_command::run_command, style};
 #[derive(Clone, Debug)]
 pub struct Cli {
     pub start_timestamp: DateTime<Utc>,
-    pub root: Option<PathBuf>,
+    pub root: PathBuf,
     pub pkg: Option<PackageManager>,
 }
 
@@ -19,7 +19,7 @@ impl Cli {
     pub fn new() -> Self {
         Self {
             start_timestamp: Utc::now(),
-            root: None,
+            root: std::env::current_dir().unwrap(),
             pkg: None,
         }
     }
@@ -58,7 +58,7 @@ impl Cli {
     }
 
     pub fn set_root(mut self, root: PathBuf) -> Self {
-        self.root = Some(root);
+        self.root = root;
         self
     }
 

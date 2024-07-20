@@ -11,8 +11,12 @@ thiserror = "1.0.63"
 tokio = { version = "1", features = ["full"] }
 logger = { path = "../logger" }
 chrono = "0.4.38"
-boa_engine = "0.19.0"
+boa_engine = { version = "0.19.0", features = ["annex-b"] }
 anstyle = "1.0.7"
 serde_json = "1.0.120"
 derive_builder = "0.20.0"
 os_info = "3.8.2"
+regex = "1.10.5"
+isahc = "1.7.2"
+futures-util = "0.3.30"
+boa_gc = "0.19.0"
