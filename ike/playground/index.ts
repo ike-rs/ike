@@ -1,9 +1,19 @@
-import { Base64 } from 'https://esm.run/js-base64@3.7.6';
+// const values = ["String", 123, 3.14, 123n, true, false, null, undefined, { key: "value" }, [1, 2, 3], new Date()];
 
-const data = `
-    object:
-    array: ["hello", "world"]
-    key: "value"
-`;
+// for (const value of values) {
+//   console.log(value);
+// }
 
-console.log(Base64.encode(data));
+const symbol = Symbol();
+
+const withdescription = Symbol("description");
+
+// console.log(symbol);
+// console.log(withdescription);
+// console.log(/regex/);
+// console.log(new Date())
+const map = new Map()
+map.set("key", "value")
+console.log(map)
+
+console.log({ key: "value" })

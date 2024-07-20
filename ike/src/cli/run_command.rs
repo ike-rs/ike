@@ -12,7 +12,6 @@ use super::cli::Cli;
 pub fn run_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
     let cli_entry = resolve_entry(cli.clone(), sub_matches)?;
     let entry = parse_entry(&cli_entry, cli.root)?;
-    println!("{:?}", entry);
 
     if entry.is_file {
         // TODO: strip typescript specific syntax and execute the file

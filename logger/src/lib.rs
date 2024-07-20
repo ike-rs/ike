@@ -105,10 +105,39 @@ impl Logger {
             println!("{}", formatted_message);
         }
     }
+
+    pub fn log_without_newline(&self, message: &str) {
+        let formatted_message = pretty_fmt(message);
+        if self.print_to_error {
+            eprint!("{}", formatted_message);
+        } else {
+            print!("{}", formatted_message);
+        }
+    }
 }
 
 #[macro_export]
 macro_rules! log {
+    (info, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(false);
+        logger.log_without_newline(&format!("<cyan>info:<r> {}", format!($($arg)*)));
+    });
+    (error, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(false);
+        logger.log_without_newline(&format!("<red>error:<r> {}", format!($($arg)*)));
+    });
+    (success, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(false);
+        logger.log_without_newline(&format!("<green>success:<r> {}", format!($($arg)*)));
+    });
+    (warn, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(false);
+        logger.log_without_newline(&format!("<yellow>warn:<r> {}", format!($($arg)*)));
+    });
+    (wt, $($arg:tt)*) => ({
+        let logger = Logger::new(false);
+        logger.log_without_newline(&format!($($arg)*));
+    });
     (info, $($arg:tt)*) => ({
         let logger = Logger::new(false);
         logger.log(&format!("<cyan>info:<r> {}", format!($($arg)*)));
@@ -133,6 +162,26 @@ macro_rules! log {
 
 #[macro_export]
 macro_rules! elog {
+    (info, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(true);
+        logger.log_without_newline(&format!("<cyan>info:<r> {}", format!($($arg)*)));
+    });
+    (error, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(true);
+        logger.log_without_newline(&format!("<red>error:<r> {}", format!($($arg)*)));
+    });
+    (success, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(true);
+        logger.log_without_newline(&format!("<green>success:<r> {}", format!($($arg)*)));
+    });
+    (warn, wt, $($arg:tt)*) => ({
+        let logger = Logger::new(true);
+        logger.log_without_newline(&format!("<yellow>warn:<r> {}", format!($($arg)*)));
+    });
+    (wt, $($arg:tt)*) => ({
+        let logger = Logger::new(true);
+        logger.log_without_newline(&format!($($arg)*));
+    });
     (info, $($arg:tt)*) => ({
         let logger = Logger::new(true);
         logger.log(&format!("<cyan>info:<r> {}", format!($($arg)*)));
@@ -153,6 +202,37 @@ macro_rules! elog {
         let logger = Logger::new(true);
         logger.log(&format!($($arg)*));
     });
+}
+
+#[macro_export]
+macro_rules! cond_log {
+    ($cond:expr, wt, $($arg:tt)*) => {
+        if $cond {
+            let logger = Logger::new(true);
+            logger.log_without_newline(&format!($($arg)*));
+        } else {
+            let logger = Logger::new(false);
+            logger.log_without_newline(&format!($($arg)*));
+        }
+    };
+    ($cond:expr, $($arg:tt)*) => {
+        if $cond {
+            let logger = Logger::new(true);
+            logger.log(&format!($($arg)*));
+        } else {
+            let logger = Logger::new(false);
+            logger.log(&format!($($arg)*));
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! print_indent {
+    ($num:expr) => {
+        for _ in 0..$num {
+            print!("  ");
+        }
+    };
 }
 
 #[derive(Debug)]
