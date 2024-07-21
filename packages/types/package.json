@@ -1,0 +1,16 @@
+{
+  "name": "@ike-runtime/types",
+  "types": "src/index.d.ts",
+  "files": [
+    "*.d.ts"
+  ],
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/malezjaa/ike",
+    "directory": "packages/types"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

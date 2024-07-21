@@ -1,4 +1,4 @@
-import { test } from "C:\\skbidi\\ike-runetime\\ike\\playground\\test.ts";
+import { test } from "./test";
 
 // console.log(test)
 
@@ -16,4 +16,5 @@ import { test } from "C:\\skbidi\\ike-runetime\\ike\\playground\\test.ts";
 //   console.log(item)
 // }
 
-console.log(test)
+console.log(Ike.meta.filename);
+import.meta.url;
