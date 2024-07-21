@@ -1,7 +1,7 @@
 use anyhow::{format_err, Result};
 use regex::Regex;
 use std::{
-    fs::File,
+    fs::{self, File},
     io::{ErrorKind, Read},
     path::{Path, PathBuf},
 };
@@ -59,4 +59,22 @@ pub fn read_to_string(file_path: &PathBuf) -> Result<String> {
 pub fn is_file(path: &str) -> bool {
     let re = Regex::new(r"\.[a-zA-Z0-9]+$").unwrap();
     re.is_match(path)
+}
+
+pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> PathBuf {
+    if path.is_relative() {
+        path = root.join(path);
+    }
+
+    path = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+    let root_str = path.to_str().unwrap_or("");
+    // On windows, paths can be prefixed with \\?\ to allow longer paths, we need to remove this prefix
+    let normalized_root_str = if root_str.starts_with(r"\\?\") {
+        &root_str[4..]
+    } else {
+        root_str
+    };
+    path = PathBuf::from(normalized_root_str);
+
+    path
 }

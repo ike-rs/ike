@@ -1,10 +1,10 @@
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use clap::{Arg, ArgAction, Command, Parser, Subcommand};
 
-use crate::resolver::package_json::PackageManager;
+use crate::{fs::normalize_path, resolver::package_json::PackageManager};
 
 use super::{run_command::run_command, style};
 
@@ -72,10 +72,12 @@ impl Cli {
 
         match matches.subcommand() {
             Some(("run", sub_matches)) => {
-                let root = sub_matches
+                let mut root = sub_matches
                     .get_one::<String>("root_folder")
                     .map(PathBuf::from)
                     .unwrap_or_else(|| std::env::current_dir().unwrap());
+                root = normalize_path(root, std::env::current_dir().unwrap());
+
                 let pkg = PackageManager::find_nearest_from(root.clone());
 
                 run_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?

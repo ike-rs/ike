@@ -3,7 +3,7 @@ use boa_engine::{
     native_function::NativeFunction,
     object::{builtins::JsMap, JsObject, ObjectInitializer},
     value::{JsValue, Numeric},
-    Context, JsData, JsResult, JsString,
+    Context, JsData, JsResult,
 };
 use boa_gc::{Finalize, Trace};
 use logger::{cond_log, print_indent, Logger};
@@ -64,7 +64,6 @@ impl Console {
         }
 
         for arg in args {
-            println!("arg: {:?} {:?}", arg.js_type_of(), arg);
             Self::print_as(arg, ctx, level);
         }
         Ok(JsValue::undefined())
@@ -112,7 +111,14 @@ impl Console {
             }
             // TODO: better handling. array, object, map, set support
             JsValue::Object(obj) => {
-                let proto = obj.prototype().expect("Object prototype not found");
+                let proto = match obj.prototype() {
+                    Some(proto) => proto,
+                    None => {
+                        // TODO: make func to print objects and implement it in the object later
+                        cond_log!(error, "<r><yellow>[object Object]<r>");
+                        return;
+                    }
+                };
                 let proto_name = proto
                     .get(js_string!("constructor"), ctx)
                     .unwrap()
@@ -145,17 +151,6 @@ impl Console {
 
                     cond_log!(error, "<r><green>Map({})<r> {{", size);
                     let entries = map.entries(ctx).unwrap();
-
-                    // for (i, (key, value)) in entries.next(ctx).unwrap() {
-                    //     if i != 0 {
-                    //         cond_log!(error, "<r>}}<r>");
-                    //     }
-
-                    //     print_indent!(1);
-                    //     Self::print_as(key, ctx, level);
-                    //     cond_log!(error, "<r> => <r>");
-                    //     Self::print_as(value, ctx, level);
-                    // }
 
                     cond_log!(error, "<r>}}<r>");
                 }

@@ -1,5 +1,3 @@
-use boa_engine::native_function::NativeFunction;
-
 #[macro_export]
 macro_rules! create_method {
     ($func:expr, immutable $state:expr) => {
