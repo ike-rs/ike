@@ -28,7 +28,6 @@ impl ModuleLoader for IkeModuleLoader {
 
         if is_fetchable(&spec) {
             let fetch = async move {
-                println!("Fetching `{spec}`...");
                 let body: Result<_, isahc::Error> = async {
                     let mut response = Request::get(&spec)
                         .redirect_policy(RedirectPolicy::Limit(5))
@@ -39,7 +38,6 @@ impl ModuleLoader for IkeModuleLoader {
                     Ok(response.text().await?)
                 }
                 .await;
-                println!("Finished fetching `{spec}`");
 
                 NativeJob::new(move |context| -> JsResult<JsValue> {
                     let body = match body {
@@ -70,7 +68,7 @@ impl ModuleLoader for IkeModuleLoader {
         } else {
             let meta_path = context
                 .global_object()
-                .get(js_string!("ike"), context)
+                .get(js_string!("Ike"), context)
                 .unwrap()
                 .to_object(context)
                 .unwrap()
@@ -141,7 +139,6 @@ impl ModuleLoader for IkeModuleLoader {
 
                 return;
             }
-            println!("Loading `{}`...", path.display());
 
             // TODO: should we update the meta current file?
             // TODO: also strip typescript specific syntax

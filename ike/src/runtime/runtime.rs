@@ -73,7 +73,7 @@ pub fn setup_context(ctx: &mut Context, file: &PathBuf) {
         SetupEntry::<JsObject> {
             setup_type: SetupType::Property,
             value: ike_object,
-            name: js_str!("ike"),
+            name: js_str!("Ike"),
         },
     ];
 
