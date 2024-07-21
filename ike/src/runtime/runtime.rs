@@ -1,6 +1,6 @@
 use std::{path::PathBuf, rc::Rc};
 
-use crate::fs::read_to_string;
+use crate::{fs::read_to_string, js_str_to_string};
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, Source,
@@ -35,7 +35,9 @@ pub fn start_runtime(file: &PathBuf) -> JsResult<()> {
             assert_eq!(v, JsValue::undefined())
         }
         PromiseState::Rejected(err) => {
-            elog!(error, "{:?}", err);
+            let message = err.to_string(ctx)?;
+
+            elog!(error, "{}", js_str_to_string!(message));
         }
     }
 

@@ -1,13 +1,13 @@
 use boa_engine::{
-    js_str, js_string,
+    js_string,
     native_function::NativeFunction,
     object::{builtins::JsMap, JsObject, ObjectInitializer},
     value::{JsValue, Numeric},
-    Context, JsArgs, JsData, JsError, JsResult, JsStr, JsString,
+    Context, JsData, JsResult, JsString,
 };
 use boa_gc::{Finalize, Trace};
 use logger::{cond_log, print_indent, Logger};
-use std::{cell::RefCell, collections::hash_map::Entry, rc::Rc, time::SystemTime};
+use std::{cell::RefCell, rc::Rc};
 
 use crate::{create_method, js_str_to_string, str_from_jsvalue};
 
@@ -44,7 +44,7 @@ impl Console {
     }
 
     fn log(_: &JsValue, args: &[JsValue], console: &Self, ctx: &mut Context) -> JsResult<JsValue> {
-        Self::print(args, console, ctx, LogLevel::Normal)?;
+        Self::print(args, ctx, LogLevel::Normal)?;
         Ok(JsValue::undefined())
     }
 
@@ -54,16 +54,11 @@ impl Console {
         console: &Self,
         ctx: &mut Context,
     ) -> JsResult<JsValue> {
-        Self::print(args, console, ctx, LogLevel::Error)?;
+        Self::print(args, ctx, LogLevel::Error)?;
         Ok(JsValue::undefined())
     }
 
-    fn print(
-        args: &[JsValue],
-        console: &Self,
-        ctx: &mut Context,
-        level: LogLevel,
-    ) -> JsResult<JsValue> {
+    fn print(args: &[JsValue], ctx: &mut Context, level: LogLevel) -> JsResult<JsValue> {
         if args.is_empty() {
             return Ok(JsValue::undefined());
         }
@@ -149,11 +144,22 @@ impl Console {
                     }
 
                     cond_log!(error, "<r><green>Map({})<r> {{", size);
+                    let entries = map.entries(ctx).unwrap();
+
+                    // for (i, (key, value)) in entries.next(ctx).unwrap() {
+                    //     if i != 0 {
+                    //         cond_log!(error, "<r>}}<r>");
+                    //     }
+
+                    //     print_indent!(1);
+                    //     Self::print_as(key, ctx, level);
+                    //     cond_log!(error, "<r> => <r>");
+                    //     Self::print_as(value, ctx, level);
+                    // }
 
                     cond_log!(error, "<r>}}<r>");
                 }
             }
-            _ => {}
         }
     }
 
