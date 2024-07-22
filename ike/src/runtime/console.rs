@@ -6,10 +6,10 @@ use boa_engine::{
     Context, JsData, JsResult,
 };
 use boa_gc::{Finalize, Trace};
-use logger::{cond_log, print_indent, Logger};
+use logger::{cond_log, Logger};
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{create_method_with_state, js_str_to_string, str_from_jsvalue};
+use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct Console {}
@@ -43,17 +43,12 @@ impl Console {
             .build()
     }
 
-    fn log(_: &JsValue, args: &[JsValue], console: &Self, ctx: &mut Context) -> JsResult<JsValue> {
+    fn log(_: &JsValue, args: &[JsValue], _: &Self, ctx: &mut Context) -> JsResult<JsValue> {
         Self::print(args, ctx, LogLevel::Normal)?;
         Ok(JsValue::undefined())
     }
 
-    fn error(
-        _: &JsValue,
-        args: &[JsValue],
-        console: &Self,
-        ctx: &mut Context,
-    ) -> JsResult<JsValue> {
+    fn error(_: &JsValue, args: &[JsValue], _: &Self, ctx: &mut Context) -> JsResult<JsValue> {
         Self::print(args, ctx, LogLevel::Error)?;
         Ok(JsValue::undefined())
     }
@@ -119,14 +114,7 @@ impl Console {
                         return;
                     }
                 };
-                let proto_name = proto
-                    .get(js_string!("constructor"), ctx)
-                    .unwrap()
-                    .to_object(ctx)
-                    .unwrap()
-                    .get(js_string!("name"), ctx)
-                    .unwrap();
-                let str_name = js_str_to_string!(proto_name.to_string(ctx).unwrap());
+                let str_name = get_prototype_name!(proto, ctx);
 
                 if str_name == "Date" {
                     cond_log!(

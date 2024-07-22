@@ -900,6 +900,7 @@ dependencies = [
  "base64",
  "boa_engine",
  "boa_gc",
+ "cc",
  "chrono",
  "clap",
  "derive_builder",
@@ -910,6 +911,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "simdutf",
  "thiserror",
  "tokio",
 ]
@@ -1565,6 +1567,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a9e9e0b4211b72e7b8b6e85c807d36c212bdb33ea8587f7569562a84df5465b1"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "simdutf"
+version = "0.4.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf8fd29a602ffc1f2d4587b7fb7b74ea7b480901c634eb8bd748501adbc586a2"
+dependencies = [
+ "bitflags 2.6.0",
+ "cc",
 ]
 
 [[package]]

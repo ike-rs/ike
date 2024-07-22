@@ -16,5 +16,6 @@ import { test } from "./test";
 //   console.log(item)
 // }
 
-console.log(atob("SGVsbG8gV29ybGQh"));
-console.log(btoa("Hello World!"));
+// console.log(atob("SGVsbG8gV29ybGQh"));
+
+console.log(isAscii(new Uint8Array([1, 2, 3, 4, 5])));

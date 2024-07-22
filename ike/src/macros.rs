@@ -38,13 +38,13 @@ macro_rules! throw {
         typ,
         $message:expr
     ) => {
-        return Err(JsNativeError::typ().with_message($message).into());
+        return Err(JsNativeError::typ().with_message($message).into())
     };
     (
         ref,
         $message:expr
     ) => {
-        return Err(JsNativeError::reference().with_message($message).into());
+        return Err(JsNativeError::reference().with_message($message).into())
     };
     (
         err,
@@ -61,4 +61,19 @@ macro_rules! assert_arg_type {
             throw!(typ, format!("Expected a string, got {:?}", $arg.get_type()));
         }
     };
+}
+
+#[macro_export]
+macro_rules! get_prototype_name {
+    ($proto:expr, $ctx:expr) => {{
+        let proto_name = $proto
+            .get(js_string!("constructor"), $ctx)
+            .unwrap()
+            .to_object($ctx)
+            .unwrap()
+            .get(js_string!("name"), $ctx)
+            .unwrap();
+        let str_name = js_str_to_string!(proto_name.to_string($ctx).unwrap());
+        str_name
+    }};
 }

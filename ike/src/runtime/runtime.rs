@@ -8,7 +8,7 @@ use boa_engine::{
 use logger::{elog, Logger};
 
 use super::{
-    buffer::{atob, btoa},
+    buffer::{atob, btoa, is_ascii_string},
     console::Console,
     meta::Meta,
     modules::IkeModuleLoader,
@@ -99,6 +99,12 @@ pub fn setup_context(ctx: &mut Context, file: &PathBuf) {
             setup_type: SetupType::BuiltinCallable,
             value: SetupValue::Function(unsafe { NativeFunction::from_closure(btoa) }),
             name: js_str!("btoa"),
+            length: None,
+        },
+        SetupEntry {
+            setup_type: SetupType::BuiltinCallable,
+            value: SetupValue::Function(unsafe { NativeFunction::from_closure(is_ascii_string) }),
+            name: js_str!("isAscii"),
             length: None,
         },
     ];
