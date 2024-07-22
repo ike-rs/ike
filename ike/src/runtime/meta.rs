@@ -5,7 +5,7 @@ use boa_engine::{
     Context, JsData,
 };
 use boa_gc::{Finalize, Trace};
-use std::{cell::RefCell, path::PathBuf, rc::Rc};
+use std::path::PathBuf;
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct Meta;

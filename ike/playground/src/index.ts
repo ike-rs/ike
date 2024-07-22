@@ -16,5 +16,5 @@ import { test } from "./test";
 //   console.log(item)
 // }
 
-console.log(Ike.meta.filename);
-import.meta.url;
+console.log(atob("SGVsbG8gV29ybGQh"));
+console.log(btoa("Hello World!"));

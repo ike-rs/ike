@@ -9,7 +9,7 @@ use boa_gc::{Finalize, Trace};
 use logger::{cond_log, print_indent, Logger};
 use std::{cell::RefCell, rc::Rc};
 
-use crate::{create_method, js_str_to_string, str_from_jsvalue};
+use crate::{create_method_with_state, js_str_to_string, str_from_jsvalue};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct Console {}
@@ -26,17 +26,17 @@ impl Console {
 
         ObjectInitializer::with_native_data(Self::default(), ctx)
             .function(
-                create_method!(Self::log, mutable state.clone()),
+                create_method_with_state!(Self::log, mutable state.clone()),
                 js_string!("log"),
                 0,
             )
             .function(
-                create_method!(Self::log, mutable state.clone()),
+                create_method_with_state!(Self::log, mutable state.clone()),
                 js_string!("info"),
                 0,
             )
             .function(
-                create_method!(Self::error, mutable state.clone()),
+                create_method_with_state!(Self::error, mutable state.clone()),
                 js_string!("error"),
                 0,
             )

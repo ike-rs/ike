@@ -1,3 +1,4 @@
+pub mod buffer;
 pub mod console;
 pub mod meta;
 pub mod modules;

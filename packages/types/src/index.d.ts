@@ -1,3 +1,5 @@
+import './modules/buffer'
+
 /**
  * The Meta interface contains information about the current file and its paths.
  */

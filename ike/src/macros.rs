@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! create_method {
+macro_rules! create_method_with_state {
     ($func:expr, immutable $state:expr) => {
         unsafe {
             NativeFunction::from_closure(move |this, args, context| {
@@ -29,5 +29,36 @@ macro_rules! str_from_jsvalue {
 macro_rules! js_str_to_string {
     ($value:expr) => {
         $value.to_std_string_escaped()
+    };
+}
+
+#[macro_export]
+macro_rules! throw {
+    (
+        typ,
+        $message:expr
+    ) => {
+        return Err(JsNativeError::typ().with_message($message).into());
+    };
+    (
+        ref,
+        $message:expr
+    ) => {
+        return Err(JsNativeError::reference().with_message($message).into());
+    };
+    (
+        err,
+        $message:expr
+    ) => {
+        return Err(JsNativeError::error().with_message($message).into())
+    };
+}
+
+#[macro_export]
+macro_rules! assert_arg_type {
+    (string, $arg:expr) => {
+        if !$arg.is_string() {
+            throw!(typ, format!("Expected a string, got {:?}", $arg.get_type()));
+        }
     };
 }
