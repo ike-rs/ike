@@ -1,0 +1,8 @@
+{
+  "name": "ike-runetime",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

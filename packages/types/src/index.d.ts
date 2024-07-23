@@ -1,4 +1,4 @@
-import './modules/buffer'
+import "./modules/buffer";
 
 /**
  * The Meta interface contains information about the current file and its paths.
@@ -44,6 +44,13 @@ declare namespace Ike {
 
 declare global {
   const Ike: Ike;
+
+  /**
+   * Function allows to call internal rust functions.
+   *
+   * @internal
+   */
+  function $rustFunction(name: string): Function;
 }
 
 export {};

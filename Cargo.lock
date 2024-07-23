@@ -906,6 +906,7 @@ dependencies = [
  "derive_builder",
  "futures-util",
  "isahc",
+ "lazy_static",
  "logger",
  "os_info",
  "regex",

@@ -9,6 +9,7 @@ use logger::{elog, Logger};
 
 use super::{
     buffer::{atob, btoa, is_ascii_string},
+    call::rust_function,
     console::Console,
     meta::Meta,
     modules::IkeModuleLoader,
@@ -103,8 +104,8 @@ pub fn setup_context(ctx: &mut Context, file: &PathBuf) {
         },
         SetupEntry {
             setup_type: SetupType::BuiltinCallable,
-            value: SetupValue::Function(unsafe { NativeFunction::from_closure(is_ascii_string) }),
-            name: js_str!("isAscii"),
+            value: SetupValue::Function(unsafe { NativeFunction::from_closure(rust_function) }),
+            name: js_str!("$rustFunction"),
             length: None,
         },
     ];

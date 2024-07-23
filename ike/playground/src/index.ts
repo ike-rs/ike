@@ -1,21 +1,11 @@
-import { test } from "./test";
+import { isAscii, btoa } from "buffer";
 
-// console.log(test)
+console.log(
+  isAscii(
+    new Uint8Array([
+      0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64,
+    ])
+  )
+); // true
 
-// console.log(import.meta.url)
-
-// console.log("<cyan>Test<r>")
-// let map = new Map()
-// map.set('key', 'value')
-
-// console.log(map)
-
-// const arr = [1, 2, 3, 4, 5]
-
-// for (const item of arr) {
-//   console.log(item)
-// }
-
-// console.log(atob("SGVsbG8gV29ybGQh"));
-
-console.log(isAscii(new Uint8Array([1, 2, 3, 4, 5])));
+console.log(btoa("Hello World!")); // SGVsbG8gV29ybGQh

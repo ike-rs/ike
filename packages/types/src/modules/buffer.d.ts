@@ -41,12 +41,14 @@ declare module "buffer" {
      * ```
      */
     function btoa(input: string): string;
-    /**
-     * Returns boolean based on whether the input contains only valid ASCII-encoded data.
-     *
-     * @throws TypeError If the input is detached.
-     * @param input The input to check.
-     */
-    function isAscii(input: Buffer | ArrayBuffer | TypedArray): boolean;
   }
+  /**
+   * Returns boolean based on whether the input contains only valid ASCII-encoded data.
+   *
+   * @throws TypeError If the input is detached.
+   * @param input The input to check.
+   */
+  function isAscii(input: Buffer | ArrayBuffer | TypedArray): boolean;
+
+  export { TypedArray, atob, btoa, isAscii };
 }

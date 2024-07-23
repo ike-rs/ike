@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 use boa_engine::{
     job::NativeJob, js_string, module::ModuleLoader, Context, JsNativeError, JsResult, JsString,
@@ -15,6 +18,15 @@ use crate::fs::normalize_path;
 pub struct IkeModuleLoader;
 
 const ALLOWED_EXTENSIONS: [&str; 5] = ["js", "mjs", "ts", "mts", "cjs"];
+
+lazy_static::lazy_static! {
+    static ref BUILTIN_MODULES: HashMap<&'static str, String> = {
+        let mut m = HashMap::new();
+        m.insert("util", include_str!("js/util.ts").to_string());
+        m.insert("buffer", include_str!("js/buffer.ts").to_string());
+        m
+    };
+}
 
 impl ModuleLoader for IkeModuleLoader {
     fn load_imported_module(
@@ -65,6 +77,12 @@ impl ModuleLoader for IkeModuleLoader {
             context
                 .job_queue()
                 .enqueue_future_job(Box::pin(fetch), context)
+        } else if is_builtin_module(&spec) {
+            let stripped_spec = strip_spec(&spec);
+            let source = Source::from_bytes(BUILTIN_MODULES.get(stripped_spec).unwrap().as_bytes());
+            let module = Module::parse(source, None, context);
+
+            finish_load(module, context);
         } else {
             let meta_path = context
                 .global_object()
@@ -155,4 +173,23 @@ impl ModuleLoader for IkeModuleLoader {
 
 pub fn is_fetchable(specifier: &str) -> bool {
     specifier.starts_with("http://") || specifier.starts_with("https://")
+}
+
+pub fn strip_spec(specifier: &str) -> &str {
+    let name = if let Some(stripped) = specifier.strip_prefix("node:") {
+        stripped
+    } else if let Some(stripped) = specifier.strip_prefix("ike:") {
+        stripped
+    } else {
+        specifier
+    };
+
+    name
+}
+
+// This also supports node:util and ike:util
+pub fn is_builtin_module(specifier: &str) -> bool {
+    let name = strip_spec(specifier);
+
+    BUILTIN_MODULES.contains_key(name)
 }
