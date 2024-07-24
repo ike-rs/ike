@@ -12,18 +12,20 @@ use isahc::{
     AsyncReadResponseExt, Request, RequestExt,
 };
 
-use crate::fs::normalize_path;
+use crate::{
+    fs::{is_file, normalize_path},
+    globals::ALLOWED_EXTENSIONS,
+};
 
 #[derive(Debug, Default)]
 pub struct IkeModuleLoader;
-
-const ALLOWED_EXTENSIONS: [&str; 5] = ["js", "mjs", "ts", "mts", "cjs"];
 
 lazy_static::lazy_static! {
     static ref BUILTIN_MODULES: HashMap<&'static str, String> = {
         let mut m = HashMap::new();
         m.insert("util", include_str!("js/util.ts").to_string());
         m.insert("buffer", include_str!("js/buffer.ts").to_string());
+        m.insert("test", include_str!("js/test.ts").to_string());
         m
     };
 }
@@ -84,89 +86,99 @@ impl ModuleLoader for IkeModuleLoader {
 
             finish_load(module, context);
         } else {
-            let meta_path = context
-                .global_object()
-                .get(js_string!("Ike"), context)
-                .unwrap()
-                .to_object(context)
-                .unwrap()
-                .get(js_string!("meta"), context)
-                .unwrap()
-                .to_object(context)
-                .unwrap()
-                .get(js_string!("path"), context)
-                .unwrap()
-                .to_string(context)
-                .unwrap()
-                .to_std_string_escaped();
+            if is_file(&spec) {
+                let path = Path::new(&spec);
 
-            let temp_path = PathBuf::from(meta_path);
-            let current_ext = temp_path.extension().unwrap().to_str().unwrap();
+                if path.is_absolute() {
+                    let module = Module::parse(Source::from_filepath(path).unwrap(), None, context);
 
-            let mut path = PathBuf::from(temp_path.parent().unwrap());
+                    finish_load(module, context);
+                } else {
+                    let meta_path = context
+                        .global_object()
+                        .get(js_string!("Ike"), context)
+                        .unwrap()
+                        .to_object(context)
+                        .unwrap()
+                        .get(js_string!("meta"), context)
+                        .unwrap()
+                        .to_object(context)
+                        .unwrap()
+                        .get(js_string!("path"), context)
+                        .unwrap()
+                        .to_string(context)
+                        .unwrap()
+                        .to_std_string_escaped();
 
-            if path.extension().is_none() {
-                // Look for all files with the basename of spec
-                let files = std::fs::read_dir(&path).unwrap();
-                let spec_path = PathBuf::from(spec.as_str());
-                let candidates: Vec<PathBuf> = files
-                    .filter_map(|entry| entry.ok())
-                    .map(|entry| entry.path())
-                    .filter(|file_path| {
-                        file_path.is_file()
-                            && file_path.file_stem() == spec_path.file_stem()
-                            && ALLOWED_EXTENSIONS
-                                .contains(&file_path.extension().unwrap().to_str().unwrap())
-                    })
-                    .collect();
+                    let temp_path = PathBuf::from(meta_path);
+                    let current_ext = temp_path.extension().unwrap().to_str().unwrap();
 
-                if candidates.is_empty() {
-                    finish_load(
-                        Err(JsNativeError::typ()
-                            .with_message(format!("Module not found: {}", spec))
-                            .into()),
+                    let mut path = PathBuf::from(temp_path.parent().unwrap());
+
+                    if path.extension().is_none() {
+                        // Look for all files with the basename of spec
+                        let files = std::fs::read_dir(&path).unwrap();
+                        let spec_path = PathBuf::from(spec.as_str());
+                        let candidates: Vec<PathBuf> = files
+                            .filter_map(|entry| entry.ok())
+                            .map(|entry| entry.path())
+                            .filter(|file_path| {
+                                file_path.is_file()
+                                    && file_path.file_stem() == spec_path.file_stem()
+                                    && ALLOWED_EXTENSIONS
+                                        .contains(&file_path.extension().unwrap().to_str().unwrap())
+                            })
+                            .collect();
+
+                        if candidates.is_empty() {
+                            finish_load(
+                                Err(JsNativeError::typ()
+                                    .with_message(format!("Module not found: {}", spec))
+                                    .into()),
+                                context,
+                            );
+
+                            return;
+                        }
+
+                        // Check if there is only one candidate or one with the same extension.
+                        if candidates.len() == 1 {
+                            path = candidates[0].clone();
+                        } else {
+                            path = candidates
+                                .iter()
+                                .find(|candidate| {
+                                    candidate.extension().unwrap().to_str().unwrap() == current_ext
+                                })
+                                .unwrap_or(&candidates[0])
+                                .clone();
+                        }
+                    } else {
+                        path = normalize_path(PathBuf::from(spec.clone()), path);
+                    }
+
+                    if !path.exists() {
+                        finish_load(
+                            Err(JsNativeError::typ()
+                                .with_message(format!("Module not found: {}", spec))
+                                .into()),
+                            context,
+                        );
+
+                        return;
+                    }
+
+                    // TODO: should we update the meta current file?
+                    // TODO: also strip typescript specific syntax
+                    let module = Module::parse(
+                        Source::from_filepath(path.as_path()).unwrap(),
+                        None,
                         context,
                     );
 
-                    return;
+                    finish_load(module, context);
                 }
-
-                // Check if there is only one candidate or one with the same extension.
-                if candidates.len() == 1 {
-                    path = candidates[0].clone();
-                } else {
-                    path = candidates
-                        .iter()
-                        .find(|candidate| {
-                            candidate.extension().unwrap().to_str().unwrap() == current_ext
-                        })
-                        .unwrap_or(&candidates[0])
-                        .clone();
-                }
-            } else {
-                path = normalize_path(PathBuf::from(spec.clone()), path);
             }
-
-            if !path.exists() {
-                finish_load(
-                    Err(JsNativeError::typ()
-                        .with_message(format!("Module not found: {}", spec))
-                        .into()),
-                    context,
-                );
-
-                return;
-            }
-
-            // TODO: should we update the meta current file?
-            // TODO: also strip typescript specific syntax
-            let module = Module::parse(
-                Source::from_filepath(path.as_path()).unwrap(),
-                None,
-                context,
-            );
-
-            finish_load(module, context);
         }
     }
 }

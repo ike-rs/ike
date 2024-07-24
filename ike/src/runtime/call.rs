@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
-use crate::{assert_arg_type, str_from_jsvalue, throw};
+use crate::{assert_arg_type, runtime::buffer::is_utf8, str_from_jsvalue, throw};
 
 use super::buffer::{atob, btoa, is_ascii_string};
+use crate::testing::js::describe;
 use boa_engine::{
     js_string, object::FunctionObjectBuilder, Context, JsNativeError, JsValue, NativeFunction,
 };
@@ -20,6 +21,10 @@ pub fn rust_function(
         });
         m.insert("atob", unsafe { NativeFunction::from_closure(atob) });
         m.insert("btoa", unsafe { NativeFunction::from_closure(btoa) });
+        m.insert("isUtf8", unsafe { NativeFunction::from_closure(is_utf8) });
+        m.insert("describe", unsafe {
+            NativeFunction::from_closure(describe)
+        });
         m
     };
     if args.is_empty() {

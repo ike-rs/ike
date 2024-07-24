@@ -6,7 +6,11 @@ use clap::{Arg, ArgAction, Command, Parser, Subcommand};
 
 use crate::{fs::normalize_path, resolver::package_json::PackageManager};
 
-use super::{run_command::run_command, style};
+use super::{
+    run_command::run_command,
+    style,
+    test_command::{self, test_command},
+};
 
 #[derive(Clone, Debug)]
 pub struct Cli {
@@ -41,20 +45,34 @@ impl Cli {
             .author(env!("CARGO_PKG_AUTHORS"))
             .about("Simple JavaScript runtime")
             .subcommand(
-                Command::new("run").about("Run a JavaScript file").args([
-                    Arg::new("entry")
+                Command::new("run")
+                    .about("Run a JavaScript file")
+                    .args([Arg::new("entry")
                         .help("name of the script.")
                         .required(false)
-                        .num_args(1),
-                    Arg::new("root_folder")
-                        .short('r')
-                        .long("root")
-                        .help("Root directory of the project"),
-                ]),
+                        .num_args(1)])
+                    .args(Self::global_args()),
+            )
+            .subcommand(
+                Command::new("test")
+                    .about("Run tests")
+                    .args([Arg::new("pattern")
+                        .help("Pattern to match test files")
+                        .required(false)
+                        .short('p')
+                        .long("pattern")])
+                    .args(Self::global_args()),
             )
             .next_display_order(800)
             .allow_external_subcommands(true)
             .styles(styles)
+    }
+
+    pub fn global_args() -> Vec<Arg> {
+        vec![Arg::new("root_folder")
+            .short('r')
+            .long("root")
+            .help("Root directory of the project")]
     }
 
     pub fn set_root(mut self, root: PathBuf) -> Self {
@@ -67,20 +85,31 @@ impl Cli {
         self
     }
 
+    pub fn parse_root(&self, matches: &clap::ArgMatches) -> PathBuf {
+        let mut root = matches
+            .get_one::<String>("root_folder")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| std::env::current_dir().unwrap());
+        root = normalize_path(root, std::env::current_dir().unwrap());
+
+        root
+    }
+
     pub async fn run(self) -> Result<()> {
         let matches = Self::construct_cli().get_matches();
 
         match matches.subcommand() {
             Some(("run", sub_matches)) => {
-                let mut root = sub_matches
-                    .get_one::<String>("root_folder")
-                    .map(PathBuf::from)
-                    .unwrap_or_else(|| std::env::current_dir().unwrap());
-                root = normalize_path(root, std::env::current_dir().unwrap());
-
+                let root = self.parse_root(sub_matches);
                 let pkg = PackageManager::find_nearest_from(root.clone());
 
                 run_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?
+            }
+            Some(("test", sub_matches)) => {
+                let root = self.parse_root(sub_matches);
+                let pkg = PackageManager::find_nearest_from(root.clone());
+
+                test_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?
             }
             _ => {}
         };

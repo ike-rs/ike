@@ -61,6 +61,14 @@ macro_rules! assert_arg_type {
             throw!(typ, format!("Expected a string, got {:?}", $arg.get_type()));
         }
     };
+    (function, $arg:expr) => {
+        if !$arg.is_callable() {
+            throw!(
+                typ,
+                format!("Expected a function, got {:?}", $arg.get_type())
+            );
+        }
+    };
 }
 
 #[macro_export]

@@ -16,16 +16,13 @@ pub fn run_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
     if entry.is_file {
         // TODO: strip typescript specific syntax and execute the file
 
-        // Spawn a new thread so tokio doesn't complain about nested runtimes
-        thread::spawn(move || match start_runtime(entry.path.as_ref().unwrap()) {
+        match start_runtime(entry.path.as_ref().unwrap(), None) {
             Ok(_) => {}
             Err(e) => {
                 elog!(error, "{}", e);
                 std::process::exit(1);
             }
-        })
-        .join()
-        .expect("Thread panicked");
+        }
     } else {
         // TODO: Implement execution of a script and global packages
     }

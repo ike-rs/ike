@@ -235,6 +235,13 @@ macro_rules! print_indent {
     };
 }
 
+#[macro_export]
+macro_rules! new_line {
+    () => {
+        println!();
+    };
+}
+
 #[derive(Debug)]
 pub struct ErrorMessage {
     pub message: String,

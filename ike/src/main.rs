@@ -1,9 +1,11 @@
 pub mod cli;
 pub mod fs;
+pub mod globals;
 pub mod macros;
 pub mod panic_handler;
 pub mod resolver;
 pub mod runtime;
+pub mod testing;
 
 use anyhow::Result;
 use cli::cli::Cli;

@@ -2,7 +2,7 @@ use base64::prelude::*;
 use boa_engine::{
     js_string, object::builtins::JsArrayBuffer, Context, JsNativeError, JsResult, JsString, JsValue,
 };
-use simdutf::validate_ascii;
+use simdutf::{validate_ascii, validate_utf8};
 
 use crate::{assert_arg_type, str_from_jsvalue, throw};
 
@@ -42,7 +42,7 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
     let obj = args.get(0).unwrap().as_object().unwrap();
     let len = obj
         .get(js_string!("byteLength"), ctx)
-        .unwrap()
+        .expect("Expected ArrayBuffer, TypedArray or Buffer")
         .to_uint8(ctx)
         .unwrap();
     let data_block: Vec<u8> = (0..len).collect();
@@ -58,6 +58,35 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
             }
 
             return Ok(JsValue::Boolean(validate_ascii(data)));
+        }
+        None => throw!(typ, "ArrayBuffer is detached"),
+    }
+}
+
+pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    if args.is_empty() {
+        throw!(err, "Expected an argument in isUtf8");
+    }
+
+    let obj = args.get(0).unwrap().as_object().unwrap();
+    let len = obj
+        .get(js_string!("byteLength"), ctx)
+        .expect("Expected ArrayBuffer, TypedArray or Buffer")
+        .to_uint8(ctx)
+        .unwrap();
+    let data_block: Vec<u8> = (0..len).collect();
+
+    let array_buffer = JsArrayBuffer::from_byte_block(data_block, ctx)?;
+    let buf = array_buffer.data();
+    let deref = buf.as_deref();
+
+    match deref {
+        Some(data) => {
+            if data.is_empty() {
+                return Ok(JsValue::Boolean(true));
+            }
+
+            return Ok(JsValue::Boolean(validate_utf8(data)));
         }
         None => throw!(typ, "ArrayBuffer is detached"),
     }

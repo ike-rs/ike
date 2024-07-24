@@ -1,4 +1,5 @@
 use anyhow::{format_err, Result};
+use logger::{elog, Logger};
 use regex::Regex;
 use std::{
     fs::{self, File},
@@ -66,7 +67,19 @@ pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> PathBuf {
         path = root.join(path);
     }
 
-    path = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+    path = match path.canonicalize() {
+        Ok(path) => path,
+        Err(err) => match err.kind() {
+            ErrorKind::NotFound => {
+                elog!(error, "Path not found: {:?}", path);
+                std::process::exit(1);
+            }
+            _ => {
+                elog!(error, "Error opening file: {:?}", err);
+                std::process::exit(1);
+            }
+        },
+    };
     let root_str = path.to_str().unwrap_or("");
     // On windows, paths can be prefixed with \\?\ to allow longer paths, we need to remove this prefix
     let normalized_root_str = if root_str.starts_with(r"\\?\") {
@@ -75,6 +88,7 @@ pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> PathBuf {
         root_str
     };
     path = PathBuf::from(normalized_root_str);
+    println!("{:?}", path);
 
     path
 }

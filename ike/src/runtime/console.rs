@@ -106,6 +106,7 @@ impl Console {
             }
             // TODO: better handling. array, object, map, set support
             JsValue::Object(obj) => {
+                println!("{:?}", obj.own_property_keys(ctx));
                 let proto = match obj.prototype() {
                     Some(proto) => proto,
                     None => {
