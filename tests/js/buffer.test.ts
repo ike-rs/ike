@@ -11,5 +11,3 @@ describe("Buffer", () => {
 });
 
 it("should create", () => {});
-
-console.log("dw");

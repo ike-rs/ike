@@ -206,22 +206,23 @@ macro_rules! elog {
 
 #[macro_export]
 macro_rules! cond_log {
-    ($cond:expr, wt, $($arg:tt)*) => {
+    ($cond:expr, $wt:expr, $($arg:tt)*) => {
         if $cond {
             let logger = Logger::new(true);
-            logger.log_without_newline(&format!($($arg)*));
+
+            if $wt {
+                logger.log(&format!($($arg)*));
+            } else {
+                logger.log_without_newline(&format!($($arg)*));
+            }
         } else {
             let logger = Logger::new(false);
-            logger.log_without_newline(&format!($($arg)*));
-        }
-    };
-    ($cond:expr, $($arg:tt)*) => {
-        if $cond {
-            let logger = Logger::new(true);
-            logger.log(&format!($($arg)*));
-        } else {
-            let logger = Logger::new(false);
-            logger.log(&format!($($arg)*));
+
+            if $wt {
+                logger.log(&format!($($arg)*));
+            } else {
+                logger.log_without_newline(&format!($($arg)*));
+            }
         }
     };
 }
