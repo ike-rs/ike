@@ -44,7 +44,22 @@ pub fn describe(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Js
 
     let group_obj = JsObject::default();
     group_obj.set(js_string!("name"), name.clone(), false, ctx)?;
+    let current_path = ctx
+        .global_object()
+        .get(js_string!("Ike"), ctx)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get(js_string!("meta"), ctx)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get(js_string!("path"), ctx)
+        .unwrap()
+        .to_string(ctx)
+        .unwrap();
     group_obj.set(js_string!("tests"), JsArray::new(ctx), false, ctx)?;
+    group_obj.set(js_string!("path"), current_path, false, ctx)?;
 
     groups.push(group_obj, ctx)?;
 

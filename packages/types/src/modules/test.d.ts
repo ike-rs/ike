@@ -15,7 +15,18 @@ declare module "test" {
     type InternalDescribeGroup = {
       name: string;
       tests: IkeInternalTest[];
+      path: string;
     };
+
+    /**
+     * Test status.
+     */
+    enum TestStatus {
+      Pass,
+      Fail,
+      Todo,
+      Skip,
+    }
 
     /**
      * Describes a test.

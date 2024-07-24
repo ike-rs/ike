@@ -189,7 +189,7 @@ impl Console {
                     }
 
                     cond_log!(error, new_line, "<r><green>Map({})<r> {{", size);
-                    let entries = map.entries(ctx).unwrap();
+                    let _ = map.entries(ctx).unwrap();
 
                     cond_log!(error, new_line, "<r>}}<r>");
                 } else {
@@ -248,7 +248,7 @@ impl Console {
         }
 
         Self::print_indent(console);
-        log!(wt, "<r>}}<r>");
+        log!(wt, "<r>}}<r>\n");
     }
 
     fn print_comma() {

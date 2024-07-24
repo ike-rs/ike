@@ -22,7 +22,9 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+
+    "outDir": "ike/src/runtime/js"
   },
   "include": ["ike/src/**/*", "packages/types/src/index.d.ts", "tests/**/*"],
 }

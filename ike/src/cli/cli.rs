@@ -1,16 +1,12 @@
-use std::{fs, path::PathBuf};
+use std::path::PathBuf;
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
-use clap::{Arg, ArgAction, Command, Parser, Subcommand};
+use clap::{Arg, Command};
 
 use crate::{fs::normalize_path, resolver::package_json::PackageManager};
 
-use super::{
-    run_command::run_command,
-    style,
-    test_command::{self, test_command},
-};
+use super::{run_command::run_command, style, test_command::test_command};
 
 #[derive(Clone, Debug)]
 pub struct Cli {

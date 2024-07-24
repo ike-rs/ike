@@ -2,11 +2,15 @@ import { describe, it } from "test";
 
 describe("Buffer", () => {
   it("should create", () => {
-    console.log("Buffer");
+    throw new Error("Not implemented");
   });
 
-  it("should create", () => {
-    console.log("Buffer");
+  it("should create", () => {});
+});
+
+describe("Blob", () => {
+  it.todo("should create", () => {
+    throw new Error("Not implemented");
   });
 });
 

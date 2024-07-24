@@ -1,4 +1,5 @@
 pub mod cli;
+pub mod format;
 pub mod fs;
 pub mod globals;
 pub mod macros;

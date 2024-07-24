@@ -88,7 +88,6 @@ pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> PathBuf {
         root_str
     };
     path = PathBuf::from(normalized_root_str);
-    println!("{:?}", path);
 
     path
 }

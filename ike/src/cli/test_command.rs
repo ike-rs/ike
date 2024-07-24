@@ -15,7 +15,7 @@ pub fn test_command(cli: Cli, _: &clap::ArgMatches) -> Result<()> {
 
     log!(info, "<cyan>{}<r> <d>{}<r>", VERSION, root.display());
 
-    let glob_result = Scanner::scan(root)?;
+    let glob_result = Scanner::scan(root.clone())?;
 
     if glob_result.is_empty() {
         new_line!();
@@ -24,8 +24,9 @@ pub fn test_command(cli: Cli, _: &clap::ArgMatches) -> Result<()> {
             "no test files found. files should have _spec, .spec, _test, .test in thier filename"
         );
     }
+    new_line!();
 
-    run_tests(glob_result).unwrap();
+    run_tests(glob_result, root).unwrap();
 
     Ok(())
 }
