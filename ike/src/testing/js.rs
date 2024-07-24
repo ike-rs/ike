@@ -2,10 +2,10 @@ use boa_engine::{
     js_string,
     object::builtins::{JsArray, JsFunction},
     property::Attribute,
-    Context, JsNativeError, JsObject, JsResult, JsValue, NativeFunction,
+    Context, JsNativeError, JsObject, JsResult, JsValue,
 };
 
-use crate::{assert_arg_type, str_from_jsvalue, throw};
+use crate::{assert_arg_type, throw};
 
 pub struct JsTest;
 
@@ -108,7 +108,6 @@ pub fn test_it(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
         .global_object()
         .get(js_string!("IKE_INTERNAL_DESCRIBE"), ctx)
         .unwrap();
-    println!("last_describe_name: {:?}", last_describe_name);
 
     if last_describe_name.is_undefined() {
         let alone_tests = obj.get(js_string!("alone"), ctx)?;
@@ -120,11 +119,8 @@ pub fn test_it(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
     } else {
         let group = groups.get(groups.length(ctx)? - 1, ctx)?;
         let tests_val = group.as_object().unwrap().get(js_string!("tests"), ctx)?;
-        println!("tests_val: {:?}", tests_val);
         let tests_obj = tests_val.as_object().unwrap();
-        println!("tests_obj: {:?}", tests_obj);
         let tests = JsArray::from_object(tests_obj.clone()).expect("tests is not an array");
-        println!("tests: {:?}", tests);
 
         tests.push(test_obj, ctx)?;
         group
