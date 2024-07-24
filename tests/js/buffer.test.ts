@@ -1,7 +1,15 @@
-import { describe } from "test";
+import { describe, it } from "test";
 
-await describe("Buffer", () => {
-  console.log("from");
+describe("Buffer", () => {
+  it("should create", () => {
+    console.log("Buffer");
+  });
+
+  it("should create", () => {
+    console.log("Buffer");
+  });
 });
+
+it("should create", () => {});
 
 console.log("dw");
