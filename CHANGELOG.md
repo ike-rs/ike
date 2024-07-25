@@ -1,4 +1,11 @@
-## [0.1.1](https://github.com/malezjaa/ike/compare/v0.1.0..0.1.1) - 2024-07-25
+## [0.1.2](https://github.com/malezjaa/ike/compare/v0.1.1..0.1.2) - 2024-07-25
+
+### ⚙️ Miscellaneous Tasks
+
+- Maybe works - ([0fbf8f7](https://github.com/malezjaa/ike/commit/0fbf8f7cc752dbf8d534af5549a57115d5e5c880))
+- Fix file - ([4bb405e](https://github.com/malezjaa/ike/commit/4bb405e2998654cd205eed6ad96cd0c3adc4f7d7))
+
+## [0.1.1](https://github.com/malezjaa/ike/compare/v0.1.0..v0.1.1) - 2024-07-25
 
 ### ⚙️ Miscellaneous Tasks
 
