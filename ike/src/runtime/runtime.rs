@@ -153,3 +153,17 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
         }
     }
 }
+
+pub fn get_current_path(ctx: &mut Context) -> JsValue {
+    ctx.global_object()
+        .get(js_string!("Ike"), ctx)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get(js_string!("meta"), ctx)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get(js_string!("path"), ctx)
+        .unwrap()
+}

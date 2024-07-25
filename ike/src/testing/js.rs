@@ -5,7 +5,7 @@ use boa_engine::{
     Context, JsNativeError, JsObject, JsResult, JsValue,
 };
 
-use crate::{assert_arg_type, throw};
+use crate::{assert_arg_type, runtime::runtime::get_current_path, throw};
 
 pub struct JsTest;
 
@@ -44,21 +44,8 @@ pub fn describe(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Js
 
     let group_obj = JsObject::default();
     group_obj.set(js_string!("name"), name.clone(), false, ctx)?;
-    let current_path = ctx
-        .global_object()
-        .get(js_string!("Ike"), ctx)
-        .unwrap()
-        .as_object()
-        .unwrap()
-        .get(js_string!("meta"), ctx)
-        .unwrap()
-        .as_object()
-        .unwrap()
-        .get(js_string!("path"), ctx)
-        .unwrap()
-        .to_string(ctx)
-        .unwrap();
     group_obj.set(js_string!("tests"), JsArray::new(ctx), false, ctx)?;
+    let current_path = get_current_path(ctx);
     group_obj.set(js_string!("path"), current_path, false, ctx)?;
 
     groups.push(group_obj, ctx)?;
@@ -114,6 +101,8 @@ pub fn test_it(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
     let test_obj = JsObject::default();
     test_obj.set(js_string!("name"), name.clone(), false, ctx)?;
     test_obj.set(js_string!("func"), func.clone(), false, ctx)?;
+    let current_path = get_current_path(ctx);
+    test_obj.set(js_string!("path"), current_path, false, ctx)?;
 
     let groups_temp = obj.get(js_string!("groups"), ctx)?;
     let groups_val = groups_temp.as_object().unwrap();

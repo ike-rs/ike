@@ -73,6 +73,7 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let start_time = Instant::now();
     let mut results = TestResults::new();
     let mut test_groups_by_file: HashMap<String, Vec<JsValue>> = HashMap::new();
+    let mut alone_tests_by_file: HashMap<String, Vec<JsValue>> = HashMap::new();
 
     for path in paths {
         let entry = Entry::new(true, Some(path.clone()), None);
@@ -120,8 +121,11 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
         .as_object()
         .expect("IKE_INTERNAL_TEST is not an object");
     let groups_val = obj.get(js_string!("groups"), ctx).unwrap();
+    let alone_val = obj.get(js_string!("alone"), ctx).unwrap();
     let groups_obj = groups_val.as_object().unwrap();
+    let alone_obj = alone_val.as_object().unwrap();
     let groups = JsArray::from_object(groups_obj.clone())?;
+    let alone = JsArray::from_object(alone_obj.clone())?;
 
     for i in 0..groups.length(ctx)? {
         let test_val = groups.get(i, ctx)?;
@@ -135,28 +139,65 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
             .push(test_val);
     }
 
+    for i in 0..alone.length(ctx)? {
+        let test_val = alone.get(i, ctx)?;
+        let test_obj = test_val.as_object().unwrap();
+        let test_path = test_obj.get(js_string!("path"), ctx).unwrap();
+        let path_str = test_path.to_string(ctx).unwrap().to_std_string_escaped();
+
+        alone_tests_by_file
+            .entry(path_str)
+            .or_insert_with(Vec::new)
+            .push(test_val);
+    }
+
+    let mut tests_by_files: HashMap<String, HashMap<String, Vec<JsValue>>> = HashMap::new();
+
+    for (path_str, alone_tests) in alone_tests_by_file {
+        tests_by_files
+            .entry(path_str.clone())
+            .or_insert_with(HashMap::new)
+            .insert("alone".to_string(), alone_tests);
+    }
+
     for (path_str, test_groups) in test_groups_by_file {
+        tests_by_files
+            .entry(path_str.clone())
+            .or_insert_with(HashMap::new)
+            .insert("groups".to_string(), test_groups);
+    }
+
+    for (path_str, tests) in tests_by_files {
         let path = strip_prefix_from_path(root.clone(), PathBuf::from(path_str.clone()));
         log!("{} <r><d>{}<r>", ICONS["skip"], path.display());
 
-        for test_val in test_groups {
-            let test_group = test_val.as_object().unwrap();
-            let name = test_group.get(js_string!("name"), ctx).unwrap();
-            let tests_val = test_group.get(js_string!("tests"), ctx).unwrap();
-            let tests_obj = tests_val.as_object().unwrap();
-            let tests = JsArray::from_object(tests_obj.clone())?;
+        for (group_name, test_group) in tests {
+            if group_name.eq("alone") {
+                for test_val in test_group {
+                    results.tests += 1;
+                    run_single_test(test_val, ctx, &mut results, 1);
+                }
+            } else {
+                for test_val in test_group {
+                    let test_group = test_val.as_object().unwrap();
+                    let name = test_group.get(js_string!("name"), ctx).unwrap();
+                    let tests_val = test_group.get(js_string!("tests"), ctx).unwrap();
+                    let tests_obj = tests_val.as_object().unwrap();
+                    let tests = JsArray::from_object(tests_obj.clone())?;
 
-            print_indent!(1);
-            log!(
-                "{} <r><d>{}<r>",
-                ICONS["skip"],
-                name.to_string(ctx).unwrap().to_std_string_escaped()
-            );
+                    print_indent!(1);
+                    log!(
+                        "{} <r><d>{}<r>",
+                        ICONS["skip"],
+                        name.to_string(ctx).unwrap().to_std_string_escaped()
+                    );
 
-            for j in 0..tests.length(ctx)? {
-                let single_test = tests.get(j, ctx)?;
-                results.tests += 1;
-                run_single_test(single_test, ctx, &mut results);
+                    for j in 0..tests.length(ctx)? {
+                        let single_test = tests.get(j, ctx)?;
+                        results.tests += 1;
+                        run_single_test(single_test, ctx, &mut results, 2);
+                    }
+                }
             }
         }
         new_line!();
@@ -210,7 +251,7 @@ pub fn strip_prefix_from_path(mut root: PathBuf, mut path: PathBuf) -> PathBuf {
     path.strip_prefix(&root).unwrap().to_path_buf()
 }
 
-pub fn run_single_test(test: JsValue, ctx: &mut Context, results: &mut TestResults) {
+pub fn run_single_test(test: JsValue, ctx: &mut Context, results: &mut TestResults, indent: usize) {
     let test_obj = test.as_object().unwrap();
     let name = test_obj.get(js_string!("name"), ctx).unwrap();
     let func_obj = test_obj.get(js_string!("func"), ctx).unwrap();
@@ -227,7 +268,7 @@ pub fn run_single_test(test: JsValue, ctx: &mut Context, results: &mut TestResul
     let duration = start.elapsed();
     let formatted_time = format_time(duration, true);
 
-    print_indent!(2);
+    print_indent!(indent);
     match status.as_str() {
         "pass" => {
             results.pass += 1;
