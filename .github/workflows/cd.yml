@@ -170,7 +170,7 @@ jobs:
         tar -czvf ike-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz \
           ike-${{ env.RELEASE_VERSION }}/
         shasum -a 512 ike-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz \
-          > ike-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz.sha512
+           ike-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz.sha512
           fi
       - name: Sign the release
         if: matrix.build.OS == 'ubuntu-22.04' || matrix.build.OS == 'macos-14'

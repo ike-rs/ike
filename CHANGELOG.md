@@ -1,7 +1,10 @@
-## [0.1.0](https://github.com/malezjaa/ike/compare/v0.1.0..0.1.0) - 2024-07-25
+## [0.1.1](https://github.com/malezjaa/ike/compare/v0.1.0..0.1.1) - 2024-07-25
 
 ### ⚙️ Miscellaneous Tasks
 
+- Change assets name - ([a75d1f3](https://github.com/malezjaa/ike/commit/a75d1f31f667aa6483807cbbb351df690a172149))
+- Fix ci - ([53aa6ee](https://github.com/malezjaa/ike/commit/53aa6ee89f9149249e1c5237fdb17c6c7448dd88))
+- Release 0.1.0 - ([48a0761](https://github.com/malezjaa/ike/commit/48a0761a28e5b843373a960270d6ce6ae1384534))
 - Test - ([3000891](https://github.com/malezjaa/ike/commit/30008919826ec3a898ddc6fcd6b10945d262a0f7))
 
 ## [0.1.0] - 2024-07-25
