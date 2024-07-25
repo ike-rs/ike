@@ -1,8 +1,31 @@
+## [0.1.1](https://github.com/malezjaa/ike/compare/v0.1.2..0.1.1) - 2024-07-25
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix - ([fc3d3bb](https://github.com/malezjaa/ike/commit/fc3d3bb6e1dcaefaecda4de9d775efa9b26f1843))
+- Release 0.1.2 - ([c61554e](https://github.com/malezjaa/ike/commit/c61554e64da86f9339f23c9852d475946cef9463))
+
+## [0.1.2](https://github.com/malezjaa/ike/compare/v0.1.1..v0.1.2) - 2024-07-25
+
+### ⚙️ Miscellaneous Tasks
+
+- Maybe works - ([0fbf8f7](https://github.com/malezjaa/ike/commit/0fbf8f7cc752dbf8d534af5549a57115d5e5c880))
+- Fix file - ([4bb405e](https://github.com/malezjaa/ike/commit/4bb405e2998654cd205eed6ad96cd0c3adc4f7d7))
+
+## [0.1.1](https://github.com/malezjaa/ike/compare/v0.1.0..v0.1.1) - 2024-07-25
+
+### ⚙️ Miscellaneous Tasks
+
+- Change assets name - ([a75d1f3](https://github.com/malezjaa/ike/commit/a75d1f31f667aa6483807cbbb351df690a172149))
+- Fix ci - ([53aa6ee](https://github.com/malezjaa/ike/commit/53aa6ee89f9149249e1c5237fdb17c6c7448dd88))
+- Release 0.1.0 - ([48a0761](https://github.com/malezjaa/ike/commit/48a0761a28e5b843373a960270d6ce6ae1384534))
+- Test - ([3000891](https://github.com/malezjaa/ike/commit/30008919826ec3a898ddc6fcd6b10945d262a0f7))
+
 ## [0.1.0] - 2024-07-25
 
 ### ⚙️ Miscellaneous Tasks
 
-- _(release)_ V0.1.0 - ([64ec140](https://github.com/malezjaa/ike/commit/64ec140cee428b543516669ec34d745aa74e5642))
+- *(release)* V0.1.0 - ([64ec140](https://github.com/malezjaa/ike/commit/64ec140cee428b543516669ec34d745aa74e5642))
 - Ci file from orhun/git-cliff - ([fc6ec12](https://github.com/malezjaa/ike/commit/fc6ec12b12f4aa9e555e353fc4d2068846d1edf3))
 - Remove more dead code - ([466f2f7](https://github.com/malezjaa/ike/commit/466f2f7061b9c340b9f1b4634ad716d443c51c45))
 - Remove old code - ([71ff98e](https://github.com/malezjaa/ike/commit/71ff98e4cd2d1acc29b6a226f73cc13ca8bb19a5))
