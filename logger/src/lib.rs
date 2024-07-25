@@ -24,53 +24,57 @@ lazy_static::lazy_static! {
 
 pub fn pretty_fmt(fmt_str: &str) -> String {
     let mut new_fmt = String::new();
-    let mut i = 0;
+    let mut chars = fmt_str.chars().peekable();
 
-    let fmt_str_bytes = fmt_str.as_bytes();
-
-    while i < fmt_str_bytes.len() {
-        let c = fmt_str_bytes[i] as char;
+    while let Some(c) = chars.next() {
         match c {
             '\\' => {
-                i += 1;
-                if i < fmt_str_bytes.len() {
-                    if fmt_str_bytes[i] as char == '<' || fmt_str_bytes[i] as char == '>' {
-                        new_fmt.push(fmt_str_bytes[i] as char);
-                        i += 1;
+                if let Some(&next_char) = chars.peek() {
+                    if next_char == '<' || next_char == '>' {
+                        new_fmt.push(chars.next().unwrap());
                     } else {
                         new_fmt.push('\\');
-                        new_fmt.push(fmt_str_bytes[i] as char);
-                        i += 1;
+                        new_fmt.push(chars.next().unwrap());
                     }
                 }
             }
             '>' => {
-                i += 1;
+                // Skip '>'
             }
             '{' => {
-                while i < fmt_str_bytes.len() && fmt_str_bytes[i] as char != '}' {
-                    new_fmt.push(fmt_str_bytes[i] as char);
-                    i += 1;
+                new_fmt.push('{');
+                while let Some(next_char) = chars.next() {
+                    new_fmt.push(next_char);
+                    if next_char == '}' {
+                        break;
+                    }
                 }
             }
             '<' => {
-                i += 1;
-                let is_reset = fmt_str_bytes[i] as char == '/';
+                let is_reset = chars.peek() == Some(&'/');
                 if is_reset {
-                    i += 1;
+                    chars.next(); // Skip '/'
                 }
-                let start = i;
-                while i < fmt_str_bytes.len() && fmt_str_bytes[i] as char != '>' {
-                    i += 1;
-                }
-                let color_name = &fmt_str[start..i];
-                let color_str = COLOR_MAP.get(color_name).cloned().unwrap_or_else(|| {
-                    if color_name == "r" {
-                        RESET.to_string()
-                    } else {
-                        format!("<{}>", color_name)
+
+                let mut color_name = String::new();
+                while let Some(&next_char) = chars.peek() {
+                    if next_char == '>' {
+                        break;
                     }
-                });
+                    color_name.push(chars.next().unwrap());
+                }
+                chars.next(); // Skip '>'
+
+                let color_str = COLOR_MAP
+                    .get(color_name.as_str())
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        if color_name == "r" {
+                            RESET.to_string()
+                        } else {
+                            format!("<{}>", color_name)
+                        }
+                    });
 
                 if is_reset {
                     new_fmt.push_str(RESET);
@@ -79,15 +83,13 @@ pub fn pretty_fmt(fmt_str: &str) -> String {
                 }
             }
             _ => {
-                new_fmt.push(fmt_str_bytes[i] as char);
-                i += 1;
+                new_fmt.push(c);
             }
         }
     }
 
     new_fmt
 }
-
 pub struct Logger {
     pub print_to_error: bool,
 }
@@ -206,22 +208,23 @@ macro_rules! elog {
 
 #[macro_export]
 macro_rules! cond_log {
-    ($cond:expr, wt, $($arg:tt)*) => {
+    ($cond:expr, $wt:expr, $($arg:tt)*) => {
         if $cond {
             let logger = Logger::new(true);
-            logger.log_without_newline(&format!($($arg)*));
+
+            if $wt {
+                logger.log(&format!($($arg)*));
+            } else {
+                logger.log_without_newline(&format!($($arg)*));
+            }
         } else {
             let logger = Logger::new(false);
-            logger.log_without_newline(&format!($($arg)*));
-        }
-    };
-    ($cond:expr, $($arg:tt)*) => {
-        if $cond {
-            let logger = Logger::new(true);
-            logger.log(&format!($($arg)*));
-        } else {
-            let logger = Logger::new(false);
-            logger.log(&format!($($arg)*));
+
+            if $wt {
+                logger.log(&format!($($arg)*));
+            } else {
+                logger.log_without_newline(&format!($($arg)*));
+            }
         }
     };
 }
@@ -232,6 +235,13 @@ macro_rules! print_indent {
         for _ in 0..$num {
             print!("  ");
         }
+    };
+}
+
+#[macro_export]
+macro_rules! new_line {
+    () => {
+        println!();
     };
 }
 

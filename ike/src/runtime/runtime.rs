@@ -1,14 +1,15 @@
 use std::{path::PathBuf, rc::Rc};
 
-use crate::{fs::read_to_string, js_str_to_string};
+use crate::{fs::read_to_string, js_str_to_string, testing::js::JsTest};
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
 };
 use logger::{elog, Logger};
+use smol::LocalExecutor;
 
 use super::{
-    buffer::{atob, btoa, is_ascii_string},
+    buffer::{atob, btoa},
     call::rust_function,
     console::Console,
     meta::Meta,
@@ -16,20 +17,23 @@ use super::{
     queue::Queue,
 };
 
-pub fn start_runtime(file: &PathBuf) -> JsResult<()> {
-    let queue = Rc::new(Queue::new());
-    let ctx = &mut Context::builder()
-        .job_queue(queue)
-        .module_loader(Rc::new(IkeModuleLoader))
-        .build()
-        .unwrap();
+pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
+    let queue = Rc::new(Queue::new(LocalExecutor::new()));
+    let ctx = match context {
+        Some(ctx) => ctx,
+        None => &mut Context::builder()
+            .job_queue(queue)
+            .module_loader(Rc::new(IkeModuleLoader))
+            .build()
+            .unwrap(),
+    };
     let content_src = match read_to_string(file) {
         Ok(content) => content,
         // TODO: don't return type error
         Err(e) => return Err(JsNativeError::typ().with_message(e.to_string()).into()),
     };
 
-    setup_context(ctx, file);
+    setup_context(ctx, Some(file));
 
     let module = Module::parse(Source::from_bytes(content_src.as_bytes()), None, ctx)?;
     let promise = module.load_link_evaluate(ctx);
@@ -70,12 +74,15 @@ pub struct SetupEntry {
     pub length: Option<usize>,
 }
 
-pub fn setup_context(ctx: &mut Context, file: &PathBuf) {
+pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
     let ike_object = JsObject::default();
+    JsTest::init(ctx);
 
-    ike_object
-        .set(js_str!("meta"), Meta::init(ctx, file), false, ctx)
-        .expect("meta is already defined");
+    if let Some(file) = file {
+        ike_object
+            .set(js_str!("meta"), Meta::init(ctx, file), false, ctx)
+            .expect("meta is already defined");
+    }
 
     let entries = [
         SetupEntry {
@@ -145,4 +152,18 @@ pub fn setup_context(ctx: &mut Context, file: &PathBuf) {
             _ => todo!(),
         }
     }
+}
+
+pub fn get_current_path(ctx: &mut Context) -> JsValue {
+    ctx.global_object()
+        .get(js_string!("Ike"), ctx)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get(js_string!("meta"), ctx)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get(js_string!("path"), ctx)
+        .unwrap()
 }

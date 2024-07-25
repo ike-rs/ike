@@ -1,4 +1,5 @@
 import "./modules/buffer";
+import "./modules/test";
 
 /**
  * The Meta interface contains information about the current file and its paths.
