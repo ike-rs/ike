@@ -1,7 +1,14 @@
-## [unreleased]
+## [0.1.0](https://github.com/malezjaa/ike/compare/v0.1.0..0.1.0) - 2024-07-25
 
 ### ⚙️ Miscellaneous Tasks
 
+- Test - ([3000891](https://github.com/malezjaa/ike/commit/30008919826ec3a898ddc6fcd6b10945d262a0f7))
+
+## [0.1.0] - 2024-07-25
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* V0.1.0 - ([64ec140](https://github.com/malezjaa/ike/commit/64ec140cee428b543516669ec34d745aa74e5642))
 - Ci file from orhun/git-cliff - ([fc6ec12](https://github.com/malezjaa/ike/commit/fc6ec12b12f4aa9e555e353fc4d2068846d1edf3))
 - Remove more dead code - ([466f2f7](https://github.com/malezjaa/ike/commit/466f2f7061b9c340b9f1b4634ad716d443c51c45))
 - Remove old code - ([71ff98e](https://github.com/malezjaa/ike/commit/71ff98e4cd2d1acc29b6a226f73cc13ca8bb19a5))
