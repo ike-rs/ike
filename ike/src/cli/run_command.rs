@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
 use anyhow::Result;
-use boa_engine::{Context, Source};
 use logger::{elog, Logger};
 
 use crate::{fs::is_file, runtime::runtime::start_runtime};

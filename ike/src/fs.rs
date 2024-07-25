@@ -2,7 +2,7 @@ use anyhow::{format_err, Result};
 use logger::{elog, Logger};
 use regex::Regex;
 use std::{
-    fs::{self, File},
+    fs::File,
     io::{ErrorKind, Read},
     path::{Path, PathBuf},
 };

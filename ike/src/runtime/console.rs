@@ -26,7 +26,6 @@ pub enum LogLevel {
 
 impl Console {
     pub fn init(ctx: &mut Context) -> JsObject {
-        let console = Self::new(5);
         let state = Rc::new(RefCell::new(Self::default()));
 
         ObjectInitializer::with_native_data(Self::default(), ctx)
@@ -270,7 +269,6 @@ impl Console {
 
     fn format(arg: &JsValue, ctx: &mut Context) -> JsResult<String> {
         let mut formatted = String::new();
-        let mut arg_index = 1;
         let target = str_from_jsvalue!(arg, ctx);
         let mut chars = target.chars();
 
@@ -281,12 +279,10 @@ impl Console {
                 match fmt {
                     's' => {
                         formatted.push_str(&str_from_jsvalue!(arg, ctx));
-                        arg_index += 1;
                     }
                     'f' => {
                         let arg = arg.to_number(ctx)?;
                         formatted.push_str(&format!("{arg:.6}"));
-                        arg_index += 1;
                     }
                     'd' | 'i' => {
                         let arg = match arg.to_numeric(ctx)? {
@@ -294,7 +290,6 @@ impl Console {
                             Numeric::BigInt(int) => int.to_string(),
                         };
                         formatted.push_str(&arg);
-                        arg_index += 1;
                     }
                     '%' => {
                         formatted.push('%');
