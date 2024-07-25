@@ -125,6 +125,12 @@ jobs:
           toolchain: ${{ matrix.build.TOOLCHAIN }}
           target: ${{ matrix.build.TARGET }}
           override: true
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+      - name: Install bun deps
+        run: bun install
+      - name: Bundle js
+        run: bun unbuild
       - name: Build (linux/macos)
         if: matrix.build.OS != 'windows-2022'
         uses: actions-rs/cargo@v1
@@ -132,12 +138,6 @@ jobs:
           use-cross: true
           command: build
           args: --release --locked --target ${{ matrix.build.TARGET }}
-      - name: Setup bun
-        uses: oven-sh/setup-bun@v1
-      - name: Install bun deps
-        run: bun install
-      - name: Bundle js
-        run: bun unbuild
       - name: Build (windows)
         if: matrix.build.OS == 'windows-2022'
         uses: actions-rs/cargo@v1
