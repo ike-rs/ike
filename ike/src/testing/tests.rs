@@ -4,14 +4,14 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc, time::Instant};
 use crate::{
     cli::run_command::Entry,
     format::format_time,
-    js_str_to_string,
+    get_prototype_name, js_str_to_string,
     runtime::{
         modules::IkeModuleLoader,
         queue::Queue,
         runtime::{setup_context, update_meta_property},
     },
 };
-use logger::{elog, log, new_line, print_indent, Logger};
+use logger::{cond_log, elog, log, new_line, print_indent, Logger};
 
 use boa_engine::{
     builtins::promise::PromiseState,
@@ -256,9 +256,14 @@ pub fn run_single_test(test: JsValue, ctx: &mut Context, results: &mut TestResul
     let result = JsFunction::from_object(func.clone())
         .unwrap()
         .call(&JsValue::undefined(), &[], ctx)
-        .unwrap_or(JsValue::from(JsString::from("fail")));
-
-    let status = result.to_string(ctx).unwrap().to_std_string_escaped();
+        .unwrap();
+    let result_obj = result.as_object().unwrap();
+    let status = result_obj
+        .get(js_string!("status"), ctx)
+        .unwrap()
+        .to_string(ctx)
+        .unwrap()
+        .to_std_string_escaped();
 
     let duration = start.elapsed();
     let formatted_time = format_time(duration, true);
@@ -293,4 +298,27 @@ pub fn run_single_test(test: JsValue, ctx: &mut Context, results: &mut TestResul
             ""
         }
     );
+
+    if status.eq("fail") {
+        let error = result_obj.get(js_string!("error"), ctx).unwrap();
+        let error = error.as_object().unwrap();
+
+        let proto = match error.prototype() {
+            Some(proto) => proto,
+            None => {
+                panic!("No prototype found for test result object");
+            }
+        };
+        let str_name = get_prototype_name!(proto, ctx);
+
+        let message = error.get(js_string!("message"), ctx).unwrap();
+        cond_log!(
+            true,
+            true,
+            "{}<r><red>└─ error<r><d>({})<r>: {}",
+            "  ".repeat(indent),
+            str_name,
+            js_str_to_string!(message.to_string(ctx).unwrap())
+        );
+    }
 }

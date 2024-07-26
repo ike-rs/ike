@@ -13,23 +13,30 @@ const $try_it = (fn: () => void) => {
   try {
     fn();
 
-    return "pass";
+    return {
+      status: "pass",
+    };
   } catch (e) {
-    console.error(e);
-
-    return "fail";
+    return {
+      status: "fail",
+      error: e,
+    };
   }
 };
 
 it.skip = (test: string, fn: () => void) => {
   return $it(test, () => {
-    return "skip";
+    return {
+      status: "skip",
+    };
   });
 };
 
 it.todo = (test: string, fn: () => void) => {
   return $it(test, () => {
-    return "todo";
+    return {
+      status: "todo",
+    };
   });
 };
 
