@@ -6,7 +6,7 @@ use boa_engine::{
     Context, JsData, JsResult,
 };
 use boa_gc::{Finalize, Trace};
-use logger::{cond_log, log, new_line, Logger};
+use logger::{cond_log, elog, log, new_line, Logger};
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};
@@ -157,12 +157,24 @@ impl Console {
                 let proto = match obj.prototype() {
                     Some(proto) => proto,
                     None => {
-                        // TODO: make func to print objects and implement it in the object later
                         Self::print_object(obj, ctx, console);
                         return;
                     }
                 };
                 let str_name = get_prototype_name!(proto, ctx);
+
+                if str_name.contains("Error") {
+                    let message = obj.get(js_string!("message"), ctx).unwrap();
+                    cond_log!(
+                        error,
+                        new_line,
+                        "<r><red>error<r><d>({})<r>: {}",
+                        str_name,
+                        js_str_to_string!(message.to_string(ctx).unwrap())
+                    );
+
+                    return;
+                }
 
                 if str_name == "Date" {
                     cond_log!(
@@ -198,6 +210,7 @@ impl Console {
         }
     }
 
+    // TODO: still some issues with the object printing
     fn print_object(obj: &JsObject, ctx: &mut Context, console: &mut Self) {
         let properties = obj.own_property_keys(ctx).unwrap();
         let i = properties.iter().count();
