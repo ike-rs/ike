@@ -1,7 +1,6 @@
 use std::{path::PathBuf, rc::Rc};
 
 use crate::{fs::read_to_string, js_str_to_string, testing::js::JsTest};
-use anyhow::Result;
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,

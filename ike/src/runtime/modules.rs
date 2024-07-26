@@ -20,6 +20,8 @@ lazy_static::lazy_static! {
         m.insert("util", include_str!("js\\util.mjs").to_string());
         m.insert("buffer", include_str!("js\\buffer.mjs").to_string());
         m.insert("test", include_str!("js\\test.mjs").to_string());
+        m.insert("assert", include_str!("js\\assert.mjs").to_string());
+        m.insert("inspect", include_str!("js\\inspect.mjs").to_string());
         m
     };
 }

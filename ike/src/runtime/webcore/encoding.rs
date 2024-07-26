@@ -5,7 +5,7 @@ use boa_engine::{
     native_function::NativeFunction,
     object::builtins::{JsArrayBuffer, JsUint8Array},
     property::Attribute,
-    Context, JsArgs, JsData, JsObject, JsResult, JsString, JsValue, Source,
+    Context, JsData, JsObject, JsResult, JsValue,
 };
 use boa_gc::{Finalize, Trace};
 
