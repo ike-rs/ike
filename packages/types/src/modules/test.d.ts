@@ -1,4 +1,4 @@
-declare module 'test' {
+declare module "test" {
   /**
    * Describes a group of tests.
    *
@@ -34,7 +34,30 @@ declare module 'test' {
      * @param test The name of the test.
      * @param fn The function that contains the test.
      */
-    function it(test: string, fn: () => void): void;
+    const it: {
+      (test: string, fn: () => void): void;
+      /**
+       * Skips a test, and marks it as todo.
+       * @param test The name of the test.
+       * @param fn The function that contains the test.
+       */
+      todo: (test: string, fn: () => void) => void;
+      /**
+       * Skips a test.
+       *
+       * @param test The name of the test.
+       * @param fn The function that contains the test.
+       */
+      skip: (test: string, fn: () => void) => void;
+      /**
+       * Runs a test only if the condition is true.
+       *
+       * @param condition The condition to be checked.
+       * @param test The name of the test.
+       * @param fn The function that contains the test.
+       */
+      if: (condition: boolean, test: string, fn: () => void) => void;
+    };
 
     /**
      * Describes a test stored in a global object.
