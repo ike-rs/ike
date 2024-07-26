@@ -13,6 +13,7 @@ use super::{
     buffer::{atob, btoa},
     call::rust_function,
     console::Console,
+    ike::IkeGlobalObject,
     meta::Meta,
     modules::IkeModuleLoader,
     queue::Queue,
@@ -76,14 +77,8 @@ pub struct SetupEntry {
 }
 
 pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
-    let ike_object = JsObject::default();
+    let ike = IkeGlobalObject::init(ctx, file);
     JsTest::init(ctx);
-
-    if let Some(file) = file {
-        ike_object
-            .set(js_str!("meta"), Meta::init(ctx, file), false, ctx)
-            .expect("meta is already defined");
-    }
 
     let entries = [
         SetupEntry {
@@ -94,7 +89,7 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
         },
         SetupEntry {
             setup_type: SetupType::Property,
-            value: SetupValue::Object(ike_object),
+            value: SetupValue::Object(ike),
             name: js_str!("Ike"),
             length: None,
         },

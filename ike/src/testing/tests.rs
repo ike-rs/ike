@@ -65,7 +65,7 @@ impl TestResults {
     }
 }
 
-// TODO: add support for alone tests, and showing what went wrong
+// TODO: and showing what went wrong
 pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));
     let ctx = &mut Context::builder()

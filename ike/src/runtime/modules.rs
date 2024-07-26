@@ -131,18 +131,13 @@ pub fn is_fetchable(specifier: &str) -> bool {
 }
 
 pub fn strip_spec(specifier: &str) -> &str {
-    let name = if let Some(stripped) = specifier.strip_prefix("node:") {
-        stripped
-    } else if let Some(stripped) = specifier.strip_prefix("ike:") {
+    if let Some(stripped) = specifier.strip_prefix("ike:") {
         stripped
     } else {
         specifier
-    };
-
-    name
+    }
 }
 
-// This also supports node:util and ike:util
 pub fn is_builtin_module(specifier: &str) -> bool {
     let name = strip_spec(specifier);
 
