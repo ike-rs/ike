@@ -1,6 +1,7 @@
 use std::{path::PathBuf, rc::Rc};
 
 use crate::{fs::read_to_string, js_str_to_string, testing::js::JsTest};
+use anyhow::Result;
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
@@ -166,4 +167,12 @@ pub fn get_current_path(ctx: &mut Context) -> JsValue {
         .unwrap()
         .get(js_string!("path"), ctx)
         .unwrap()
+}
+
+pub fn update_meta_property(ctx: &mut Context, path: &PathBuf) {
+    let ike_val = ctx.global_object().get(js_string!("Ike"), ctx).unwrap();
+    let ike_obj = ike_val.as_object().unwrap();
+    ike_obj
+        .set(js_string!("meta"), Meta::init(ctx, path), false, ctx)
+        .expect("meta is already defined");
 }

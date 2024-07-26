@@ -5,7 +5,11 @@ use crate::{
     cli::run_command::Entry,
     format::format_time,
     js_str_to_string,
-    runtime::{meta::Meta, modules::IkeModuleLoader, queue::Queue, runtime::setup_context},
+    runtime::{
+        modules::IkeModuleLoader,
+        queue::Queue,
+        runtime::{setup_context, update_meta_property},
+    },
 };
 use logger::{elog, log, new_line, print_indent, Logger};
 
@@ -77,16 +81,7 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
 
     for path in paths {
         let entry = Entry::new(true, Some(path.clone()), None);
-        let ike_val = ctx.global_object().get(js_string!("Ike"), ctx).unwrap();
-        let ike_obj = ike_val.as_object().unwrap();
-        ike_obj
-            .set(
-                js_string!("meta"),
-                Meta::init(ctx, &entry.path.clone().unwrap()),
-                false,
-                ctx,
-            )
-            .expect("meta is already defined");
+        update_meta_property(ctx, &entry.path.clone().unwrap());
 
         let module = Module::parse(
             Source::from_filepath(entry.path.unwrap().as_path()).unwrap(),
