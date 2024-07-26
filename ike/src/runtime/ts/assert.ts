@@ -1,9 +1,9 @@
-import { inspect } from "inspect";
+import { inspect } from 'inspect';
 
 export class AssertionError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "AssertionError";
+    this.name = 'AssertionError';
   }
 }
 
@@ -14,6 +14,6 @@ export const assert = (actual: any, expected: any, msg: string) => {
     return;
   }
   throw new AssertionError(
-    `Expected ${expectedStr}, but got ${actualStr}. ${msg}`
+    `Expected ${expectedStr}, but got ${actualStr}. ${msg}`,
   );
 };

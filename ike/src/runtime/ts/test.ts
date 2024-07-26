@@ -1,5 +1,5 @@
-const describe = $rustFunction("describe");
-const $it = $rustFunction("it");
+const describe = $rustFunction('describe');
+const $it = $rustFunction('it');
 
 const it = (test: string, fn: () => void) => {
   return $it(test, () => {
@@ -11,23 +11,23 @@ const $try_it = (fn: () => void) => {
   try {
     fn();
 
-    return "pass";
+    return 'pass';
   } catch (e) {
     console.error(e);
 
-    return "fail";
+    return 'fail';
   }
 };
 
 it.skip = (test: string, fn: () => void) => {
   return $it(test, () => {
-    return "skip";
+    return 'skip';
   });
 };
 
 it.todo = (test: string, fn: () => void) => {
   return $it(test, () => {
-    return "todo";
+    return 'todo';
   });
 };
 
