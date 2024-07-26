@@ -1,4 +1,4 @@
-declare module "test" {
+declare module 'test' {
   /**
    * Describes a group of tests.
    *

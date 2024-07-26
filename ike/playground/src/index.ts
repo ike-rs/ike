@@ -1,5 +1,7 @@
 // import { assert } from "assert";
 
+import { inspect } from 'inspect';
+
 // assert(
 //   new TextEncoder().encodeInto("Hello, world! 🌍", new Uint8Array([0, 20])),
 //   {
@@ -23,4 +25,4 @@
 //   "Object failed"
 // );
 
-console.log(decodeURIComponent('Hello%2C%20world%21%20%F0%9F%8C%8D'));
+console.log(inspect.colors.bold);

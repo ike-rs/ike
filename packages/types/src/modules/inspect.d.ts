@@ -1,4 +1,4 @@
-declare module "inspect" {
+declare module 'inspect' {
   /**
    * Options for customizing the inspection of an object.
    */
@@ -29,14 +29,6 @@ declare module "inspect" {
     [key: string]: any;
   }
 
-  /**
-   * Inspects an object and returns a string representation.
-   * @param {*} obj - Any JavaScript primitive or Object
-   * @param {InspectOptions} [opts] - Options for customizing the inspection.
-   * @returns {string} The string representation of the object.
-   */
-  export const inspect: (obj: any, opts?: InspectOptions) => string;
-
   type InspectColorCode = [number, number];
 
   interface InspectColors {
@@ -66,6 +58,15 @@ declare module "inspect" {
     regexp: string;
   }
 
-  declare const inspectColors: InspectColors;
-  declare const inspectStyles: InspectStyles;
+  /**
+   * Inspects an object and returns a string representation.
+   * @param {*} obj - Any JavaScript primitive or Object
+   * @param {InspectOptions} [opts] - Options for customizing the inspection.
+   * @returns {string} The string representation of the object.
+   */
+  export const inspect: {
+    (obj: any, opts?: InspectOptions): string;
+    colors: InspectColors;
+    styles: InspectStyles;
+  };
 }

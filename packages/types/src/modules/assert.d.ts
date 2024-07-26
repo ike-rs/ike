@@ -1,4 +1,4 @@
-declare module "assert" {
+declare module 'assert' {
   /**
    * Custom error class for assertion errors.
    * @class

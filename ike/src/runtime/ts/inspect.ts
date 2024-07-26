@@ -66,6 +66,8 @@ const inspectColors: Record<string, [number, number]> = {
   yellow: [33, 39],
 };
 
+inspect.colors = inspectColors;
+
 const inspectStyles: Record<string, string> = {
   special: 'cyan',
   number: 'yellow',
@@ -76,6 +78,8 @@ const inspectStyles: Record<string, string> = {
   date: 'magenta',
   regexp: 'red',
 };
+
+inspect.styles = inspectStyles;
 
 const stylizeWithColor = (str: string, styleType: string): string => {
   const style = inspectStyles[styleType];

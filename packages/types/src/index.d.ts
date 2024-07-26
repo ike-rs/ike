@@ -1,7 +1,7 @@
-import "./modules/buffer";
-import "./modules/test";
-import "./modules/inspect";
-import "./modules/assert";
+import './modules/buffer';
+import './modules/test';
+import './modules/inspect';
+import './modules/assert';
 
 /**
  * The Meta interface contains information about the current file and its paths.

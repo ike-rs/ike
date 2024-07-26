@@ -1,9 +1,7 @@
 {
   "name": "@ike-runtime/types",
   "types": "src/index.d.ts",
-  "files": [
-    "*.d.ts"
-  ],
+  "files": ["*.d.ts"],
   "type": "module",
   "repository": {
     "type": "git",

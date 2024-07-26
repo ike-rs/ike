@@ -1,17 +1,17 @@
-import { describe, it } from "test";
+import { describe, it } from 'test';
 
-describe("Buffer", () => {
-  it("should create", () => {
-    throw new Error("Not implemented");
+describe('Buffer', () => {
+  it('should create', () => {
+    throw new Error('Not implemented');
   });
 
-  it("should create", () => {});
+  it('should create', () => {});
 });
 
-describe("Blob", () => {
-  it.todo("should create", () => {
-    throw new Error("Not implemented");
+describe('Blob', () => {
+  it.todo('should create', () => {
+    throw new Error('Not implemented');
   });
 });
 
-it("should create", () => {});
+it('should create', () => {});
