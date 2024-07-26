@@ -1,4 +1,4 @@
-declare module 'assert' {
+declare module "assert" {
   /**
    * Custom error class for assertion errors.
    * @class
@@ -21,5 +21,22 @@ declare module 'assert' {
    * @param {string} msg - The custom error message to be included if the assertion fails.
    * @throws {AssertionError} If the actual value does not equal the expected value.
    */
-  export const assert: <T>(actual: T, expected: T, msg: string) => void;
+  export const assertEquals: <T = any>(
+    actual: T,
+    expected: T,
+    msg: string
+  ) => void;
+
+  /**
+   * Asserts that a condition is true.
+   * If the assertion fails, throws an AssertionError with a detailed message.
+   *
+   * @param {boolean}
+   * @param {string} msg - The custom error message to be included if the assertion fails.
+   * @throws {AssertionError} If the condition is false.
+   * @example
+   * assert(true, "This should pass");
+   * assert(false, "This should fail");
+   */
+  export const assert: (condition: boolean, msg: string) => void;
 }

@@ -2,8 +2,7 @@ use std::{path::PathBuf, rc::Rc};
 
 use crate::{fs::read_to_string, js_str_to_string, testing::js::JsTest};
 use boa_engine::{
-    builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
-    JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
+    builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context, JsNativeError, JsObject, JsResult, JsStr, JsString, JsValue, Module, NativeFunction, Source
 };
 use logger::{elog, Logger};
 use smol::LocalExecutor;
@@ -29,6 +28,7 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
             .build()
             .unwrap(),
     };
+
     let content_src = match read_to_string(file) {
         Ok(content) => content,
         // TODO: don't return type error
