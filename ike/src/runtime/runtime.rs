@@ -17,6 +17,7 @@ use super::{
     meta::Meta,
     modules::IkeModuleLoader,
     queue::Queue,
+    webcore::encoding::TextEncoder,
 };
 
 pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
@@ -112,6 +113,9 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
             length: None,
         },
     ];
+
+    ctx.register_global_class::<TextEncoder>()
+        .expect("TextEncoder is already defined");
 
     for entry in entries.iter() {
         match entry.setup_type {
