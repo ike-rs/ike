@@ -1,4 +1,4 @@
-import { assertEquals } from "assert";
+import { assertEquals, assertNotEquals } from "assert";
 
 const describe = $rustFunction("describe");
 const $it = $rustFunction("it");
@@ -49,34 +49,26 @@ it.if = (condition: boolean, test: string, fn: () => void) => {
 const expect = <T = unknown>(value: any) => {
   const matchers = {
     toBe: (expected: T) => {
-      if (value !== expected) {
-        throw new Error(`Expected ${expected}, but got ${value}`);
-      }
+      assertEquals(value, expected, `Expected ${expected}, but got ${value}`);
     },
     notToBe: (expected: T) => {
-      if (value === expected) {
-        throw new Error(`Expected not to be ${expected}, but got ${value}`);
-      }
+      assertNotEquals(value, expected, `Values are the same for ${value}`);
     },
     toBeNull: () => {
-      if (value !== null) {
-        throw new Error(`Expected null, but got ${value}`);
-      }
+      assertEquals(value, null, `Expected null, but got ${value}`);
     },
     notToBeNull: () => {
-      if (value === null) {
-        throw new Error(`Expected not to be null, but got ${value}`);
-      }
+      assertNotEquals(value, null, `Expected not to be null, but got ${value}`);
     },
     toBeUndefined: () => {
-      if (value !== undefined) {
-        throw new Error(`Expected undefined, but got ${value}`);
-      }
+      assertEquals(value, undefined, `Expected undefined, but got ${value}`);
     },
     notToBeUndefined: () => {
-      if (value === undefined) {
-        throw new Error(`Expected not to be undefined, but got ${value}`);
-      }
+      assertNotEquals(
+        value,
+        undefined,
+        `Expected not to be undefined, but got ${value}`
+      );
     },
     toBeTruthy: () => {
       if (!value) {
@@ -306,7 +298,9 @@ const expect = <T = unknown>(value: any) => {
       try {
         value();
       } catch (e) {
-        throw new Error("Expected function not to throw an error, but it did");
+        throw new Error(
+          "Expected function not to throw an error, but it did: " + e
+        );
       }
     },
     toBeArray: () => {

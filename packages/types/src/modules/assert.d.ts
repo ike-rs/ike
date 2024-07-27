@@ -39,4 +39,22 @@ declare module "assert" {
    * assert(false, "This should fail");
    */
   export const assert: (condition: boolean, msg: string) => void;
+
+  /**
+   * Asserts that the actual value is not equal to the expected value.
+   * If the assertion fails, throws an AssertionError with a detailed message.
+   *
+   * @param {*} actual - The actual value to be tested.
+   * @param {*} expected - The expected value to compare against.
+   * @param {string}
+   * @throws {AssertionError} If the actual value equals the expected value.
+   * @example
+   * assertNotEquals(1, 2, "This should pass");
+   * assertNotEquals(1, 1, "This should fail");
+   */
+  export const assertNotEquals: <T = any>(
+    actual: T,
+    expected: T,
+    msg: string
+  ) => void;
 }

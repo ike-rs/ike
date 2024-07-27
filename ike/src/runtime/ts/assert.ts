@@ -24,3 +24,12 @@ export const assert = (condition: boolean, msg: string) => {
   }
   throw new AssertionError(msg);
 };
+
+export const assertNotEquals = (actual: any, expected: any, msg: string) => {
+  const actualStr = inspect(actual);
+  const expectedStr = inspect(expected);
+  if (actualStr != expectedStr) {
+    return;
+  }
+  throw new AssertionError(`Values are the same for ${actualStr}. ${msg}`);
+};
