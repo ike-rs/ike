@@ -6,7 +6,7 @@ use boa_engine::{
     Context, JsData, JsResult,
 };
 use boa_gc::{Finalize, Trace};
-use logger::{cond_log, elog, log, new_line, Logger};
+use logger::{cond_log, log, new_line, Logger};
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};

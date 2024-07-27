@@ -1,6 +1,7 @@
 use base64::prelude::*;
 use boa_engine::{
-    js_string, object::builtins::JsArrayBuffer, Context, JsNativeError, JsResult, JsString, JsValue,
+    object::builtins::{JsArrayBuffer, JsTypedArray},
+    Context, JsNativeError, JsResult, JsString, JsValue,
 };
 use simdutf::{validate_ascii, validate_utf8};
 
@@ -44,29 +45,24 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
     if obj.is_none() {
         throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
     }
-
     let obj = obj.unwrap();
-    let len = obj
-        .get(js_string!("byteLength"), ctx)
-        .expect("Expected ArrayBuffer, TypedArray or Buffer")
-        .to_uint8(ctx)
-        .unwrap();
-    let data_block: Vec<u8> = (0..len).collect();
+    let typed_arr = JsTypedArray::from_object(obj.clone());
 
-    let array_buffer = JsArrayBuffer::from_byte_block(data_block, ctx)?;
-    let buf = array_buffer.data();
-    let deref = buf.as_deref();
-
-    match deref {
-        Some(data) => {
-            if data.is_empty() {
-                return Ok(JsValue::Boolean(true));
-            }
-
-            return Ok(JsValue::Boolean(validate_ascii(data)));
-        }
-        None => throw!(typ, "ArrayBuffer is detached"),
+    if typed_arr.is_err() {
+        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
     }
+
+    let typed_arr = typed_arr.unwrap();
+    let arr_buf = typed_arr.buffer(ctx).unwrap();
+    let arr_buf = JsArrayBuffer::from_object(arr_buf.as_object().unwrap().clone()).unwrap();
+    let arr_buf = arr_buf.data();
+    let data_block = arr_buf.as_deref().unwrap();
+
+    if data_block.is_empty() {
+        return Ok(JsValue::Boolean(true));
+    }
+
+    Ok(JsValue::Boolean(validate_ascii(&data_block)))
 }
 
 pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
@@ -81,25 +77,21 @@ pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
     }
 
     let obj = obj.unwrap();
-    let len = obj
-        .get(js_string!("byteLength"), ctx)
-        .expect("Expected ArrayBuffer, TypedArray or Buffer")
-        .to_uint8(ctx)
-        .unwrap();
-    let data_block: Vec<u8> = (0..len).collect();
+    let typed_arr = JsTypedArray::from_object(obj.clone());
 
-    let array_buffer = JsArrayBuffer::from_byte_block(data_block, ctx)?;
-    let buf = array_buffer.data();
-    let deref = buf.as_deref();
-
-    match deref {
-        Some(data) => {
-            if data.is_empty() {
-                return Ok(JsValue::Boolean(true));
-            }
-
-            return Ok(JsValue::Boolean(validate_utf8(data)));
-        }
-        None => throw!(typ, "ArrayBuffer is detached"),
+    if typed_arr.is_err() {
+        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
     }
+
+    let typed_arr = typed_arr.unwrap();
+    let arr_buf = typed_arr.buffer(ctx).unwrap();
+    let arr_buf = JsArrayBuffer::from_object(arr_buf.as_object().unwrap().clone()).unwrap();
+    let arr_buf = arr_buf.data();
+    let data_block = arr_buf.as_deref().unwrap();
+
+    if data_block.is_empty() {
+        return Ok(JsValue::Boolean(true));
+    }
+
+    Ok(JsValue::Boolean(validate_utf8(&data_block)))
 }

@@ -1,6 +1,8 @@
 import { describe, it, expect } from "test";
 import { isAscii, isUtf8 } from "buffer";
 
+let encoder = new TextEncoder();
+
 describe("Base64 encoding and decoding", () => {
   it("should encode a string to base64 using btoa", () => {
     const originalString = "Hello, World!";
@@ -42,4 +44,14 @@ describe("TextEncoder and TextDecoder", () => {
       ])
     );
   });
+});
+
+it("isAscii", () => {
+  expect(isAscii(encoder.encode("ğ"))).toBe(false);
+  expect(isAscii(encoder.encode("a"))).toBe(true);
+});
+
+it("isUtf8", () => {
+  expect(isUtf8(encoder.encode("ğ"))).toBe(true);
+  expect(isUtf8(encoder.encode("a"))).toBe(true);
 });
