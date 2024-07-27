@@ -46,12 +46,36 @@ describe("TextEncoder and TextDecoder", () => {
   });
 });
 
-it("isAscii", () => {
-  expect(isAscii(encoder.encode("ğ"))).toBe(false);
-  expect(isAscii(encoder.encode("a"))).toBe(true);
+describe("isAscii", () => {
+  it("should return true for ASCII strings", () => {
+    const arr = encoder.encode("Hello, World!");
+    expect(isAscii(arr)).toBe(true);
+  });
+
+  it("should return false for non-ASCII strings", () => {
+    const arr = encoder.encode("你好，世界！");
+    expect(isAscii(arr)).toBe(false);
+  });
+
+  it("should throw if the input is not a TypedArray or ArrayBuffer", () => {
+    // @ts-ignore
+    expect(() => isAscii("Hello, World!")).toThrow();
+  });
 });
 
-it("isUtf8", () => {
-  expect(isUtf8(encoder.encode("ğ"))).toBe(true);
-  expect(isUtf8(encoder.encode("a"))).toBe(true);
+describe("isUtf8", () => {
+  it("should return true for valid UTF-8 strings", () => {
+    const arr = encoder.encode("Hello, World!");
+    expect(isUtf8(arr)).toBe(true);
+  });
+
+  it("should return false for invalid UTF-8 strings", () => {
+    const arr = new Uint8Array([0xff]);
+    expect(isUtf8(arr)).toBe(false);
+  });
+
+  it("should throw if the input is not a TypedArray or ArrayBuffer", () => {
+    // @ts-ignore
+    expect(() => isUtf8("Hello, World!")).toThrow();
+  });
 });
