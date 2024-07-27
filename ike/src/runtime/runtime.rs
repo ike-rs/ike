@@ -1,10 +1,11 @@
 use std::{path::PathBuf, rc::Rc};
 
-use crate::{fs::read_to_string, js_str_to_string, testing::js::JsTest};
+use crate::{fs::read_to_string, get_prototype_name, js_str_to_string, testing::js::JsTest};
 use boa_engine::{
-    builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context, JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source
+    builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
+    JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
 };
-use logger::{elog, Logger};
+use logger::{cond_log, elog, Logger};
 use smol::LocalExecutor;
 
 use super::{
@@ -48,9 +49,23 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
             assert_eq!(v, JsValue::undefined())
         }
         PromiseState::Rejected(err) => {
-            let message = err.to_string(ctx)?;
+            let obj = err.to_object(ctx).unwrap();
+            let proto = match obj.prototype() {
+                Some(proto) => proto,
+                None => {
+                    panic!("Error object has no prototype");
+                }
+            };
+            let str_name = get_prototype_name!(proto, ctx);
 
-            elog!(error, "{}", js_str_to_string!(message));
+            let message = obj.get(js_string!("message"), ctx).unwrap();
+            cond_log!(
+                true,
+                true,
+                "<r><red>error<r><d>({})<r>: {}",
+                str_name,
+                js_str_to_string!(message.to_string(ctx).unwrap())
+            );
         }
     }
 

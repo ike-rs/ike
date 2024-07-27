@@ -65,7 +65,6 @@ impl TestResults {
     }
 }
 
-// TODO: and showing what went wrong
 pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));
     let ctx = &mut Context::builder()
@@ -98,9 +97,23 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
                 assert_eq!(v, JsValue::undefined())
             }
             PromiseState::Rejected(err) => {
-                let message = err.to_string(ctx)?;
+                let obj = err.to_object(ctx).unwrap();
+                let proto = match obj.prototype() {
+                    Some(proto) => proto,
+                    None => {
+                        panic!("Error object has no prototype");
+                    }
+                };
+                let str_name = get_prototype_name!(proto, ctx);
 
-                elog!(error, "{}", js_str_to_string!(message));
+                let message = obj.get(js_string!("message"), ctx).unwrap();
+                cond_log!(
+                    true,
+                    true,
+                    "<r><red>error<r><d>({})<r>: {}",
+                    str_name,
+                    js_str_to_string!(message.to_string(ctx).unwrap())
+                );
             }
         }
 
