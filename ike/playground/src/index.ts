@@ -1,11 +1,3 @@
-try {
-  throw new Error("This is an error");
-} catch (error) {
-  console.error(error);
-}
+import { isAscii } from "buffer";
 
-console.log({
-  Hello: "World",
-});
-
-console.log(12 + 12);
+console.log(isAscii(new TextEncoder().encode("dwa")));

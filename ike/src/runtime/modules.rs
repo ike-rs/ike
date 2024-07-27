@@ -22,6 +22,7 @@ lazy_static::lazy_static! {
         m.insert("test", include_str!("js\\test.mjs").to_string());
         m.insert("assert", include_str!("js\\assert.mjs").to_string());
         m.insert("inspect", include_str!("js\\inspect.mjs").to_string());
+        m.insert("_internal_", include_str!("js\\_internal_.mjs").to_string());
         m
     };
 }
