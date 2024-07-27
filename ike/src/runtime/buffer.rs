@@ -39,7 +39,13 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
         throw!(err, "Expected an argument in isAscii");
     }
 
-    let obj = args.get(0).unwrap().as_object().unwrap();
+    let obj = args.get(0).unwrap().as_object();
+
+    if obj.is_none() {
+        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
+    }
+
+    let obj = obj.unwrap();
     let len = obj
         .get(js_string!("byteLength"), ctx)
         .expect("Expected ArrayBuffer, TypedArray or Buffer")
@@ -68,7 +74,13 @@ pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
         throw!(err, "Expected an argument in isUtf8");
     }
 
-    let obj = args.get(0).unwrap().as_object().unwrap();
+    let obj = args.get(0).unwrap().as_object();
+
+    if obj.is_none() {
+        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
+    }
+
+    let obj = obj.unwrap();
     let len = obj
         .get(js_string!("byteLength"), ctx)
         .expect("Expected ArrayBuffer, TypedArray or Buffer")
