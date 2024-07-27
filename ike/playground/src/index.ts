@@ -1,3 +1,5 @@
 import { isAscii } from "buffer";
 
-console.log(isAscii(new TextEncoder().encode("dwa")));
+setTimeout(() => {
+  console.log(isAscii(new TextEncoder().encode("dwa")));
+}, 1000);
