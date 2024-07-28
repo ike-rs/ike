@@ -1,59 +1,18 @@
+// Thanks to https://github.com/jedel1043 for help with implementing timeouts
+
 use boa_engine::{
     error::JsNativeError, job::NativeJob, object::builtins::JsFunction, Context, JsResult, JsValue,
 };
-use once_cell::sync::Lazy;
+use futures_util::future::{AbortHandle, Abortable};
 use smol::Timer;
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::sync::atomic::AtomicU32;
-use std::{
-    fmt::Display,
-    sync::{Arc, Mutex},
-    time::Duration,
-};
-
-use crate::throw;
-
-#[derive(Clone)]
-struct TimeoutHandle {
-    id: usize,
-    cancelled: Arc<Mutex<bool>>,
-}
-
-impl TimeoutHandle {
-    fn new(id: usize) -> Self {
-        TimeoutHandle {
-            id,
-            cancelled: Arc::new(Mutex::new(false)),
-        }
-    }
-
-    fn cancel(&self) {
-        let mut cancelled = self.cancelled.lock().unwrap();
-        *cancelled = true;
-    }
-
-    fn is_cancelled(&self) -> bool {
-        *self.cancelled.lock().unwrap()
-    }
-}
-
-impl Display for TimeoutHandle {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "TimeoutHandle({}, {})", self.id, self.is_cancelled())
-    }
-}
-
-impl Debug for TimeoutHandle {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "TimeoutHandle({}, {})", self.id, self.is_cancelled())
-    }
-}
+use std::sync::LazyLock;
+use std::{collections::HashMap, sync::atomic::AtomicU32};
+use std::{sync::Mutex, time::Duration};
 
 struct Timeouts {}
 
 impl Timeouts {
-    pub fn get(id: u32) -> Option<TimeoutHandle> {
+    pub fn get(id: u32) -> Option<AbortHandle> {
         let timeouts = unsafe { TIMEOUTS.lock().unwrap() };
         timeouts.get(&id).cloned()
     }
@@ -64,24 +23,16 @@ impl Timeouts {
     }
 }
 
-// ! Something like this won't work. We have to fix it
-// function myFunction() {
-//   console.log("Hello, World!");
-// }
-
-// let timeoutId = setTimeout(myFunction, 3000);
-// setTimeout(() => {
-//   clearTimeout(timeoutId);
-//   console.log("Timeout canceled!");
-// }, 1000);
-
-static mut TIMEOUTS: Lazy<Mutex<HashMap<u32, TimeoutHandle>>> = Lazy::new(|| Default::default());
+static mut TIMEOUTS: LazyLock<Mutex<HashMap<u32, AbortHandle>>> =
+    LazyLock::new(|| Default::default());
 static TIMER_ID: AtomicU32 = AtomicU32::new(0);
 
 pub fn set_timeout(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let callback = args.get(0);
     if callback.is_none() {
-        throw!(typ, "Expected callback in setTimeout")
+        return Err(JsNativeError::error()
+            .with_message("Expected callback in setTimeout")
+            .into());
     }
 
     let callback = callback.unwrap();
@@ -113,24 +64,23 @@ pub fn set_timeout(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult
     }
 
     let timeout_id = TIMER_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed) as usize;
-    let timeout_handle = TimeoutHandle::new(timeout_id);
+    let (abort_handle, abort_registration) = AbortHandle::new_pair();
     {
         let mut timeouts = unsafe { TIMEOUTS.lock().unwrap() };
-        timeouts.insert(timeout_id as u32, timeout_handle.clone());
+        timeouts.insert(timeout_id as u32, abort_handle);
     }
 
     let wait = async move {
-        if timeout_handle.is_cancelled() {
-            return NativeJob::new(move |_| -> JsResult<JsValue> { Ok(JsValue::undefined()) });
-        }
-        Timer::after(Duration::from_millis(delay as u64)).await;
-
-        if timeout_handle.is_cancelled() {
-            return NativeJob::new(move |_| -> JsResult<JsValue> { Ok(JsValue::undefined()) });
-        }
+        let result = Abortable::new(
+            Timer::after(Duration::from_millis(delay as u64)),
+            abort_registration,
+        )
+        .await;
 
         NativeJob::new(move |context| -> JsResult<JsValue> {
-            callback.call(&JsValue::undefined(), &params, context)?;
+            if result.is_ok() {
+                callback.call(&JsValue::undefined(), &params, context)?;
+            }
             Timeouts::remove(timeout_id as u32);
             Ok(JsValue::undefined())
         })
@@ -146,9 +96,9 @@ pub fn clear_timeout(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResu
         if let Ok(timeout_id) = timeout_id_value.to_i32(ctx) {
             let timeout_id = timeout_id as u32;
 
-            if let Some(timeout) = Timeouts::get(timeout_id) {
-                timeout.cancel();
-                Timeouts::remove(timeout_id);
+            if let Some(handle) = Timeouts::get(timeout_id) {
+                handle.abort()
+                // the original timeout will remove the id from the timeouts list
             }
         }
     }
