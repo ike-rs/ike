@@ -40,6 +40,14 @@ interface Ike {
    * Provides information for the module about itself.
    */
   meta: Meta;
+
+  /**
+   * Exit the process with optional exit code.
+   *
+   * @param code Exit code.
+   * @returns void
+   */
+  exit(code?: number): never;
 }
 
 declare namespace Ike {

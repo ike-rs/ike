@@ -17,6 +17,13 @@ macro_rules! create_method_with_state {
     };
 }
 
+#[macro_export]
+macro_rules! create_method {
+    ($func:expr) => {
+        unsafe { NativeFunction::from_closure($func) }
+    };
+}
+
 // This converts a JsValue to a Rust string
 #[macro_export]
 macro_rules! str_from_jsvalue {

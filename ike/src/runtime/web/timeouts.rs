@@ -152,6 +152,5 @@ pub fn clear_timeout(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResu
             }
         }
     }
-    println!("Timeouts: {:?}", unsafe { TIMEOUTS.lock().unwrap() });
     Ok(JsValue::undefined())
 }
