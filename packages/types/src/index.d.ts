@@ -48,6 +48,23 @@ interface Ike {
    * @returns void
    */
   exit(code?: number): never;
+
+  /**
+   * Set an exit code for the process.
+   *
+   * @param code Exit code.
+   * @returns void
+   * @throws Error if the code is not a number or no arguments are provided.
+   */
+  setExitCode(code: number): void;
+
+  /**
+   * Global exit code
+   *
+   * @default 0
+   * @returns number
+   */
+  exitCode: number;
 }
 
 declare namespace Ike {
