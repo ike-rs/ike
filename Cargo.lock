@@ -1131,6 +1131,7 @@ dependencies = [
  "isahc",
  "lazy_static",
  "logger",
+ "once_cell",
  "os_info",
  "oxc_resolver",
  "regex",

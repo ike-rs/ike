@@ -16,7 +16,8 @@ use super::{
     meta::Meta,
     modules::IkeModuleLoader,
     queue::Queue,
-    webcore::encoding::TextEncoder,
+    web::encoding::TextEncoder,
+    web::timeouts::{clear_timeout, set_timeout},
 };
 
 pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
@@ -124,6 +125,18 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
             setup_type: SetupType::BuiltinCallable,
             value: SetupValue::Function(unsafe { NativeFunction::from_closure(rust_function) }),
             name: js_str!("$rustFunction"),
+            length: None,
+        },
+        SetupEntry {
+            setup_type: SetupType::BuiltinCallable,
+            value: SetupValue::Function(unsafe { NativeFunction::from_closure(set_timeout) }),
+            name: js_str!("setTimeout"),
+            length: None,
+        },
+        SetupEntry {
+            setup_type: SetupType::BuiltinCallable,
+            value: SetupValue::Function(unsafe { NativeFunction::from_closure(clear_timeout) }),
+            name: js_str!("clearTimeout"),
             length: None,
         },
     ];

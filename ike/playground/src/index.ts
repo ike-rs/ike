@@ -1,5 +1,9 @@
-import { isAscii } from "buffer";
+function myFunction() {
+  console.log("Hello, World!");
+}
 
+let timeoutId = setTimeout(myFunction, 3000);
 setTimeout(() => {
-  console.log(isAscii(new TextEncoder().encode("dwa")));
+  clearTimeout(timeoutId);
+  console.log("Timeout canceled!");
 }, 1000);
