@@ -65,6 +65,25 @@ interface Ike {
    * @returns number
    */
   exitCode: number;
+
+  /**
+   * Returns group ID of the process.
+   *
+   * Only available on Unix platforms. Returns null on Windows.
+   */
+  gid(): number | null;
+
+  /**
+   * Returns process ID of the process.
+   */
+  pid: number;
+
+  /**
+   * Returns user ID of the process.
+   *
+   * Only available on Unix platforms. Returns null on Windows.
+   */
+  uid(): number | null;
 }
 
 declare namespace Ike {

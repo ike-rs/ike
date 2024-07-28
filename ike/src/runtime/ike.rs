@@ -18,11 +18,14 @@ impl IkeGlobalObject {
 
         obj.function(create_method!(Self::exit), js_string!("exit"), 1);
         obj.property(js_string!("exitCode"), JsValue::from(0), Attribute::all());
+        obj.property(js_string!("pid"), std::process::id(), Attribute::all());
         obj.function(
             create_method!(Self::set_exit_code),
             js_string!("setExitCode"),
             1,
         );
+        obj.function(create_method!(Self::uid), js_string!("uid"), 0);
+        obj.function(create_method!(Self::gid), js_string!("gid"), 0);
 
         let obj = obj.build();
 
@@ -69,5 +72,27 @@ impl IkeGlobalObject {
             .expect("Failed to set exit code");
 
         Ok(JsValue::undefined())
+    }
+
+    // TODO: add tests for these functions
+
+    #[cfg(unix)]
+    pub fn gid(_: &JsValue, _: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        Ok(JsValue::from(nix::unistd::getgid().as_raw() as i32))
+    }
+
+    #[cfg(not(unix))]
+    pub fn gid(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
+        Ok(JsValue::Null)
+    }
+
+    #[cfg(unix)]
+    pub fn uid(_: &JsValue, _: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        Ok(JsValue::from(nix::unistd::getuid().as_raw() as i32))
+    }
+
+    #[cfg(not(unix))]
+    pub fn uid(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
+        Ok(JsValue::Null)
     }
 }
