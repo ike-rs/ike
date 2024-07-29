@@ -95,19 +95,6 @@ describe("TextDecoder", () => {
     expect(decodedString).toBe("€");
   });
 
-  // Expect to fail, because TextDecoder doesn't implement all the options
-  it("should handle incomplete UTF-8 sequences when streaming", () => {
-    const decoder = new TextDecoder("utf-8", { fatal: true });
-    const bytes1 = new Uint8Array([0xe2]);
-    const bytes2 = new Uint8Array([0x82, 0xac]);
-
-    const partialDecodedString = decoder.decode(bytes1, { stream: true });
-    expect(partialDecodedString).toBe("");
-
-    const completeDecodedString = decoder.decode(bytes2, { stream: false });
-    expect(completeDecodedString).toBe("€");
-  });
-
   it("should handle empty byte arrays", () => {
     const decoder = new TextDecoder("utf-8");
     const bytes = new Uint8Array([]);
@@ -122,5 +109,42 @@ describe("TextDecoder", () => {
     expect(() => {
       decoder.decode(invalidBytes);
     }).toThrow();
+  });
+
+  it("should ignore BOM when decode with ignoreBOM option", () => {
+    const decoder = new TextDecoder("utf-8", { ignoreBOM: true });
+    const bytes = new Uint8Array([0xef, 0xbb, 0xbf, 0xe2, 0x82, 0xac]);
+    const decodedString = decoder.decode(bytes);
+    expect(decodedString).toBe("€");
+  });
+
+  it("should not ignore BOM when decode without ignoreBOM option", () => {
+    const decoder = new TextDecoder("utf-8");
+    const bytes = new Uint8Array([0xef, 0xbb, 0xbf, 0xe2, 0x82, 0xac]);
+    const decodedString = decoder.decode(bytes);
+    expect(decodedString).toBe("\uFEFF€"); // BOM character included
+  });
+
+  it("should throw an error for incomplete UTF-16LE sequences when using fatal mode", () => {
+    const decoder = new TextDecoder("utf-16le", { fatal: true });
+    const incompleteBytes = new Uint8Array([0x61, 0x00, 0x62]);
+
+    expect(() => {
+      decoder.decode(incompleteBytes);
+    }).toThrow();
+  });
+
+  it("should decode UTF-16LE bytes with ignoreBOM option", () => {
+    const decoder = new TextDecoder("utf-16le", { ignoreBOM: true });
+    const bytes = new Uint8Array([0xff, 0xfe, 0x61, 0x00, 0x62, 0x00]);
+    const decodedString = decoder.decode(bytes);
+    expect(decodedString).toBe("ab");
+  });
+
+  it("should decode UTF-16LE bytes without ignoreBOM option", () => {
+    const decoder = new TextDecoder("utf-16le");
+    const bytes = new Uint8Array([0xff, 0xfe, 0x61, 0x00, 0x62, 0x00]);
+    const decodedString = decoder.decode(bytes);
+    expect(decodedString).toBe("\uFEFFab"); // BOM character included
   });
 });

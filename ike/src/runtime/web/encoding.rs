@@ -295,12 +295,8 @@ impl TextDecoder {
             }
         }
 
-        match Self::decode_slice(
-            data_block,
-            stream,
-            obj.downcast_ref::<TextDecoder>().unwrap(),
-            ctx,
-        ) {
+        let decoder = obj.downcast_ref::<TextDecoder>().unwrap();
+        match Self::decode_slice(data_block, stream, decoder, ctx) {
             Ok(result) => return Ok(result),
             Err(err) => {
                 return Err(JsNativeError::typ()
@@ -310,13 +306,15 @@ impl TextDecoder {
         }
     }
 
-    // TODO: add support for fatal and ignoreBOM
     pub fn decode_slice(
         input: &[u8],
         stream: bool,
         decoder: GcRef<Self>,
         ctx: &mut Context,
     ) -> JsResult<JsValue> {
+        let fatal = decoder.fatal;
+        let ignore_bom = decoder.ignore_bom;
+
         match EncodingLabel::from_str(&decoder.encoding).unwrap() {
             // Latin1
             EncodingLabel::Windows1252 => {
@@ -330,17 +328,32 @@ impl TextDecoder {
                 let mut data = Vec::new();
                 data.extend_from_slice(input);
 
+                if ignore_bom {
+                    if data.starts_with(&[0xEF, 0xBB, 0xBF]) {
+                        data.drain(..3);
+                    }
+                }
+
                 match String::from_utf8(data.clone()) {
                     Ok(s) => Ok(JsValue::from(js_string!(s))),
                     Err(e) => {
                         if stream {
                             let valid_up_to = e.utf8_error().valid_up_to();
-                            data = data[valid_up_to..].to_vec();
+                            if valid_up_to == 0 {
+                                Ok(JsValue::from(js_string!("")))
+                            } else {
+                                let valid_data = &data[..valid_up_to];
+                                Ok(JsValue::from(js_string!(String::from_utf8_lossy(
+                                    valid_data
+                                )
+                                .to_string())))
+                            }
+                        } else if fatal {
+                            throw!(typ, "Invalid UTF-8 data");
+                        } else {
                             Ok(JsValue::from(js_string!(
                                 String::from_utf8_lossy(&data).to_string()
                             )))
-                        } else {
-                            throw!(typ, "Invalid UTF-8 data");
                         }
                     }
                 }
@@ -350,6 +363,14 @@ impl TextDecoder {
                 data.extend_from_slice(input);
                 let mut output = String::new();
                 let mut iter = data.iter().copied().peekable();
+
+                if ignore_bom {
+                    if data.len() >= 2 && data[0] == 0xFF && data[1] == 0xFE {
+                        iter.next();
+                        iter.next();
+                    }
+                }
+
                 while let Some(byte) = iter.next() {
                     let next_byte = iter.peek().copied();
                     if next_byte.is_none() {
@@ -357,12 +378,15 @@ impl TextDecoder {
                             data.clear();
                             data.push(byte);
                             break;
-                        } else {
+                        } else if fatal {
                             throw!(typ, "Invalid UTF-16 data");
+                        } else {
+                            output.push('\u{FFFD}');
+                            break;
                         }
                     }
                     let code_unit = u16::from_le_bytes([byte, next_byte.unwrap()]);
-                    output.push(std::char::from_u32(code_unit as u32).unwrap());
+                    output.push(std::char::from_u32(code_unit as u32).unwrap_or('\u{FFFD}'));
                     iter.next();
                 }
                 Ok(JsValue::from(js_string!(output)))
