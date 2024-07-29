@@ -178,45 +178,6 @@ impl EncodingLabelMap {
     }
 }
 
-const UTF16_NAMES: &[&str] = &[
-    "ucs-2",
-    "utf-16",
-    "unicode",
-    "utf-16le",
-    "csunicode",
-    "unicodefeff",
-    "iso-10646-ucs-2",
-];
-
-const UTF8_NAMES: &[&str] = &[
-    "utf8",
-    "utf-8",
-    "unicode11utf8",
-    "unicode20utf8",
-    "x-unicode20utf8",
-    "unicode-1-1-utf-8",
-];
-
-const LATIN1_NAMES: &[&str] = &[
-    "l1",
-    "ascii",
-    "cp819",
-    "cp1252",
-    "ibm819",
-    "latin1",
-    "iso88591",
-    "us-ascii",
-    "x-cp1252",
-    "iso8859-1",
-    "iso_8859-1",
-    "iso-8859-1",
-    "iso-ir-100",
-    "csisolatin1",
-    "windows-1252",
-    "ansi_x3.4-1968",
-    "iso_8859-1:1987",
-];
-
 impl EncodingLabel {
     pub fn from_str(input: &str) -> Option<EncodingLabel> {
         let trimmed_input = input.trim();
@@ -310,7 +271,7 @@ impl TextDecoder {
         input: &[u8],
         stream: bool,
         decoder: GcRef<Self>,
-        ctx: &mut Context,
+        _: &mut Context,
     ) -> JsResult<JsValue> {
         let fatal = decoder.fatal;
         let ignore_bom = decoder.ignore_bom;
