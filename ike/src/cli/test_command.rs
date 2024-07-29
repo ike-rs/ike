@@ -10,12 +10,28 @@ use anyhow::Result;
 use logger::{log, new_line, Logger};
 
 // TODO: pattern handling
-pub fn test_command(cli: Cli, _: &clap::ArgMatches) -> Result<()> {
+pub fn test_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
     let root = cli.root;
 
     log!(info, "<cyan>{}<r> <d>{}<r>", VERSION, root.display());
 
-    let glob_result = Scanner::scan(root.clone())?;
+    let pattern = sub_matches.get_one::<String>("pattern");
+    let patterns: Vec<&str> = pattern
+        .as_ref()
+        .map(|p| p.split(',').collect())
+        .unwrap_or_default();
+
+    log!(
+        info,
+        "<d>patterns: <r>{}",
+        patterns
+            .iter()
+            .map(|p| format!("<cyan>{}</r>", p))
+            .collect::<Vec<String>>()
+            .join(", ")
+    );
+
+    let glob_result = Scanner::scan(root.clone(), patterns)?;
 
     if glob_result.is_empty() {
         new_line!();
@@ -48,7 +64,7 @@ impl Scanner {
         Self::NAME_SUFIXES.iter().any(|sufix| stem.ends_with(sufix))
     }
 
-    pub fn scan(dir: PathBuf) -> Result<Vec<PathBuf>> {
+    pub fn scan(dir: PathBuf, patterns: Vec<&str>) -> Result<Vec<PathBuf>> {
         let mut paths = Vec::new();
 
         for file in read_dir(dir)? {
@@ -56,11 +72,15 @@ impl Scanner {
             let path = file.path();
 
             if path.is_dir() {
-                paths.extend(Self::scan(path)?);
-            } else {
-                if Self::is_test_file(&path) {
-                    paths.push(path);
-                }
+                paths.extend(Self::scan(path, patterns.clone())?);
+            } else if patterns.is_empty() && Self::is_test_file(&path) {
+                paths.push(path);
+            } else if Self::is_test_file(&path)
+                && patterns
+                    .iter()
+                    .any(|p| path.file_stem().unwrap().to_str().unwrap().contains(p))
+            {
+                paths.push(path);
             }
         }
 
