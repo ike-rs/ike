@@ -16,4 +16,8 @@ describe("Ike", () => {
       expect(Ike.os).toBeString();
     }
   });
+
+  it("expect Ike.version to be defined", () => {
+    expect(Ike.version).notToBeUndefined();
+  });
 });

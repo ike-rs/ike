@@ -5,7 +5,7 @@ use boa_engine::{
 use boa_gc::{Finalize, Trace};
 use std::path::PathBuf;
 
-use crate::{create_method, throw};
+use crate::{create_method, globals::VERSION, throw};
 
 use super::meta::Meta;
 
@@ -23,6 +23,7 @@ impl IkeGlobalObject {
             JsValue::from(js_string!(std::env::consts::OS)),
             Attribute::all(),
         );
+        obj.property(js_string!("version"), js_string!(VERSION), Attribute::all());
         obj.function(create_method!(Self::exit), js_string!("exit"), 1);
         obj.function(
             create_method!(Self::set_exit_code),

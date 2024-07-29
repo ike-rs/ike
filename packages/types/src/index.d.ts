@@ -99,23 +99,38 @@ interface Ike {
 
   /**
    * Checks if current operating system is Windows.
+   *
+   * @returns boolean
    */
   isWindows(): boolean;
 
   /**
    * Checks if current operating system is MacOS.
+   *
+   * @returns boolean
    */
   isMacOS(): boolean;
 
   /**
    * Checks if current operating system is Linux.
+   *
+   * @returns boolean
    */
   isLinux(): boolean;
 
   /**
    * Returns the name of the current operating system.
+   *
+   * @example 'linux'
    */
   os: Os;
+
+  /**
+   * Returns the version of the Ike runtime.
+   *
+   * @example '0.1.0'
+   */
+  version: string;
 }
 
 declare namespace Ike {
