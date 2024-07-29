@@ -43,6 +43,8 @@ it.todo = (test: string, fn: () => void) => {
 it.if = (condition: boolean, test: string, fn: () => void) => {
   if (condition) {
     return it(test, fn);
+  } else {
+    return it.skip(test, fn);
   }
 };
 

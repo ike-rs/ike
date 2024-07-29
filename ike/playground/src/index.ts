@@ -1,8 +1,3 @@
-const timeout = setTimeout(() => {
-  console.log("Hello, World!");
-}, 3000);
-
-setTimeout(() => {
-  clearTimeout(timeout);
-  console.log("Timeout cleared!");
-}, 100);
+console.log(Ike.isLinux());
+console.log(Ike.isMacOS());
+console.log(Ike.isWindows());

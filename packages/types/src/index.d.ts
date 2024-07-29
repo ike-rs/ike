@@ -84,6 +84,21 @@ interface Ike {
    * Only available on Unix platforms. Returns null on Windows.
    */
   uid(): number | null;
+
+  /**
+   * Checks if current operating system is Windows.
+   */
+  isWindows(): boolean;
+
+  /**
+   * Checks if current operating system is MacOS.
+   */
+  isMacOS(): boolean;
+
+  /**
+   * Checks if current operating system is Linux.
+   */
+  isLinux(): boolean;
 }
 
 declare namespace Ike {

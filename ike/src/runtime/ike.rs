@@ -26,6 +26,9 @@ impl IkeGlobalObject {
         );
         obj.function(create_method!(Self::uid), js_string!("uid"), 0);
         obj.function(create_method!(Self::gid), js_string!("gid"), 0);
+        obj.function(create_method!(Self::is_windows), js_string!("isWindows"), 0);
+        obj.function(create_method!(Self::is_linux), js_string!("isLinux"), 0);
+        obj.function(create_method!(Self::is_macos), js_string!("isMacOS"), 0);
 
         let obj = obj.build();
 
@@ -94,5 +97,17 @@ impl IkeGlobalObject {
     #[cfg(not(unix))]
     pub fn uid(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
         Ok(JsValue::Null)
+    }
+
+    pub fn is_windows(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
+        Ok(JsValue::from(std::env::consts::OS == "windows"))
+    }
+
+    pub fn is_linux(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
+        Ok(JsValue::from(std::env::consts::OS == "linux"))
+    }
+
+    pub fn is_macos(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
+        Ok(JsValue::from(std::env::consts::OS == "macos"))
     }
 }
