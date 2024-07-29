@@ -35,6 +35,18 @@ interface Meta {
   dirname: string;
 }
 
+type Os =
+  | "linux"
+  | "macos"
+  | "ios"
+  | "freebsd"
+  | "dragonfly"
+  | "netbsd"
+  | "openbsd"
+  | "solaris"
+  | "android"
+  | "windows";
+
 interface Ike {
   /**
    * Provides information for the module about itself.
@@ -99,6 +111,11 @@ interface Ike {
    * Checks if current operating system is Linux.
    */
   isLinux(): boolean;
+
+  /**
+   * Returns the name of the current operating system.
+   */
+  os: Os;
 }
 
 declare namespace Ike {

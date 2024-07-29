@@ -16,9 +16,14 @@ impl IkeGlobalObject {
     pub fn init(ctx: &mut Context, file: Option<&PathBuf>) -> JsObject {
         let mut obj = ObjectInitializer::with_native_data(Self::default(), ctx);
 
-        obj.function(create_method!(Self::exit), js_string!("exit"), 1);
         obj.property(js_string!("exitCode"), JsValue::from(0), Attribute::all());
         obj.property(js_string!("pid"), std::process::id(), Attribute::all());
+        obj.property(
+            js_string!("os"),
+            JsValue::from(js_string!(std::env::consts::OS)),
+            Attribute::all(),
+        );
+        obj.function(create_method!(Self::exit), js_string!("exit"), 1);
         obj.function(
             create_method!(Self::set_exit_code),
             js_string!("setExitCode"),
