@@ -43,13 +43,13 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
     let obj = args.get(0).unwrap().as_object();
 
     if obj.is_none() {
-        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
+        throw!(err, "Expected ArrayBuffer, TypedArray");
     }
     let obj = obj.unwrap();
     let typed_arr = JsTypedArray::from_object(obj.clone());
 
     if typed_arr.is_err() {
-        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
+        throw!(err, "Expected ArrayBuffer, TypedArray");
     }
 
     let typed_arr = typed_arr.unwrap();
@@ -73,14 +73,14 @@ pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
     let obj = args.get(0).unwrap().as_object();
 
     if obj.is_none() {
-        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
+        throw!(err, "Expected ArrayBuffer, TypedArray");
     }
 
     let obj = obj.unwrap();
     let typed_arr = JsTypedArray::from_object(obj.clone());
 
     if typed_arr.is_err() {
-        throw!(err, "Expected ArrayBuffer, TypedArray or Buffer");
+        throw!(err, "Expected ArrayBuffer, TypedArray");
     }
 
     let typed_arr = typed_arr.unwrap();

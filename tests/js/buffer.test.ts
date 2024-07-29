@@ -79,3 +79,48 @@ describe("isUtf8", () => {
     expect(() => isUtf8("Hello, World!")).toThrow();
   });
 });
+
+describe("TextDecoder", () => {
+  it("should decode Latin-1 (Windows-1252) encoded bytes", () => {
+    const decoder = new TextDecoder("windows-1252");
+    const bytes = new Uint8Array([0xe4, 0xf6, 0xfc, 0xc4, 0xd6, 0xdc, 0xdf]);
+    const decodedString = decoder.decode(bytes);
+    expect(decodedString).toBe("äöüÄÖÜß");
+  });
+
+  it("should decode UTF-8 encoded bytes", () => {
+    const decoder = new TextDecoder("utf-8");
+    const bytes = new Uint8Array([0xe2, 0x82, 0xac]);
+    const decodedString = decoder.decode(bytes);
+    expect(decodedString).toBe("€");
+  });
+
+  // Expect to fail, because TextDecoder doesn't implement all the options
+  it("should handle incomplete UTF-8 sequences when streaming", () => {
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+    const bytes1 = new Uint8Array([0xe2]);
+    const bytes2 = new Uint8Array([0x82, 0xac]);
+
+    const partialDecodedString = decoder.decode(bytes1, { stream: true });
+    expect(partialDecodedString).toBe("");
+
+    const completeDecodedString = decoder.decode(bytes2, { stream: false });
+    expect(completeDecodedString).toBe("€");
+  });
+
+  it("should handle empty byte arrays", () => {
+    const decoder = new TextDecoder("utf-8");
+    const bytes = new Uint8Array([]);
+    const decodedString = decoder.decode(bytes);
+    expect(decodedString).toBe("");
+  });
+
+  it("should throw an error for invalid sequences when using fatal mode", () => {
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+    const invalidBytes = new Uint8Array([0xff]);
+
+    expect(() => {
+      decoder.decode(invalidBytes);
+    }).toThrow();
+  });
+});

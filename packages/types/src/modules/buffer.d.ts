@@ -41,6 +41,42 @@ declare module "buffer" {
      * ```
      */
     function btoa(input: string): string;
+
+    /**
+     * The `TextDecoder` class is used to decode a stream of bytes into a string, using a specified character encoding.
+     */
+    class TextDecoder {
+      readonly encoding: string;
+      readonly fatal: boolean;
+      readonly ignoreBOM: boolean;
+
+      /**
+       * Creates a new `TextDecoder` object.
+       * @param encoding The character encoding to use. If not specified, the default encoding is used.
+       * @param options An object containing optional parameters:
+       *   - `fatal`: A boolean indicating whether decoding errors should throw an error or replace the erroneous character. Default is `false`.
+       *   - `ignoreBOM`: A boolean indicating whether to ignore the Byte Order Mark (BOM) when decoding. Default is `false`.
+       */
+      constructor(
+        encoding?: string,
+        options?: {
+          fatal?: boolean | undefined;
+          ignoreBOM?: boolean | undefined;
+        }
+      );
+
+      /**
+       * Decodes a stream of bytes into a string.
+       * @param input The input data to be decoded. It can be an `ArrayBufferView`, `ArrayBuffer`, or `null`.
+       * @param options An object containing optional parameters:
+       *   - `stream`: A boolean indicating whether the input data is a stream. Default is `false`.
+       * @returns The decoded string.
+       */
+      decode(
+        input?: ArrayBufferView | ArrayBuffer | null,
+        options?: { stream?: boolean | undefined }
+      ): string;
+    }
   }
   /**
    * Returns boolean based on whether the input contains only valid ASCII-encoded data.

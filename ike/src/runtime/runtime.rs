@@ -16,8 +16,10 @@ use super::{
     meta::Meta,
     modules::IkeModuleLoader,
     queue::Queue,
-    web::encoding::TextEncoder,
-    web::timeouts::{clear_timeout, set_timeout},
+    web::{
+        encoding::{TextDecoder, TextEncoder},
+        timeouts::{clear_timeout, set_timeout},
+    },
 };
 
 pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
@@ -143,6 +145,8 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
 
     ctx.register_global_class::<TextEncoder>()
         .expect("TextEncoder is already defined");
+    ctx.register_global_class::<TextDecoder>()
+        .expect("TextDecoder is already defined");
 
     for entry in entries.iter() {
         match entry.setup_type {
