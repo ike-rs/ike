@@ -4,6 +4,7 @@ import "./modules/inspect";
 import "./modules/assert";
 import "./modules/_internal_";
 import "./url"
+import "./console"
 
 /**
  * The Meta interface contains information about the current file and its paths.
