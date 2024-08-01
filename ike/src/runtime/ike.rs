@@ -7,6 +7,7 @@ use std::path::PathBuf;
 
 use super::meta::Meta;
 use crate::runtime::fs::files::{read_file, read_file_sync};
+use crate::runtime::toml::parse_toml;
 use crate::{create_method, globals::VERSION, throw};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
@@ -45,6 +46,12 @@ impl IkeGlobalObject {
         obj.function(
             NativeFunction::from_fn_ptr(read_file_sync),
             js_string!("readFileSync"),
+            1,
+        );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(parse_toml),
+            js_string!("parseToml"),
             1,
         );
 

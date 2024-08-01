@@ -35,8 +35,7 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
 
     let content_src = match read_to_string(file) {
         Ok(content) => content,
-        // TODO: don't return type error
-        Err(e) => return Err(JsNativeError::typ().with_message(e.to_string()).into()),
+        Err(e) => return Err(JsNativeError::error().with_message(e.to_string()).into()),
     };
 
     setup_context(ctx, Some(file));

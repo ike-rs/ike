@@ -162,6 +162,14 @@ interface Ike {
      * @returns Uint8Array Content of the file as array of bytes
      */
     readFileSync(path: string): Uint8Array
+
+    /**
+     * Takes a string and parses it as TOML.
+     *
+     * @param tomlString TOML string to parse
+     * @returns unknown
+     */
+    parseToml(tomlString: string): any
 }
 
 declare namespace Ike {

@@ -3,20 +3,28 @@
 // console.log(data[0])
 // console.log("dwadaw")
 
-const promise = new Promise((resolve, reject) => {
-    resolve("Promise resolved");
-})
+const toml = Ike.parseToml(`
+title = "TOML Example"
 
-console.log(promise)
+[owner]
+name = "Tom Preston-Werner"
+dob = 1979-05-27T07:32:00-08:00
 
-const pendingPromise = new Promise((resolve, reject) => {
-    // do nothing
-})
+[database]
+enabled = true
+ports = [ 8000, 8001, 8002 ]
+data = [ ["delta", "phi"], [3.14] ]
+temp_targets = { cpu = 79.5, case = 72.0 }
 
-console.log(pendingPromise)
+[servers]
 
-const rejectedPromise = new Promise((resolve, reject) => {
-    reject("Promise rejected");
-})
+[servers.alpha]
+ip = "10.0.0.1"
+role = "frontend"
 
-console.log(rejectedPromise)
+[servers.beta]
+ip = "10.0.0.2"
+role = "backend"
+`)
+
+console.log(toml)

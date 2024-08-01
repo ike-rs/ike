@@ -76,7 +76,6 @@ pub fn open_file(path: &Path) -> Result<std::fs::File> {
         let cwd = current_dir()?;
         normalize_p(cwd.join(path))
     };
-    println!("path: {:?}", path);
 
     let needs_canonicalization =
         !is_windows_device_path && (!cfg!(target_os = "linux") || path.starts_with("/proc"));
