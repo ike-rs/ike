@@ -1,3 +1,6 @@
+use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};
+use boa_engine::builtins::promise::PromiseState;
+use boa_engine::object::builtins::JsPromise;
 use boa_engine::{
     js_string,
     native_function::NativeFunction,
@@ -8,8 +11,6 @@ use boa_engine::{
 use boa_gc::{Finalize, Trace};
 use logger::{cond_log, log, new_line, Logger};
 use std::{cell::RefCell, rc::Rc};
-
-use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct Console {
@@ -203,6 +204,19 @@ impl Console {
                     let _ = map.entries(ctx).unwrap();
 
                     cond_log!(error, new_line, "<r>}}<r>");
+                } else if str_name == "Promise" {
+                    let promise = JsPromise::from_object(obj.clone()).unwrap();
+
+                    let state = promise.state();
+                    let string_state = match state {
+                        PromiseState::Pending => "pending",
+                        PromiseState::Fulfilled(_) => "fulfilled",
+                        PromiseState::Rejected(_) => "rejected",
+                    };
+
+                    cond_log!(error, false, "<r><green>Promise<r> <r><d>{{ ");
+                    cond_log!(error, false, "<r><yellow><{}><r>", string_state);
+                    cond_log!(error, false, "<r><d> }}<r>\n");
                 } else {
                     Self::print_object(obj, ctx, console);
                 }
