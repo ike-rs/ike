@@ -1,13 +1,13 @@
 use boa_engine::{
     js_str, js_string, object::ObjectInitializer, property::Attribute, value::Type, Context,
-    JsData, JsNativeError, JsObject, JsResult, JsValue, NativeFunction,
+    JsData, JsError, JsNativeError, JsObject, JsResult, JsValue, NativeFunction,
 };
 use boa_gc::{Finalize, Trace};
 use std::path::PathBuf;
 
-use crate::{create_method, globals::VERSION, throw};
-
 use super::meta::Meta;
+use crate::runtime::fs::files::{read_file, read_file_sync};
+use crate::{create_method, globals::VERSION, throw};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct IkeGlobalObject {}
@@ -35,6 +35,18 @@ impl IkeGlobalObject {
         obj.function(create_method!(Self::is_windows), js_string!("isWindows"), 0);
         obj.function(create_method!(Self::is_linux), js_string!("isLinux"), 0);
         obj.function(create_method!(Self::is_macos), js_string!("isMacOS"), 0);
+
+        // obj.function(
+        //     NativeFunction::from_async_fn(read_file),
+        //     js_string!("readFile"),
+        //     1,
+        // );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(read_file_sync),
+            js_string!("readFileSync"),
+            1,
+        );
 
         let obj = obj.build();
 

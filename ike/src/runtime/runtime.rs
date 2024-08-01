@@ -1,13 +1,5 @@
 use std::{path::PathBuf, rc::Rc};
 
-use crate::{fs::read_to_string, get_prototype_name, js_str_to_string, testing::js::JsTest};
-use boa_engine::{
-    builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
-    JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
-};
-use logger::{cond_log, Logger};
-use smol::LocalExecutor;
-use crate::runtime::web::url::URL;
 use super::{
     buffer::{atob, btoa},
     call::rust_function,
@@ -21,6 +13,14 @@ use super::{
         timeouts::{clear_timeout, set_timeout},
     },
 };
+use crate::runtime::web::url::URL;
+use crate::{fs::read_to_string, get_prototype_name, js_str_to_string, testing::js::JsTest};
+use boa_engine::{
+    builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
+    JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
+};
+use logger::{cond_log, Logger};
+use smol::LocalExecutor;
 
 pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));

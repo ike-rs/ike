@@ -53,7 +53,11 @@ impl Scanner {
     pub const NAME_SUFIXES: [&'static str; 4] = ["_test", ".test", "_spec", ".spec"];
 
     pub fn is_test_file(path: &PathBuf) -> bool {
-        let ext = path.extension().unwrap().to_str().unwrap();
+        let ext = if let Some(ext) = path.extension() {
+            ext.to_str().unwrap()
+        } else {
+            return false;
+        };
 
         if !ALLOWED_EXTENSIONS.contains(&ext) {
             return false;
@@ -70,6 +74,17 @@ impl Scanner {
         for file in read_dir(dir)? {
             let file = file?;
             let path = file.path();
+
+            if let Some(path_str) = path.to_str() {
+                if path_str.contains(".git")
+                    || path_str.contains("node_modules")
+                    || path_str.contains("target")
+                {
+                    continue;
+                }
+            } else {
+                return Err(anyhow::anyhow!("Failed to convert path to string"));
+            }
 
             if path.is_dir() {
                 paths.extend(Self::scan(path, patterns.clone())?);

@@ -133,6 +133,35 @@ interface Ike {
      * @example '0.1.0'
      */
     version: string;
+
+    /**
+     * Synchronously reads a file and returns entire content as array of bytes.
+     *
+     * Files are resolved using current working directory
+     *
+     * Let's say we have this structure:
+     * - src
+     *   - index.ts
+     *   - file.txt
+     *
+     *  And we are running the script from parent directory:
+     *  `ike run src/index.ts`:
+     *  ```ts
+     *  const content = Ike.readFileSync("file.txt");
+     *  ```
+     *
+     *  This will result in error because path will be resolved as `{cwd}/file.txt` which is not correct.
+     *
+     *  @example
+     *  ```ts
+     *  const content = Ike.readFileSync("file.txt");
+     *  console.log(new TextDecoder().decode(content));
+     *  ```
+     *
+     * @param path Path to the file
+     * @returns Uint8Array Content of the file as array of bytes
+     */
+    readFileSync(path: string): Uint8Array
 }
 
 declare namespace Ike {
