@@ -1,3 +1,3 @@
-import {isEven} from "is-even"
-
-console.log(isEven(0))
+console.log(
+    URL.parse("http://www.example.com?query=string")
+)

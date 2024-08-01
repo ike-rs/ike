@@ -7,7 +7,7 @@ use boa_engine::{
 };
 use logger::{cond_log, Logger};
 use smol::LocalExecutor;
-
+use crate::runtime::web::url::URL;
 use super::{
     buffer::{atob, btoa},
     call::rust_function,
@@ -147,6 +147,8 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
         .expect("TextEncoder is already defined");
     ctx.register_global_class::<TextDecoder>()
         .expect("TextDecoder is already defined");
+    ctx.register_global_class::<URL>()
+        .expect("URL is already defined");
 
     for entry in entries.iter() {
         match entry.setup_type {

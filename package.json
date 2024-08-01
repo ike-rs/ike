@@ -9,5 +9,8 @@
   },
   "scripts": {
     "format": "biome format --write"
+  },
+  "dependencies": {
+    "is-even": "^1.0.0"
   }
 }

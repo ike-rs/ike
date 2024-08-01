@@ -92,10 +92,6 @@ impl Class for TextEncoder {
     const NAME: &'static str = "TextEncoder";
     const LENGTH: usize = 0;
 
-    fn data_constructor(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<Self> {
-        Ok(TextEncoder {})
-    }
-
     fn init(class: &mut ClassBuilder<'_>) -> JsResult<()> {
         class.static_property(
             js_string!("encoding"),
@@ -116,6 +112,10 @@ impl Class for TextEncoder {
         );
 
         Ok(())
+    }
+
+    fn data_constructor(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<Self> {
+        Ok(TextEncoder {})
     }
 }
 
@@ -358,7 +358,7 @@ impl TextDecoder {
         }
     }
 
-    pub fn pasrse_args(args: &[JsValue], ctx: &mut Context) -> JsResult<(String, bool, bool)> {
+    pub fn parse_args(args: &[JsValue], ctx: &mut Context) -> JsResult<(String, bool, bool)> {
         let mut encoding = "utf-8".to_string();
         let mut fatal_bool = false;
         let mut ignore_bom_bool = false;
@@ -416,7 +416,7 @@ impl Class for TextDecoder {
     const LENGTH: usize = 0;
 
     fn data_constructor(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Self> {
-        let (encoding, fatal, ignore_bom) = Self::pasrse_args(args, ctx)?;
+        let (encoding, fatal, ignore_bom) = Self::parse_args(args, ctx)?;
         Ok(TextDecoder::new(encoding, fatal, ignore_bom))
     }
 
@@ -425,7 +425,7 @@ impl Class for TextDecoder {
         args: &[JsValue],
         context: &mut Context,
     ) -> JsResult<()> {
-        let (encoding, fatal, ignore_bom) = Self::pasrse_args(args, context)?;
+        let (encoding, fatal, ignore_bom) = Self::parse_args(args, context)?;
 
         instance.set(
             js_string!("encoding"),
