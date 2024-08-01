@@ -34,7 +34,7 @@ pub fn setup_panic_handler() {
         }
 
         eprintln!("");
-        elog!(warn, "This indicates a bug in the program a not in your code. Please report it in the github repository.");
+        elog!(warn, "This indicates a bug in the program and not in your code. Please report it in the github repository.");
         eprintln!("");
 
         // show the actual error

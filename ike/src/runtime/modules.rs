@@ -1,5 +1,3 @@
-use std::{collections::HashMap, vec};
-
 use boa_engine::{
     job::NativeJob, js_string, module::ModuleLoader, Context, JsNativeError, JsResult, JsString,
     JsValue, Module, Source,
@@ -9,6 +7,8 @@ use isahc::{
     AsyncReadResponseExt, Request, RequestExt,
 };
 use oxc_resolver::{EnforceExtension, ResolveOptions, Resolver};
+use std::path::PathBuf;
+use std::{collections::HashMap, vec};
 
 #[derive(Debug, Default)]
 pub struct IkeModuleLoader;
@@ -83,21 +83,18 @@ impl ModuleLoader for IkeModuleLoader {
 
             finish_load(module, context);
         } else {
-            let meta_path = context
-                .global_object()
-                .get(js_string!("Ike"), context)
-                .unwrap()
-                .to_object(context)
-                .unwrap()
-                .get(js_string!("meta"), context)
-                .unwrap()
-                .to_object(context)
-                .unwrap()
-                .get(js_string!("dirname"), context)
-                .unwrap()
-                .to_string(context)
-                .unwrap()
-                .to_std_string_escaped();
+            let ref_path = match _referrer.path().unwrap().parent() {
+                Some(parent) => parent,
+                None => {
+                    finish_load(
+                        Err(JsNativeError::typ()
+                            .with_message("Failed to get parent directory")
+                            .into()),
+                        context,
+                    );
+                    return;
+                }
+            };
 
             let options = ResolveOptions {
                 enforce_extension: EnforceExtension::Disabled,
@@ -113,7 +110,7 @@ impl ModuleLoader for IkeModuleLoader {
                 ..ResolveOptions::default()
             };
 
-            match Resolver::new(options).resolve(meta_path, &spec) {
+            match Resolver::new(options).resolve(ref_path, &spec) {
                 Err(error) => println!("Error: {error}"),
                 Ok(resolution) => {
                     let module = Module::parse(

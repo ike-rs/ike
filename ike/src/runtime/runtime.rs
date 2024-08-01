@@ -41,7 +41,7 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
 
     setup_context(ctx, Some(file));
 
-    let module = Module::parse(Source::from_bytes(content_src.as_bytes()), None, ctx)?;
+    let module = Module::parse(Source::from_filepath(file).unwrap(), None, ctx)?;
     let promise = module.load_link_evaluate(ctx);
 
     ctx.run_jobs();
