@@ -1,0 +1,8 @@
+[package]
+name = "ike"
+version = "0.1.0"
+main = "src/index.ts"
+
+[dependencies]
+yaml = "0.4.0"
+toml = { version = "0.5.8", features = ["utils"] }

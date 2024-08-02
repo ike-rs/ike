@@ -4,7 +4,7 @@ use anyhow::Result;
 use chrono::{DateTime, Utc};
 use clap::{Arg, Command};
 
-use crate::{fs::normalize_path, resolver::package_json::PackageManager};
+use crate::{fs::normalize_path, resolver::ike::IkeToml};
 
 use super::{run_command::run_command, style, test_command::test_command};
 
@@ -12,7 +12,7 @@ use super::{run_command::run_command, style, test_command::test_command};
 pub struct Cli {
     pub start_timestamp: DateTime<Utc>,
     pub root: PathBuf,
-    pub pkg: Option<PackageManager>,
+    pub pkg: Option<IkeToml>,
 }
 
 impl Cli {
@@ -76,7 +76,7 @@ impl Cli {
         self
     }
 
-    pub fn set_pkg(mut self, pkg: Option<PackageManager>) -> Self {
+    pub fn set_pkg(mut self, pkg: Option<IkeToml>) -> Self {
         self.pkg = pkg;
         self
     }
@@ -97,13 +97,13 @@ impl Cli {
         match matches.subcommand() {
             Some(("run", sub_matches)) => {
                 let root = self.parse_root(sub_matches);
-                let pkg = PackageManager::find_nearest_from(root.clone());
+                let pkg = IkeToml::find_nearest_from(root.clone());
 
                 run_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?
             }
             Some(("test", sub_matches)) => {
                 let root = self.parse_root(sub_matches);
-                let pkg = PackageManager::find_nearest_from(root.clone());
+                let pkg = IkeToml::find_nearest_from(root.clone());
 
                 test_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?
             }

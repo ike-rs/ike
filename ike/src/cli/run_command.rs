@@ -11,6 +11,7 @@ pub fn run_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
     let cli_entry = resolve_entry(cli.clone(), sub_matches)?;
     let entry = parse_entry(&cli_entry, cli.root)?;
 
+    println!("{:?}", cli.pkg.unwrap().toml.dependencies);
     if entry.is_file {
         // TODO: strip typescript specific syntax and execute the file
 
@@ -31,10 +32,16 @@ pub fn run_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
 fn resolve_entry(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<String> {
     if let Some(entry) = sub_matches.get_one::<String>("entry") {
         Ok(entry.to_string())
-    } else if let Some(pkg_entry) = cli.pkg.as_ref().and_then(|pkg| pkg.json.main.as_ref()) {
+    } else if let Some(pkg_entry) = cli
+        .pkg
+        .as_ref()
+        .and_then(|pkg| pkg.toml.package.main.as_ref())
+    {
         Ok(pkg_entry.clone())
     } else {
-        Err(anyhow::format_err!("Could not resolve entry"))
+        Err(anyhow::format_err!(
+            "Could not resolve entry file. Please specify one as an <cyan>argument<r> or in the <cyan>main<r> field of the <cyan>ike.toml<r> file"
+        ))
     }
 }
 
