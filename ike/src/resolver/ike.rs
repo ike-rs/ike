@@ -12,6 +12,10 @@ pub struct IkeTomlStruct {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "devDependencies")]
     pub dev_dependencies: Option<HashMap<String, DependencyOrString>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tasks: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub features: Option<HashMap<String, Feature>>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -19,6 +23,20 @@ pub struct IkeTomlStruct {
 pub enum DependencyOrString {
     Dependency(Dependency),
     String(String),
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Feature {
+    pub dependencies: HashMap<String, DependencyOrString>,
+    pub files: Vec<String>,
+    pub depends_on: Option<Vec<String>>,
+}
+
+#[derive(Deserialize, Debug, Default, Clone)]
+pub struct ParsedFeature {
+    pub dependencies: HashMap<String, Dependency>,
+    pub files: Vec<String>,
+    pub depends_on: Option<Vec<String>>,
 }
 
 #[derive(Deserialize, Debug, Default, Clone)]
@@ -70,6 +88,8 @@ pub struct ParsedIkeTomlStruct {
     pub package: IkePackage,
     pub dependencies: HashMap<String, Dependency>,
     pub dev_dependencies: HashMap<String, Dependency>,
+    pub tasks: HashMap<String, String>,
+    pub features: HashMap<String, ParsedFeature>,
 }
 
 impl IkeTomlStruct {
@@ -126,14 +146,35 @@ impl IkeTomlStruct {
         Ok(parsed_deps)
     }
 
+    fn parse_features(&self) -> Result<HashMap<String, ParsedFeature>> {
+        let mut parsed_features = HashMap::new();
+
+        if let Some(features) = &self.features {
+            for (name, feature) in features {
+                let parsed_feature = ParsedFeature {
+                    dependencies: self.parse_dependencies(Some(feature.dependencies.clone()))?,
+                    files: feature.files.clone(),
+                    depends_on: feature.depends_on.clone(),
+                };
+
+                parsed_features.insert(name.clone(), parsed_feature);
+            }
+        }
+
+        Ok(parsed_features)
+    }
+
     pub fn to_parsed(self) -> Result<ParsedIkeTomlStruct> {
         let parsed_dependencies = self.parse_dependencies(self.dependencies.clone())?;
         let parsed_dev_dependencies = self.parse_dependencies(self.dev_dependencies.clone())?;
+        let parsed_features = self.parse_features()?;
 
         Ok(ParsedIkeTomlStruct {
             package: self.package,
             dependencies: parsed_dependencies,
             dev_dependencies: parsed_dev_dependencies,
+            tasks: self.tasks.unwrap_or_default(),
+            features: parsed_features,
         })
     }
 }

@@ -11,7 +11,7 @@ pub fn run_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
     let cli_entry = resolve_entry(cli.clone(), sub_matches)?;
     let entry = parse_entry(&cli_entry, cli.root)?;
 
-    println!("{:?}", cli.pkg.unwrap().toml.dependencies);
+    println!("{:?}", cli.pkg.unwrap().toml.features);
     if entry.is_file {
         // TODO: strip typescript specific syntax and execute the file
 
