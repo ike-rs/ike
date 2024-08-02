@@ -155,7 +155,8 @@ impl Console {
             }
             // TODO: better handling. array, object, map, set support
             JsValue::Object(obj) => {
-                let proto = match obj.prototype() {
+                let proto = obj.prototype();
+                let proto = match proto {
                     Some(proto) => proto,
                     None => {
                         Self::print_object(obj, ctx, console);
@@ -217,6 +218,17 @@ impl Console {
                     cond_log!(error, false, "<r><green>Promise<r> <r><d>{{ ");
                     cond_log!(error, false, "<r><yellow><{}><r>", string_state);
                     cond_log!(error, false, "<r><d> }}<r>\n");
+                } else if str_name.contains("Function") {
+                    let name = obj
+                        .get(js_string!("name"), ctx)
+                        .unwrap_or(JsValue::undefined());
+
+                    let func_name = js_str_to_string!(name.to_string(ctx).unwrap());
+                    if name.is_undefined() || func_name.is_empty() {
+                        cond_log!(error, new_line, "<r><cyan>[{}]<r>", str_name);
+                    } else {
+                        cond_log!(error, new_line, "<r><cyan>[{}: {}]<r>", str_name, func_name);
+                    }
                 } else {
                     Self::print_object(obj, ctx, console);
                 }
