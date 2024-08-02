@@ -3,20 +3,20 @@
 // console.log(data[0])
 // console.log("dwadaw")
 
-function a() {
-}
+console.log(
+    [1, 2, 3, 4, 5]
+)
+console.log([])
 
-async function b() {
-}
-
-function* c() {
-}
-
-async function* d() {
-}
-
-console.log(a, b, c, d, () => {
-}, async () => {
-}, function* () {
-}, async function* () {
-});
+const bigarr = [
+    {
+        test: {
+            hello: "world"
+        }
+    },
+    2134,
+    () => {
+    },
+    [1, 2, 3, 4, 5]
+]
+console.log(bigarr)

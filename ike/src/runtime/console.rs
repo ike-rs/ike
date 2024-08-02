@@ -1,6 +1,6 @@
 use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};
 use boa_engine::builtins::promise::PromiseState;
-use boa_engine::object::builtins::JsPromise;
+use boa_engine::object::builtins::{JsArray, JsPromise};
 use boa_engine::{
     js_string,
     native_function::NativeFunction,
@@ -87,7 +87,8 @@ impl Console {
         }
 
         for arg in args {
-            Self::print_as(arg, ctx, level, console, true);
+            println!("{:?}", arg);
+            Self::print_as(arg, ctx, level, console, true, false);
         }
         Ok(JsValue::undefined())
     }
@@ -98,6 +99,7 @@ impl Console {
         level: LogLevel,
         console: &mut Self,
         new_line: bool,
+        in_array: bool,
     ) {
         let error = match level {
             LogLevel::Error => true,
@@ -159,7 +161,7 @@ impl Console {
                 let proto = match proto {
                     Some(proto) => proto,
                     None => {
-                        Self::print_object(obj, ctx, console);
+                        Self::print_object(obj, ctx, console, in_array);
                         return;
                     }
                 };
@@ -229,15 +231,81 @@ impl Console {
                     } else {
                         cond_log!(error, new_line, "<r><cyan>[{}: {}]<r>", str_name, func_name);
                     }
+                } else if str_name == "Array" {
+                    let arr = JsArray::from_object(obj.clone()).unwrap();
+                    let length = arr.length(ctx).unwrap();
+
+                    if length == 0 {
+                        cond_log!(error, new_line, "[]");
+                        return;
+                    }
+
+                    let new_line = length > 10;
+
+                    if new_line {
+                        cond_log!(error, new_line, "<r>[<r>");
+
+                        console.indent += 1;
+                        console.depth += 1;
+
+                        for i in 0..length {
+                            let value = arr.get(i, ctx).unwrap();
+
+                            if i == 0 {
+                                Self::print_indent(console);
+                                Self::print_as(
+                                    &value,
+                                    ctx,
+                                    LogLevel::Normal,
+                                    console,
+                                    false,
+                                    false,
+                                );
+                            } else {
+                                cond_log!(error, false, "<r><d>,<r>");
+                                new_line!();
+                                Self::print_indent(console);
+                                Self::print_as(
+                                    &value,
+                                    ctx,
+                                    LogLevel::Normal,
+                                    console,
+                                    false,
+                                    false,
+                                );
+                            }
+                        }
+
+                        console.depth -= 1;
+                        console.indent -= 1;
+                        new_line!();
+                        Self::print_indent(console);
+                        cond_log!(error, false, "<r>]<r>\n");
+                    } else {
+                        cond_log!(error, false, "<r>[ <r>");
+
+                        for i in 0..length {
+                            let value = arr.get(i, ctx).unwrap();
+
+                            if i == 0 {
+                                Self::print_as(&value, ctx, LogLevel::Normal, console, false, true);
+                            } else {
+                                cond_log!(error, false, "<r><d>, <r>");
+                                Self::print_as(&value, ctx, LogLevel::Normal, console, false, true);
+                            }
+                        }
+
+                        cond_log!(error, false, "<r> ]<r>");
+                    }
                 } else {
-                    Self::print_object(obj, ctx, console);
+                    Self::print_object(obj, ctx, console, in_array);
                 }
             }
         }
     }
 
     // TODO: still some issues with the object printing
-    fn print_object(obj: &JsObject, ctx: &mut Context, console: &mut Self) {
+    fn print_object(obj: &JsObject, ctx: &mut Context, console: &mut Self, in_array: bool) {
         let properties = obj.own_property_keys(ctx).unwrap();
         let i = properties.iter().count();
 
@@ -253,10 +321,16 @@ impl Console {
             }
 
             if index == 0 {
-                console.indent += 1;
-                console.depth += 1;
+                if in_array {
+                    console.indent += 2;
+                    console.depth += 2;
+                    print!("\n{{\n")
+                } else {
+                    console.indent += 1;
+                    console.depth += 1;
+                    print!("{{\n");
+                }
 
-                print!("{{\n");
                 Self::print_indent(console);
             } else {
                 Self::print_comma();
@@ -274,7 +348,7 @@ impl Console {
                     js_str_to_string!(value.to_string(ctx).unwrap())
                 );
             } else {
-                Self::print_as(&value, ctx, LogLevel::Normal, console, false);
+                Self::print_as(&value, ctx, LogLevel::Normal, console, false, false);
             }
 
             if index == i - 1 {
