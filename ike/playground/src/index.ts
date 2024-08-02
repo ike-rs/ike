@@ -9,14 +9,13 @@ console.log(
 console.log([])
 
 const bigarr = [
-    {
-        test: {
-            hello: "world"
-        }
-    },
     2134,
     () => {
     },
     [1, 2, 3, 4, 5]
 ]
 console.log(bigarr)
+
+const arr = new TextEncoder().encode("hello world.hello world. hello world. hello world. hello world. hello world. hello world.  ")
+
+console.log(arr)

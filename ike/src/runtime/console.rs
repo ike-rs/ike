@@ -1,6 +1,6 @@
 use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};
 use boa_engine::builtins::promise::PromiseState;
-use boa_engine::object::builtins::{JsArray, JsPromise};
+use boa_engine::object::builtins::{JsArray, JsPromise, JsTypedArray};
 use boa_engine::{
     js_string,
     native_function::NativeFunction,
@@ -87,7 +87,6 @@ impl Console {
         }
 
         for arg in args {
-            println!("{:?}", arg);
             Self::print_as(arg, ctx, level, console, true, false);
         }
         Ok(JsValue::undefined())
@@ -236,7 +235,7 @@ impl Console {
                     let length = arr.length(ctx).unwrap();
 
                     if length == 0 {
-                        cond_log!(error, new_line, "[]");
+                        cond_log!(error, new_line, "\n[]");
                         return;
                     }
 
@@ -297,11 +296,46 @@ impl Console {
 
                         cond_log!(error, false, "<r> ]<r>");
                     }
+                } else if Self::is_typed_array(&str_name) {
+                    let typed_arr = JsTypedArray::from_object(obj.clone()).unwrap();
+                    let length = typed_arr.length(ctx).unwrap();
+
+                    if length == 0 {
+                        cond_log!(error, new_line, "<r>{}<r> []", str_name);
+                        return;
+                    }
+
+                    cond_log!(error, false, "\n<r>{}({})<r> [", str_name, length);
+
+                    for i in 0..length {
+                        let value = typed_arr.get(i, ctx).unwrap();
+
+                        if i == 0 {
+                            Self::print_as(&value, ctx, LogLevel::Normal, console, false, true);
+                        } else {
+                            cond_log!(error, false, "<r><d>, <r>");
+                            Self::print_as(&value, ctx, LogLevel::Normal, console, false, true);
+                        }
+                    }
+
+                    cond_log!(error, false, "<r> ]<r>");
                 } else {
                     Self::print_object(obj, ctx, console, in_array);
                 }
             }
         }
+    }
+
+    fn is_typed_array(str_name: &str) -> bool {
+        str_name.contains("Int8Array")
+            || str_name.contains("Uint8Array")
+            || str_name.contains("Uint8ClampedArray")
+            || str_name.contains("Int16Array")
+            || str_name.contains("Uint16Array")
+            || str_name.contains("Int32Array")
+            || str_name.contains("Uint32Array")
+            || str_name.contains("Float32Array")
+            || str_name.contains("Float64Array")
     }
 
     // TODO: still some issues with the object printing
