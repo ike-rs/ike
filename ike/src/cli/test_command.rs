@@ -1,5 +1,5 @@
 use std::{fs::read_dir, path::PathBuf};
-
+use std::path::Path;
 use crate::{
     globals::{ALLOWED_EXTENSIONS, VERSION},
     testing::tests::run_tests,
@@ -52,7 +52,7 @@ struct Scanner;
 impl Scanner {
     pub const NAME_SUFIXES: [&'static str; 4] = ["_test", ".test", "_spec", ".spec"];
 
-    pub fn is_test_file(path: &PathBuf) -> bool {
+    pub fn is_test_file(path: &Path) -> bool {
         let ext = if let Some(ext) = path.extension() {
             ext.to_str().unwrap()
         } else {

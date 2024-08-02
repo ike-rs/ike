@@ -150,7 +150,7 @@ impl Console {
                 }
             }
             JsValue::String(_) => {
-                let formatted = Self::format(arg, ctx).unwrap_or(String::new());
+                let formatted = Self::format(arg, ctx).unwrap_or_default();
 
                 cond_log!(error, new_line, "{}", formatted);
             }
@@ -341,7 +341,7 @@ impl Console {
     // TODO: still some issues with the object printing
     fn print_object(obj: &JsObject, ctx: &mut Context, console: &mut Self, in_array: bool) {
         let properties = obj.own_property_keys(ctx).unwrap();
-        let i = properties.iter().count();
+        let i = properties.len();
 
         if i == 0 {
             log!("<r>{{}}<r>");

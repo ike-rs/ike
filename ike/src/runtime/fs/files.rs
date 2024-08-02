@@ -1,5 +1,5 @@
 use crate::runtime::fs::FileSystem;
-use crate::{js_str_to_string, throw};
+use crate::throw;
 use boa_engine::object::builtins::{JsArrayBuffer, JsUint8Array};
 use boa_engine::{js_string, Context, JsArgs, JsNativeError, JsResult, JsString, JsValue};
 use std::future::Future;
@@ -9,7 +9,7 @@ pub fn resolve_path_from_args(args: &[JsValue], ctx: &mut Context) -> JsResult<J
     if args.is_empty() {
         throw!(err, "Expected a path in fs function");
     }
-    let path = args.get(0).unwrap();
+    let path = args.first().unwrap();
     let path = path.to_string(ctx)?;
     Ok(path)
 }

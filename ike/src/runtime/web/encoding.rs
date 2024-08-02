@@ -24,7 +24,7 @@ impl TextEncoder {
         }
 
         let input = args
-            .get(0)
+            .first()
             .unwrap()
             .to_string(ctx)?
             .to_std_string()
@@ -45,7 +45,7 @@ impl TextEncoder {
         }
 
         let input = args
-            .get(0)
+            .first()
             .unwrap()
             .to_string(ctx)?
             .to_std_string()
@@ -59,7 +59,7 @@ impl TextEncoder {
         let mut read = 0;
         let mut written = 0;
 
-        while let Some(c) = input_iter.next() {
+        for c in input_iter {
             let mut buf = [0; 4];
             let encoded_char = c.encode_utf8(&mut buf);
             let encoded_len = encoded_char.len();
@@ -179,7 +179,7 @@ impl EncodingLabelMap {
 }
 
 impl EncodingLabel {
-    pub fn from_str(input: &str) -> Option<EncodingLabel> {
+    pub fn label_from_string(input: &str) -> Option<EncodingLabel> {
         let trimmed_input = input.trim();
         match trimmed_input.to_lowercase().as_str() {
             "l1" | "ascii" | "cp819" | "cp1252" | "ibm819" | "latin1" | "iso88591" | "us-ascii"
@@ -226,7 +226,7 @@ impl TextDecoder {
                 .into());
         }
 
-        let input = args.get(0).unwrap().as_object().ok_or_else(|| {
+        let input = args.first().unwrap().as_object().ok_or_else(|| {
             JsNativeError::typ()
                 .with_message("Expected a TypedArray or ArrayBuffer argument in decode")
         })?;
@@ -243,7 +243,7 @@ impl TextDecoder {
             let arg_1 = args.get(1).unwrap();
             if arg_1.is_object() {
                 let options = arg_1.as_object().unwrap();
-                if let Some(stream_opt) = options.get(js_string!("stream"), ctx).ok() {
+                if let Ok(stream_opt) = options.get(js_string!("stream"), ctx) {
                     if stream_opt.is_boolean() {
                         stream = stream_opt.as_boolean().unwrap();
                     } else if stream_opt.is_undefined() {
@@ -258,12 +258,10 @@ impl TextDecoder {
 
         let decoder = obj.downcast_ref::<TextDecoder>().unwrap();
         match Self::decode_slice(data_block, stream, decoder, ctx) {
-            Ok(result) => return Ok(result),
-            Err(err) => {
-                return Err(JsNativeError::typ()
-                    .with_message(format!("Error decoding data: {}", err.to_string()))
-                    .into())
-            }
+            Ok(result) => Ok(result),
+            Err(err) => Err(JsNativeError::typ()
+                .with_message(format!("Error decoding data: {}", err.to_string()))
+                .into()),
         }
     }
 
@@ -276,7 +274,7 @@ impl TextDecoder {
         let fatal = decoder.fatal;
         let ignore_bom = decoder.ignore_bom;
 
-        match EncodingLabel::from_str(&decoder.encoding).unwrap() {
+        match EncodingLabel::label_from_string(&decoder.encoding).unwrap() {
             // Latin1
             EncodingLabel::Windows1252 => {
                 let mut output = String::new();
@@ -289,10 +287,8 @@ impl TextDecoder {
                 let mut data = Vec::new();
                 data.extend_from_slice(input);
 
-                if ignore_bom {
-                    if data.starts_with(&[0xEF, 0xBB, 0xBF]) {
-                        data.drain(..3);
-                    }
+                if ignore_bom && data.starts_with(&[0xEF, 0xBB, 0xBF]) {
+                    data.drain(..3);
                 }
 
                 match String::from_utf8(data.clone()) {
@@ -364,11 +360,11 @@ impl TextDecoder {
         let mut ignore_bom_bool = false;
 
         if !args.is_empty() {
-            let arg_0 = args.get(0).unwrap();
+            let arg_0 = args.first().unwrap();
 
             if arg_0.is_string() {
                 let arg_val = arg_0.to_string(ctx)?.to_std_string().unwrap();
-                if let Some(_encoding) = EncodingLabel::from_str(&arg_val) {
+                if let Some(_encoding) = EncodingLabel::label_from_string(&arg_val) {
                     encoding = arg_val;
                 } else {
                     throw!(typ, format!("Unsupported encoding label: {}", arg_val));
@@ -384,7 +380,7 @@ impl TextDecoder {
                 if arg_1.is_object() {
                     let options = arg_1.as_object().unwrap();
 
-                    if let Some(fatal) = options.get(js_string!("fatal"), ctx).ok() {
+                    if let Ok(fatal) = options.get(js_string!("fatal"), ctx) {
                         if fatal.is_boolean() {
                             fatal_bool = fatal.as_boolean().unwrap();
                         } else if fatal.is_undefined() {
@@ -393,7 +389,7 @@ impl TextDecoder {
                         }
                     }
 
-                    if let Some(ignore_bom) = options.get(js_string!("ignoreBOM"), ctx).ok() {
+                    if let Ok(ignore_bom) = options.get(js_string!("ignoreBOM"), ctx) {
                         if ignore_bom.is_boolean() {
                             ignore_bom_bool = ignore_bom.as_boolean().unwrap();
                         } else if ignore_bom.is_undefined() {
@@ -414,6 +410,16 @@ impl TextDecoder {
 impl Class for TextDecoder {
     const NAME: &'static str = "TextDecoder";
     const LENGTH: usize = 0;
+
+    fn init(class: &mut ClassBuilder<'_>) -> JsResult<()> {
+        class.method(
+            js_string!("decode"),
+            1,
+            NativeFunction::from_fn_ptr(Self::decode),
+        );
+
+        Ok(())
+    }
 
     fn data_constructor(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Self> {
         let (encoding, fatal, ignore_bom) = Self::parse_args(args, ctx)?;
@@ -442,16 +448,6 @@ impl Class for TextDecoder {
             false,
             context,
         )?;
-
-        Ok(())
-    }
-
-    fn init(class: &mut ClassBuilder<'_>) -> JsResult<()> {
-        class.method(
-            js_string!("decode"),
-            1,
-            NativeFunction::from_fn_ptr(Self::decode),
-        );
 
         Ok(())
     }

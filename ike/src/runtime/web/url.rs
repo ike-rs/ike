@@ -27,7 +27,7 @@ impl URL {
             throw!(typ, "URL constructor requires at least one argument");
         }
 
-        let url = args.get(0).unwrap().to_string(ctx)?;
+        let url = args.first().unwrap().to_string(ctx)?;
 
         let base = if args.len() > 1 {
             Some(args.get(1).unwrap().to_string(ctx)?)
@@ -38,31 +38,23 @@ impl URL {
         Ok((url, base))
     }
 
-    pub fn js_to_string(this: &JsValue, _: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
+    pub fn js_to_string(this: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
         let this = this.as_object().unwrap();
         let this = this.downcast_ref::<URL>().unwrap();
 
         Ok(JsValue::new(js_string!(this.url.clone())))
     }
 
-    pub fn create_object_url(
-        this: &JsValue,
-        _: &[JsValue],
-        context: &mut Context,
-    ) -> JsResult<JsValue> {
+    pub fn create_object_url(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
         unimplemented!("createObjectURL is not implemented yet")
     }
 
-    pub fn revoke_object_url(
-        this: &JsValue,
-        _: &[JsValue],
-        context: &mut Context,
-    ) -> JsResult<JsValue> {
+    pub fn revoke_object_url(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
         unimplemented!("revokeObjectURL is not implemented yet")
     }
 
     // Same as constructing a new URL, but returns null if the URL is invalid
-    pub fn parse(this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
+    pub fn parse(_: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
         let (url, base) = Self::parse_args(args, context)?;
         let data = Self::new(url, base);
         let url = match url::Url::parse(&data.url) {
@@ -71,7 +63,7 @@ impl URL {
         };
 
         if let Some(base) = &data.base {
-            if let Err(_) = url.join(base) {
+            if url.join(base).is_err() {
                 return Ok(JsValue::null());
             }
         }
@@ -82,7 +74,7 @@ impl URL {
         Ok(JsValue::from(obj))
     }
 
-    pub fn can_parse(this: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
+    pub fn can_parse(_: &JsValue, args: &[JsValue], context: &mut Context) -> JsResult<JsValue> {
         let (url, base) = Self::parse_args(args, context)?;
         let data = Self::new(url, base);
         let url = match url::Url::parse(&data.url) {
@@ -91,7 +83,7 @@ impl URL {
         };
 
         if let Some(base) = &data.base {
-            if let Err(_) = url.join(base) {
+            if url.join(base).is_err() {
                 return Ok(JsValue::from(false));
             }
         }
@@ -183,33 +175,6 @@ impl Class for URL {
     const NAME: &'static str = "URL";
     const LENGTH: usize = 0;
 
-    fn data_constructor(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Self> {
-        let (url, base) = Self::parse_args(args, ctx)?;
-        Ok(URL::new(url, base))
-    }
-
-    fn object_constructor(
-        instance: &JsObject,
-        args: &[JsValue],
-        context: &mut Context,
-    ) -> JsResult<()> {
-        let (url, base) = Self::parse_args(args, context)?;
-        let data = Self::new(url, base);
-        let url = url::Url::parse(&data.url).map_err(|err| {
-            JsNativeError::error().with_message(format!("Invalid URL: {}", err.to_string()))
-        })?;
-        if data.base.is_some() {
-            url.join(&data.base.clone().unwrap()).map_err(|err| {
-                JsNativeError::error().with_message(format!("Invalid URL: {}", err.to_string()))
-            })?;
-        }
-
-        Self::set_data(instance, url, context)?;
-
-        // TODO: implement searchParams
-        Ok(())
-    }
-
     fn init(class: &mut ClassBuilder<'_>) -> JsResult<()> {
         class.method(
             js_string!("toString"),
@@ -248,6 +213,33 @@ impl Class for URL {
             NativeFunction::from_fn_ptr(Self::can_parse),
         );
 
+        Ok(())
+    }
+
+    fn data_constructor(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Self> {
+        let (url, base) = Self::parse_args(args, ctx)?;
+        Ok(URL::new(url, base))
+    }
+
+    fn object_constructor(
+        instance: &JsObject,
+        args: &[JsValue],
+        context: &mut Context,
+    ) -> JsResult<()> {
+        let (url, base) = Self::parse_args(args, context)?;
+        let data = Self::new(url, base);
+        let url = url::Url::parse(&data.url).map_err(|err| {
+            JsNativeError::error().with_message(format!("Invalid URL: {}", err.to_string()))
+        })?;
+        if data.base.is_some() {
+            url.join(&data.base.clone().unwrap()).map_err(|err| {
+                JsNativeError::error().with_message(format!("Invalid URL: {}", err.to_string()))
+            })?;
+        }
+
+        Self::set_data(instance, url, context)?;
+
+        // TODO: implement searchParams
         Ok(())
     }
 }

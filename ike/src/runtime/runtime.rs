@@ -154,31 +154,31 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
             SetupType::Property => {
                 if let SetupValue::Object(ref obj) = entry.value {
                     ctx.register_global_property(
-                        entry.name.clone(),
+                        entry.name,
                         JsValue::Object(obj.clone()),
                         Attribute::all(),
                     )
-                    .expect(&format!("{:?} is already defined", entry.name));
+                    .unwrap_or_else(|_| panic!("{:?} is already defined", entry.name));
                 }
             }
             SetupType::Callable => {
                 if let SetupValue::Function(ref func) = entry.value {
                     ctx.register_global_callable(
-                        js_string!(entry.name.clone()),
+                        js_string!(entry.name),
                         entry.length.unwrap_or(0),
                         func.clone(),
                     )
-                    .expect(&format!("{:?} is already defined", entry.name));
+                    .unwrap_or_else(|_| panic!("{:?} is already defined", entry.name));
                 }
             }
             SetupType::BuiltinCallable => {
                 if let SetupValue::Function(ref func) = entry.value {
                     ctx.register_global_builtin_callable(
-                        js_string!(entry.name.clone()),
+                        js_string!(entry.name),
                         entry.length.unwrap_or(0),
                         func.clone(),
                     )
-                    .expect(&format!("{:?} is already defined", entry.name));
+                    .unwrap_or_else(|_| panic!("{:?} is already defined", entry.name));
                 }
             }
             _ => todo!(),

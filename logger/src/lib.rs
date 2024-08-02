@@ -43,7 +43,7 @@ pub fn pretty_fmt(fmt_str: &str) -> String {
             }
             '{' => {
                 new_fmt.push('{');
-                while let Some(next_char) = chars.next() {
+                for next_char in chars.by_ref() {
                     new_fmt.push(next_char);
                     if next_char == '}' {
                         break;

@@ -1,13 +1,12 @@
 use boa_engine::{
-    job::NativeJob, js_string, module::ModuleLoader, Context, JsNativeError, JsResult, JsString,
-    JsValue, Module, Source,
+    job::NativeJob, module::ModuleLoader, Context, JsNativeError, JsResult, JsString, JsValue,
+    Module, Source,
 };
 use isahc::{
     config::{Configurable, RedirectPolicy},
     AsyncReadResponseExt, Request, RequestExt,
 };
 use oxc_resolver::{EnforceExtension, ResolveOptions, Resolver};
-use std::path::PathBuf;
 use std::{collections::HashMap, vec};
 
 #[derive(Debug, Default)]

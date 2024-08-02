@@ -33,7 +33,7 @@ pub fn describe(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Js
     if args.is_empty() {
         throw!(typ, "Expected arguments in describe");
     }
-    let name = args.get(0).unwrap();
+    let name = args.first().unwrap();
     assert_arg_type!(string, name);
     let func = args.get(1).unwrap();
     assert_arg_type!(function, func);

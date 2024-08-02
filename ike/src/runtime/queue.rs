@@ -31,10 +31,6 @@ impl JobQueue for Queue<'_> {
         self.jobs.borrow_mut().push_back(job);
     }
 
-    fn enqueue_future_job(&self, future: FutureJob, _context: &mut Context) {
-        self.futures.borrow().push(future)
-    }
-
     fn run_jobs(&self, context: &mut Context) {
         if self.jobs.borrow().is_empty() && self.futures.borrow().is_empty() {
             return;
@@ -88,5 +84,9 @@ impl JobQueue for Queue<'_> {
 
             future::zip(fqueue, jqueue).await;
         }))
+    }
+
+    fn enqueue_future_job(&self, future: FutureJob, _context: &mut Context) {
+        self.futures.borrow().push(future)
     }
 }

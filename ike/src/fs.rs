@@ -1,4 +1,3 @@
-use crate::resolver::ike::IkeTomlStruct;
 use anyhow::{format_err, Result};
 use logger::{elog, Logger};
 use regex::Regex;
@@ -8,7 +7,6 @@ use std::{
     io::{ErrorKind, Read},
     path::{Path, PathBuf},
 };
-use toml::Table;
 
 pub fn read_json<Json, FilePath>(file_path: FilePath) -> Result<Json>
 where
@@ -26,8 +24,7 @@ where
     }
 }
 
-pub fn find_nearest_file(dir: PathBuf, file_name: &str) -> Option<PathBuf> {
-    let mut dir = PathBuf::from(dir);
+pub fn find_nearest_file(mut dir: PathBuf, file_name: &str) -> Option<PathBuf> {
     loop {
         let file_path = dir.join(file_name);
         if file_path.exists() {
@@ -45,14 +42,12 @@ pub fn find_nearest_file(dir: PathBuf, file_name: &str) -> Option<PathBuf> {
 pub fn read_to_string(file_path: &PathBuf) -> Result<String> {
     let mut file = match File::open(file_path) {
         Ok(file) => file,
-        Err(e) => match e.kind() {
-            ErrorKind::NotFound => {
-                return Err(format_err!("File not found: {:?}", file_path));
+        Err(e) => {
+            return match e.kind() {
+                ErrorKind::NotFound => Err(format_err!("File not found: {:?}", file_path)),
+                _ => Err(format_err!("Error opening file: {:?}", e)),
             }
-            _ => {
-                return Err(format_err!("Error opening file: {:?}", e));
-            }
-        },
+        }
     };
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
@@ -86,7 +81,7 @@ pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> PathBuf {
     let root_str = path.to_str().unwrap_or("");
     // On windows, paths can be prefixed with \\?\ to allow longer paths, we need to remove this prefix
     let normalized_root_str = if root_str.starts_with(r"\\?\") {
-        &root_str[4..]
+        root_str.strip_prefix(r"\\?\").unwrap()
     } else {
         root_str
     };

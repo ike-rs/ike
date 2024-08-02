@@ -1,10 +1,10 @@
 use crate::throw;
 use boa_engine::object::builtins::{JsArray, JsDate};
-use boa_engine::{js_string, Context, JsError, JsNativeError, JsObject, JsResult, JsValue};
+use boa_engine::{js_string, Context, JsNativeError, JsObject, JsResult, JsValue};
 use toml::value::Datetime;
 use toml::{Table, Value};
 
-pub fn construct_date(datetime: Datetime, ctx: &mut Context) -> JsDate {
+pub fn construct_date(datetime: &Datetime, ctx: &mut Context) -> JsDate {
     let date = JsDate::new(ctx);
 
     let toml_date = datetime.date.unwrap();
@@ -31,7 +31,7 @@ pub fn construct_date(datetime: Datetime, ctx: &mut Context) -> JsDate {
 }
 
 pub fn from_toml(toml: Table, ctx: &mut Context) -> JsResult<JsObject> {
-    let mut obj = JsObject::default();
+    let obj = JsObject::default();
     for (key, value) in toml {
         match &value {
             Value::String(val) => {
@@ -56,7 +56,7 @@ pub fn from_toml(toml: Table, ctx: &mut Context) -> JsResult<JsObject> {
                     .expect("Failed to set TOML float");
             }
             Value::Datetime(val) => {
-                let new_date = construct_date(val.clone(), ctx);
+                let new_date = construct_date(&val, ctx);
                 obj.set(js_string!(key), JsValue::from(new_date), false, ctx)
                     .expect("Failed to set TOML date");
             }
@@ -69,9 +69,6 @@ pub fn from_toml(toml: Table, ctx: &mut Context) -> JsResult<JsObject> {
                 let js_array = convert_array(val, ctx)?;
                 obj.set(js_string!(key), JsValue::from(js_array), false, ctx)
                     .expect("Failed to set TOML array");
-            }
-            _ => {
-                throw!(typ, "Unsupported TOML value");
             }
         }
     }
@@ -89,7 +86,7 @@ fn convert_array(array: &[Value], ctx: &mut Context) -> JsResult<JsArray> {
             Value::Boolean(val) => JsValue::from(*val),
             Value::Float(val) => JsValue::from(*val),
             Value::Datetime(val) => {
-                let new_date = construct_date(val.clone(), ctx);
+                let new_date = construct_date(val, ctx);
                 JsValue::from(new_date)
             }
             Value::Table(val) => {
@@ -100,9 +97,6 @@ fn convert_array(array: &[Value], ctx: &mut Context) -> JsResult<JsArray> {
                 let nested_array = convert_array(val, ctx)?;
                 JsValue::from(nested_array)
             }
-            _ => {
-                throw!(typ, "Unsupported TOML value");
-            }
         };
 
         js_array.set(i as u32, js_value, false, ctx)?;
@@ -111,7 +105,7 @@ fn convert_array(array: &[Value], ctx: &mut Context) -> JsResult<JsArray> {
     Ok(js_array)
 }
 pub fn parse_toml(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
-    let arg = args.get(0);
+    let arg = args.first();
     if arg.is_none() {
         throw!(typ, "Expected a string in parseTOML");
     }

@@ -11,7 +11,7 @@ pub fn setup_panic_handler() {
             .unwrap_or(&"Unknown error");
 
         elog!("<d>==============================================================<r>");
-        eprintln!("");
+        eprintln!();
         eprintln!("Ike {}", env!("CARGO_PKG_VERSION"),);
         print_sys_info();
         eprint!("Args: ");
@@ -33,9 +33,9 @@ pub fn setup_panic_handler() {
             );
         }
 
-        eprintln!("");
+        eprintln!();
         elog!(warn, "This indicates a bug in the program and not in your code. Please report it in the github repository.");
-        eprintln!("");
+        eprintln!();
 
         // show the actual error
 
@@ -48,7 +48,7 @@ pub fn setup_panic_handler() {
                 message
             ))
         );
-        eprintln!("");
+        eprintln!();
         elog!("<d>==============================================================<r>");
 
         original_panic_handler(panic_info);

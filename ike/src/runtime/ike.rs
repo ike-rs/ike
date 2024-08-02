@@ -1,12 +1,12 @@
 use boa_engine::{
     js_str, js_string, object::ObjectInitializer, property::Attribute, value::Type, Context,
-    JsData, JsError, JsNativeError, JsObject, JsResult, JsValue, NativeFunction,
+    JsData, JsNativeError, JsObject, JsResult, JsValue, NativeFunction,
 };
 use boa_gc::{Finalize, Trace};
 use std::path::PathBuf;
 
 use super::meta::Meta;
-use crate::runtime::fs::files::{read_file, read_file_sync};
+use crate::runtime::fs::files::read_file_sync;
 use crate::runtime::toml::parse_toml;
 use crate::{create_method, globals::VERSION, throw};
 
@@ -86,7 +86,7 @@ impl IkeGlobalObject {
 
     pub fn set_exit_code(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
         let this = Self::get_ike_global_object(ctx);
-        let code = args.get(0);
+        let code = args.first();
         if code.is_none() {
             throw!(typ, "Expected an exit code");
         };

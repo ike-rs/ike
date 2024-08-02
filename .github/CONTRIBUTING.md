@@ -2,7 +2,7 @@
 
 Hey, thanks for contributing to Ike!
 
-If you wish to add a new feature please discuss it in the github issues.
+If you wish to add a new feature please discuss it in the GitHub issues.
 
 # Setup
 
@@ -16,7 +16,7 @@ If you wish to add a new feature please discuss it in the github issues.
 bun install
 ```
 
-In future we plan to make our own package manager
+In the future, we plan to make our own package manager
 
 4. Bundle ts code
 

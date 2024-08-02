@@ -11,11 +11,9 @@ pub fn format_time(time: Duration, include_brackets: bool) -> String {
         } else {
             format!("{}s {}ms", seconds, milliseconds)
         }
+    } else if include_brackets {
+        format!("<d>[{}ms]<r>", milliseconds)
     } else {
-        if include_brackets {
-            format!("<d>[{}ms]<r>", milliseconds)
-        } else {
-            format!("{}ms", milliseconds)
-        }
+        format!("{}ms", milliseconds)
     }
 }

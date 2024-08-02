@@ -1,17 +1,12 @@
 // Based on deno implementation
 
 use crate::fs::normalize_p;
-use crate::runtime::fs;
 use anyhow::{anyhow, Result};
-use boa_engine::job::NativeJob;
-use boa_engine::{Context, JsResult, JsValue};
-use std::cell::RefCell;
+use boa_engine::Context;
 use std::env::current_dir;
-use std::future::Future;
 use std::io;
 use std::io::Read;
 use std::path::Path;
-use std::rc::Rc;
 use tokio::task::spawn_blocking;
 
 pub mod files;
@@ -50,7 +45,7 @@ impl File {
         Ok(buf)
     }
 
-    pub async fn read_async(self: Self, ctx: &mut Context) -> Result<Vec<u8>, io::Error> {
+    pub async fn read_async(self, ctx: &mut Context) -> Result<Vec<u8>, io::Error> {
         let mut file = self.file;
         let buf: Vec<u8> = spawn_blocking(move || {
             let mut buf = Vec::new();

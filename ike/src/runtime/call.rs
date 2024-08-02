@@ -31,7 +31,7 @@ pub fn rust_function(
     if args.is_empty() {
         throw!(err, "Expected an argument in $rustFunction");
     }
-    let string = args.get(0).unwrap();
+    let string = args.first().unwrap();
     assert_arg_type!(string, string);
     let name = str_from_jsvalue!(string, ctx);
 
@@ -45,7 +45,7 @@ pub fn rust_function(
                 .constructor(false)
                 .build();
 
-            return Ok(JsValue::from(function));
+            Ok(JsValue::from(function))
         }
         None => throw!(err, "Function not found"),
     }

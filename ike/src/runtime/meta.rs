@@ -5,15 +5,15 @@ use boa_engine::{
     Context, JsData,
 };
 use boa_gc::{Finalize, Trace};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct Meta;
 
 impl Meta {
-    pub fn init(ctx: &mut Context, entry: &PathBuf) -> JsObject {
+    pub fn init(ctx: &mut Context, entry: &Path) -> JsObject {
         let file = entry.file_name().unwrap().to_str().unwrap();
-        ObjectInitializer::with_native_data(Self::default(), ctx)
+        ObjectInitializer::with_native_data(Self, ctx)
             .property(
                 js_string!("path"),
                 js_string!(entry.to_str().unwrap()),

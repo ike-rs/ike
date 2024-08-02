@@ -23,12 +23,11 @@ impl Timeouts {
     }
 }
 
-static mut TIMEOUTS: LazyLock<Mutex<HashMap<u32, AbortHandle>>> =
-    LazyLock::new(|| Default::default());
+static mut TIMEOUTS: LazyLock<Mutex<HashMap<u32, AbortHandle>>> = LazyLock::new(Default::default);
 static TIMER_ID: AtomicU32 = AtomicU32::new(0);
 
 pub fn set_timeout(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
-    let callback = args.get(0);
+    let callback = args.first();
     if callback.is_none() {
         return Err(JsNativeError::error()
             .with_message("Expected callback in setTimeout")
@@ -92,7 +91,7 @@ pub fn set_timeout(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult
 }
 
 pub fn clear_timeout(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
-    if let Some(timeout_id_value) = args.get(0) {
+    if let Some(timeout_id_value) = args.first() {
         if let Ok(timeout_id) = timeout_id_value.to_i32(ctx) {
             let timeout_id = timeout_id as u32;
 

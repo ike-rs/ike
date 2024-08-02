@@ -1,5 +1,14 @@
-use smol::LocalExecutor;
 use std::{collections::HashMap, path::PathBuf, rc::Rc, time::Instant};
+
+use boa_engine::{
+    builtins::promise::PromiseState,
+    Context,
+    js_string,
+    JsResult, JsValue, Module, object::builtins::{JsArray, JsFunction}, Source,
+};
+use smol::LocalExecutor;
+
+use logger::{cond_log, log, Logger, new_line, print_indent};
 
 use crate::{
     cli::run_command::Entry,
@@ -10,14 +19,6 @@ use crate::{
         queue::Queue,
         runtime::{setup_context, update_meta_property},
     },
-};
-use logger::{cond_log, elog, log, new_line, print_indent, Logger};
-
-use boa_engine::{
-    builtins::promise::PromiseState,
-    js_string,
-    object::builtins::{JsArray, JsFunction},
-    Context, JsResult, JsString, JsValue, Module, Source,
 };
 
 lazy_static::lazy_static! {
@@ -143,7 +144,7 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
 
         test_groups_by_file
             .entry(path_str)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(test_val);
     }
 
@@ -155,7 +156,7 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
 
         alone_tests_by_file
             .entry(path_str)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(test_val);
     }
 
@@ -164,14 +165,14 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     for (path_str, alone_tests) in alone_tests_by_file {
         tests_by_files
             .entry(path_str.clone())
-            .or_insert_with(HashMap::new)
+            .or_default()
             .insert("alone".to_string(), alone_tests);
     }
 
     for (path_str, test_groups) in test_groups_by_file {
         tests_by_files
             .entry(path_str.clone())
-            .or_insert_with(HashMap::new)
+            .or_default()
             .insert("groups".to_string(), test_groups);
     }
 

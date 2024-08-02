@@ -107,7 +107,7 @@ interface Ike {
     isWindows(): boolean;
 
     /**
-     * Checks if current operating system is MacOS.
+     * Checks if current operating system is macOS.
      *
      * @returns boolean
      */

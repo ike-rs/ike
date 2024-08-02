@@ -8,10 +8,10 @@ use simdutf::{validate_ascii, validate_utf8};
 use crate::{assert_arg_type, str_from_jsvalue, throw};
 
 pub fn atob(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
-    if args.len() == 0 {
+    if args.is_empty() {
         throw!(err, "Expected a string argument in atob");
     }
-    let arg = args.get(0).unwrap();
+    let arg = args.first().unwrap();
     assert_arg_type!(string, arg);
 
     let decoded = match BASE64_STANDARD.decode(str_from_jsvalue!(arg, ctx).as_bytes()) {
@@ -24,10 +24,10 @@ pub fn atob(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValu
 }
 
 pub fn btoa(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
-    if args.len() == 0 {
+    if args.is_empty() {
         throw!(err, "Expected a string argument in btoa");
     }
-    let arg = args.get(0).unwrap();
+    let arg = args.first().unwrap();
     assert_arg_type!(string, arg);
 
     let encoded = BASE64_STANDARD.encode(str_from_jsvalue!(arg, ctx).as_bytes());
@@ -40,7 +40,7 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
         throw!(err, "Expected an argument in isAscii");
     }
 
-    let obj = args.get(0).unwrap().as_object();
+    let obj = args.first().unwrap().as_object();
 
     if obj.is_none() {
         throw!(err, "Expected ArrayBuffer, TypedArray");
@@ -62,7 +62,7 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
         return Ok(JsValue::Boolean(true));
     }
 
-    Ok(JsValue::Boolean(validate_ascii(&data_block)))
+    Ok(JsValue::Boolean(validate_ascii(data_block)))
 }
 
 pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
@@ -70,7 +70,7 @@ pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
         throw!(err, "Expected an argument in isUtf8");
     }
 
-    let obj = args.get(0).unwrap().as_object();
+    let obj = args.first().unwrap().as_object();
 
     if obj.is_none() {
         throw!(err, "Expected ArrayBuffer, TypedArray");
@@ -93,5 +93,5 @@ pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
         return Ok(JsValue::Boolean(true));
     }
 
-    Ok(JsValue::Boolean(validate_utf8(&data_block)))
+    Ok(JsValue::Boolean(validate_utf8(data_block)))
 }
