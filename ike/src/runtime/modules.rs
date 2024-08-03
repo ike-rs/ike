@@ -1,3 +1,5 @@
+use crate::prepare::{transpile, transpile_with_text};
+use crate::throw;
 use boa_engine::{
     job::NativeJob, module::ModuleLoader, Context, JsNativeError, JsResult, JsString, JsValue,
     Module, Source,
@@ -36,46 +38,7 @@ impl ModuleLoader for IkeModuleLoader {
     ) {
         let spec = specifier.to_std_string_escaped();
 
-        if is_fetchable(&spec) {
-            let fetch = async move {
-                let body: Result<_, isahc::Error> = async {
-                    let mut response = Request::get(&spec)
-                        .redirect_policy(RedirectPolicy::Limit(5))
-                        .body(())?
-                        .send_async()
-                        .await?;
-
-                    Ok(response.text().await?)
-                }
-                .await;
-
-                NativeJob::new(move |context| -> JsResult<JsValue> {
-                    let body = match body {
-                        Ok(body) => body,
-                        Err(err) => {
-                            finish_load(
-                                Err(JsNativeError::typ().with_message(err.to_string()).into()),
-                                context,
-                            );
-
-                            return Ok(JsValue::undefined());
-                        }
-                    };
-
-                    let source = Source::from_bytes(body.as_bytes());
-
-                    let module = Module::parse(source, None, context);
-
-                    finish_load(module, context);
-
-                    Ok(JsValue::undefined())
-                })
-            };
-
-            context
-                .job_queue()
-                .enqueue_future_job(Box::pin(fetch), context)
-        } else if is_builtin_module(&spec) {
+        if is_builtin_module(&spec) {
             let stripped_spec = strip_spec(&spec);
             let source = Source::from_bytes(BUILTIN_MODULES.get(stripped_spec).unwrap().as_bytes());
             let module = Module::parse(source, None, context);
@@ -109,24 +72,30 @@ impl ModuleLoader for IkeModuleLoader {
                 ..ResolveOptions::default()
             };
 
+            // TODO: implement our own resolver because of the difference in package.json and ike.toml
             match Resolver::new(options).resolve(ref_path, &spec) {
                 Err(error) => println!("Error: {error}"),
                 Ok(resolution) => {
-                    let module = Module::parse(
-                        Source::from_filepath(resolution.full_path().as_path()).unwrap(),
-                        None,
-                        context,
-                    );
+                    let file = resolution.full_path();
+                    let transpiled = match transpile(&file) {
+                        Ok(transpiler) => transpiler,
+                        Err(e) => {
+                            finish_load(
+                                Err(JsNativeError::typ().with_message(e.to_string()).into()),
+                                context,
+                            );
+                            return;
+                        }
+                    };
+                    // Wait until #3941 is released in the next version, so we can specify the path
+                    let reader = Source::from_bytes(transpiled.as_bytes());
+                    let module = Module::parse(reader, None, context);
 
                     finish_load(module, context);
                 }
             }
         }
     }
-}
-
-pub fn is_fetchable(specifier: &str) -> bool {
-    specifier.starts_with("http://") || specifier.starts_with("https://")
 }
 
 pub fn strip_spec(specifier: &str) -> &str {

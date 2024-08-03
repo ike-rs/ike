@@ -1,5 +1,3 @@
-use std::{path::PathBuf, rc::Rc};
-
 use super::{
     buffer::{atob, btoa},
     call::rust_function,
@@ -13,14 +11,16 @@ use super::{
         timeouts::{clear_timeout, set_timeout},
     },
 };
+use crate::prepare::transpile;
 use crate::runtime::web::url::URL;
-use crate::{fs::read_to_string, get_prototype_name, js_str_to_string, testing::js::JsTest};
+use crate::{get_prototype_name, js_str_to_string, testing::js::JsTest, throw};
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
 };
 use logger::{cond_log, Logger};
 use smol::LocalExecutor;
+use std::{path::PathBuf, rc::Rc};
 
 pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));
@@ -33,14 +33,14 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
             .unwrap(),
     };
 
-    let content_src = match read_to_string(file) {
-        Ok(content) => content,
-        Err(e) => return Err(JsNativeError::error().with_message(e.to_string()).into()),
-    };
-
     setup_context(ctx, Some(file));
-
-    let module = Module::parse(Source::from_filepath(file).unwrap(), None, ctx)?;
+    let transpiled = match transpile(file) {
+        Ok(transpiler) => transpiler,
+        Err(e) => throw!(typ, "Failed to transpile file."),
+    };
+    // Wait until #3941 is released in the next version, so we can specify the path
+    let reader = Source::from_bytes(transpiled.as_bytes());
+    let module = Module::parse(reader, None, ctx)?;
     let promise = module.load_link_evaluate(ctx);
 
     ctx.run_jobs();
