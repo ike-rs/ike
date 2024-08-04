@@ -45,7 +45,7 @@ impl File {
         Ok(buf)
     }
 
-    pub async fn read_async(self, ctx: &mut Context) -> Result<Vec<u8>, io::Error> {
+    pub async fn read_async(self) -> Result<Vec<u8>, io::Error> {
         let mut file = self.file;
         let buf: Vec<u8> = spawn_blocking(move || {
             let mut buf = Vec::new();

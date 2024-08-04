@@ -135,6 +135,14 @@ interface Ike {
     version: string;
 
     /**
+     * Takes a string and parses it as TOML.
+     *
+     * @param tomlString TOML string to parse
+     * @returns unknown
+     */
+    parseToml(tomlString: string): any
+
+    /**
      * Synchronously reads a file and returns entire content as array of bytes.
      *
      * Files are resolved using current working directory
@@ -164,12 +172,18 @@ interface Ike {
     readFileSync(path: string): Uint8Array
 
     /**
-     * Takes a string and parses it as TOML.
+     * Synchronously reads a file and returns entire content as string.
      *
-     * @param tomlString TOML string to parse
-     * @returns unknown
+     *  @example
+     *  ```ts
+     *  const content = Ike.readFileSync("file.txt");
+     *  console.log(content);
+     *  ```
+     *
+     * @param path Path to the file
+     * @returns string Content of the file as string
      */
-    parseToml(tomlString: string): any
+    readTextFileSync(path: string): string
 }
 
 declare namespace Ike {

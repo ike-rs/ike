@@ -6,7 +6,7 @@ use boa_gc::{Finalize, Trace};
 use std::path::PathBuf;
 
 use super::meta::Meta;
-use crate::runtime::fs::files::read_file_sync;
+use crate::runtime::fs::files::{read_file_sync, read_text_file_sync};
 use crate::runtime::toml::parse_toml;
 use crate::{create_method, globals::VERSION, throw};
 
@@ -37,11 +37,11 @@ impl IkeGlobalObject {
         obj.function(create_method!(Self::is_linux), js_string!("isLinux"), 0);
         obj.function(create_method!(Self::is_macos), js_string!("isMacOS"), 0);
 
-        // obj.function(
-        //     NativeFunction::from_async_fn(read_file),
-        //     js_string!("readFile"),
-        //     1,
-        // );
+        obj.function(
+            NativeFunction::from_fn_ptr(read_text_file_sync),
+            js_string!("readTextFileSync"),
+            1,
+        );
 
         obj.function(
             NativeFunction::from_fn_ptr(read_file_sync),
