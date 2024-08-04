@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use clap::{Arg, Command};
-
-use crate::{fs::normalize_path, resolver::ike::IkeToml};
+use ike_toml::IkeToml;
+use crate::fs::normalize_path;
 
 use super::{run_command::run_command, style, test_command::test_command};
 

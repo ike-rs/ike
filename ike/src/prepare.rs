@@ -1,4 +1,3 @@
-use crate::fs::read_to_string;
 use anyhow::Result;
 use oxc_allocator::Allocator;
 use oxc_codegen::CodeGenerator;
@@ -9,6 +8,7 @@ use oxc_transformer::{
     TypeScriptOptions,
 };
 use std::path::PathBuf;
+use ike_fs::read_to_string;
 
 pub fn transpile_with_text(path: &PathBuf, source_text: String) -> Result<String> {
     let allocator = Allocator::default();

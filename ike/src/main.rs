@@ -4,8 +4,7 @@ pub mod fs;
 pub mod globals;
 pub mod macros;
 pub mod panic_handler;
-mod prepare;
-pub mod resolver;
+pub mod prepare;
 pub mod runtime;
 pub mod testing;
 
