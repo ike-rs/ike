@@ -36,7 +36,7 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
     setup_context(ctx, Some(file));
     let transpiled = match transpile(file) {
         Ok(transpiler) => transpiler,
-        Err(e) => throw!(typ, "Failed to transpile file."),
+        Err(e) => throw!(typ, format!("Failed to transpile: {:?}", e)),
     };
     // Wait until #3941 is released in the next version, so we can specify the path
     let reader = Source::from_bytes(transpiled.as_bytes());

@@ -1,4 +1,5 @@
 pub mod cli;
+mod error;
 pub mod format;
 pub mod fs;
 pub mod globals;

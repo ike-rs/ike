@@ -1216,17 +1216,17 @@ dependencies = [
 name = "ike-fs"
 version = "0.1.0"
 dependencies = [
- "anyhow",
+ "thiserror",
 ]
 
 [[package]]
 name = "ike-toml"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "ike-fs",
  "logger",
  "serde",
+ "thiserror",
  "toml",
 ]
 

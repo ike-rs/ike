@@ -1,12 +1,12 @@
 use std::path::PathBuf;
 
+use super::{run_command::run_command, style, test_command::test_command};
+use crate::error::IkeError::FailedToParseRoot;
+use crate::fs::normalize_path;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use clap::{Arg, Command};
 use ike_toml::IkeToml;
-use crate::fs::normalize_path;
-
-use super::{run_command::run_command, style, test_command::test_command};
 
 #[derive(Clone, Debug)]
 pub struct Cli {
@@ -81,14 +81,15 @@ impl Cli {
         self
     }
 
-    pub fn parse_root(&self, matches: &clap::ArgMatches) -> PathBuf {
+    pub fn parse_root(&self, matches: &clap::ArgMatches) -> Result<PathBuf> {
         let mut root = matches
             .get_one::<String>("root_folder")
             .map(PathBuf::from)
             .unwrap_or_else(|| std::env::current_dir().unwrap());
-        root = normalize_path(root, std::env::current_dir().unwrap());
+        root = normalize_path(root, std::env::current_dir().unwrap())
+            .map_err(|_| FailedToParseRoot)?;
 
-        root
+        Ok(root)
     }
 
     pub async fn run(self) -> Result<()> {
@@ -96,13 +97,13 @@ impl Cli {
 
         match matches.subcommand() {
             Some(("run", sub_matches)) => {
-                let root = self.parse_root(sub_matches);
+                let root = self.parse_root(sub_matches)?;
                 let pkg = IkeToml::find_nearest_from(root.clone());
 
                 run_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?
             }
             Some(("test", sub_matches)) => {
-                let root = self.parse_root(sub_matches);
+                let root = self.parse_root(sub_matches)?;
                 let pkg = IkeToml::find_nearest_from(root.clone());
 
                 test_command(self.set_root(root.clone()).set_pkg(pkg), sub_matches)?

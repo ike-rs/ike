@@ -1,4 +1,6 @@
 use anyhow::Result;
+use ike_fs::read_to_string;
+use ike_fs::FsError::FailedToReadFile;
 use oxc_allocator::Allocator;
 use oxc_codegen::CodeGenerator;
 use oxc_parser::Parser;
@@ -8,7 +10,6 @@ use oxc_transformer::{
     TypeScriptOptions,
 };
 use std::path::PathBuf;
-use ike_fs::read_to_string;
 
 pub fn transpile_with_text(path: &PathBuf, source_text: String) -> Result<String> {
     let allocator = Allocator::default();
@@ -55,11 +56,7 @@ pub fn transpile(path: &PathBuf) -> Result<String> {
     let source_text = match read_to_string(path) {
         Ok(content) => content,
         Err(e) => {
-            return Err(anyhow::format_err!(
-                "Failed to read file: {:?}. Error: {:?}",
-                path,
-                e
-            ))
+            return Err(FailedToReadFile(path.clone()).into());
         }
     };
 

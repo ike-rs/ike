@@ -1,4 +1,5 @@
 use anyhow::{format_err, Result};
+use ike_fs::FsError::{FailedToReadFile, FailedToReadFileWithError, FileNotFound};
 use logger::{elog, Logger};
 use regex::Regex;
 use std::path::Component;
@@ -20,7 +21,7 @@ where
 
     match serialized_json {
         Ok(json) => Ok(json),
-        Err(error) => Err(format_err!(error)),
+        Err(error) => Err(FailedToReadFileWithError(error.to_string()).into()),
     }
 }
 
@@ -30,22 +31,16 @@ pub fn is_file(path: &str) -> bool {
     re.is_match(path)
 }
 
-pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> PathBuf {
+pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> Result<PathBuf> {
     if path.is_relative() {
         path = root.join(path);
     }
 
     path = match path.canonicalize() {
         Ok(path) => path,
-        Err(err) => match err.kind() {
-            ErrorKind::NotFound => {
-                elog!(error, "Path not found: {:?}", path);
-                std::process::exit(1);
-            }
-            _ => {
-                elog!(error, "Error opening file: {:?}", err);
-                std::process::exit(1);
-            }
+        Err(err) => return match err.kind() {
+            ErrorKind::NotFound => Err(FileNotFound(path).into()),
+            _ => Err(FailedToReadFile(path).into()),
         },
     };
     let root_str = path.to_str().unwrap_or("");
@@ -57,7 +52,7 @@ pub fn normalize_path(mut path: PathBuf, root: PathBuf) -> PathBuf {
     };
     path = PathBuf::from(normalized_root_str);
 
-    path
+    Ok(path)
 }
 
 #[inline]

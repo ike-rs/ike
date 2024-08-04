@@ -1,11 +1,12 @@
-use std::{fs::read_dir, path::PathBuf};
-use std::path::Path;
 use crate::{
     globals::{ALLOWED_EXTENSIONS, VERSION},
     testing::tests::run_tests,
 };
+use std::path::Path;
+use std::{fs::read_dir, path::PathBuf};
 
 use super::cli::Cli;
+use crate::error::IkeError::FailedToConvertPath;
 use anyhow::Result;
 use logger::{log, new_line, Logger};
 
@@ -50,7 +51,7 @@ pub fn test_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
 struct Scanner;
 
 impl Scanner {
-    pub const NAME_SUFIXES: [&'static str; 4] = ["_test", ".test", "_spec", ".spec"];
+    pub const NAME_SUFFIXES: [&'static str; 4] = ["_test", ".test", "_spec", ".spec"];
 
     pub fn is_test_file(path: &Path) -> bool {
         let ext = if let Some(ext) = path.extension() {
@@ -65,7 +66,7 @@ impl Scanner {
 
         let stem = path.file_stem().unwrap().to_str().unwrap();
 
-        Self::NAME_SUFIXES.iter().any(|sufix| stem.ends_with(sufix))
+        Self::NAME_SUFFIXES.iter().any(|suffix| stem.ends_with(suffix))
     }
 
     pub fn scan(dir: PathBuf, patterns: Vec<&str>) -> Result<Vec<PathBuf>> {
@@ -83,7 +84,7 @@ impl Scanner {
                     continue;
                 }
             } else {
-                return Err(anyhow::anyhow!("Failed to convert path to string"));
+                return Err(FailedToConvertPath.into());
             }
 
             if path.is_dir() {

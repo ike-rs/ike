@@ -1,8 +1,8 @@
-use anyhow::Result;
+use ike_fs::{find_nearest_file, read_to_string};
 use logger::{elog, Logger};
 use serde::Deserialize;
 use std::{collections::HashMap, path::PathBuf};
-use ike_fs::{find_nearest_file, read_to_string};
+use thiserror::Error;
 
 #[derive(Deserialize, Debug, Default, Clone)]
 pub struct IkeTomlStruct {
@@ -10,7 +10,7 @@ pub struct IkeTomlStruct {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dependencies: Option<HashMap<String, DependencyOrString>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "devDependencies")]
+    #[serde(rename = "dev-dependencies")]
     pub dev_dependencies: Option<HashMap<String, DependencyOrString>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tasks: Option<HashMap<String, String>>,
@@ -92,11 +92,23 @@ pub struct ParsedIkeTomlStruct {
     pub features: HashMap<String, ParsedFeature>,
 }
 
+#[derive(Debug, Error)]
+pub enum IkeTomlError {
+    #[error("Dependency {0} must have at least one of 'version', 'path', or 'git'")]
+    MissingDependencyFields(String),
+    #[error("Dependency {0} has conflicting fields: 'version', 'path', and 'git' cannot be used together")]
+    ConflictingDependencyFields(String),
+    #[error("Dependency {0} has conflicting fields: 'git', 'branch', 'rev', and 'path' cannot be used together")]
+    ConflictingGitFields(String),
+    #[error("Failed to parse dependencies: {0}")]
+    FailedToParseDependencies(String),
+}
+
 impl IkeTomlStruct {
     fn parse_dependencies(
         &self,
         deps: Option<HashMap<String, DependencyOrString>>,
-    ) -> Result<HashMap<String, Dependency>> {
+    ) -> Result<HashMap<String, Dependency>, IkeTomlError> {
         let mut parsed_deps = HashMap::new();
 
         if let Some(dependencies) = deps {
@@ -114,29 +126,20 @@ impl IkeTomlStruct {
                 };
 
                 if dep.version.is_none() && dep.path.is_none() && dep.git.is_none() {
-                    return Err(anyhow::format_err!(
-                        "Dependency <d>{}<r> must have at least one of 'version', 'path', or 'git'",
-                        name
-                    ));
+                    return Err(IkeTomlError::MissingDependencyFields(name));
                 }
 
                 if (dep.version.is_some() && (dep.path.is_some() || dep.git.is_some()))
                     || (dep.path.is_some() && dep.git.is_some())
                 {
-                    return Err(anyhow::format_err!(
-                        "Dependency <d>{}<r> has conflicting fields: 'version', 'path', and 'git' cannot be used together",
-                        name
-                    ));
+                    return Err(IkeTomlError::ConflictingDependencyFields(name));
                 }
 
                 if dep.git.is_some()
                     && dep.branch.is_some()
                     && (dep.rev.is_some() || dep.path.is_some())
                 {
-                    return Err(anyhow::format_err!(
-                        "Dependency <d>{}<r> has conflicting fields: 'git', 'branch', 'rev', and 'path' cannot be used together",
-                        name
-                    ));
+                    return Err(IkeTomlError::ConflictingGitFields(name));
                 }
 
                 parsed_deps.insert(name, dep);
@@ -146,13 +149,15 @@ impl IkeTomlStruct {
         Ok(parsed_deps)
     }
 
-    fn parse_features(&self) -> Result<HashMap<String, ParsedFeature>> {
+    fn parse_features(&self) -> Result<HashMap<String, ParsedFeature>, IkeTomlError> {
         let mut parsed_features = HashMap::new();
 
         if let Some(features) = &self.features {
             for (name, feature) in features {
                 let parsed_feature = ParsedFeature {
-                    dependencies: self.parse_dependencies(Some(feature.dependencies.clone()))?,
+                    dependencies: self
+                        .parse_dependencies(Some(feature.dependencies.clone()))
+                        .map_err(|e| IkeTomlError::FailedToParseDependencies(e.to_string()))?,
                     files: feature.files.clone(),
                     depends_on: feature.depends_on.clone(),
                 };
@@ -164,9 +169,13 @@ impl IkeTomlStruct {
         Ok(parsed_features)
     }
 
-    pub fn to_parsed(self) -> Result<ParsedIkeTomlStruct> {
-        let parsed_dependencies = self.parse_dependencies(self.dependencies.clone())?;
-        let parsed_dev_dependencies = self.parse_dependencies(self.dev_dependencies.clone())?;
+    pub fn to_parsed(self) -> Result<ParsedIkeTomlStruct, IkeTomlError> {
+        let parsed_dependencies = self
+            .parse_dependencies(self.dependencies.clone())
+            .map_err(|e| IkeTomlError::FailedToParseDependencies(e.to_string()))?;
+        let parsed_dev_dependencies = self
+            .parse_dependencies(self.dev_dependencies.clone())
+            .map_err(|e| IkeTomlError::FailedToParseDependencies(e.to_string()))?;
         let parsed_features = self.parse_features()?;
 
         Ok(ParsedIkeTomlStruct {
@@ -180,7 +189,7 @@ impl IkeTomlStruct {
 }
 
 impl IkeToml {
-    pub fn from_file(file_path: PathBuf) -> Result<Self> {
+    pub fn from_file(file_path: PathBuf) -> Result<Self, IkeTomlError> {
         let toml_str = read_to_string(&file_path).expect("Could not read file");
         let serialized_toml: IkeTomlStruct = toml::from_str(&toml_str).unwrap();
         let parsed_toml = serialized_toml.to_parsed()?;
