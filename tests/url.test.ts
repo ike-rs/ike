@@ -72,3 +72,74 @@ describe("URL", () => {
         expect(URL.canParse("http://[:::1]")).toBe(false)
     })
 })
+
+describe("URLSearchParams", () => {
+    it("should initialize with empty params", () => {
+        const params = new URLSearchParams("");
+        expect(params.toString()).toBe("");
+    });
+
+    it("should append a new parameter", () => {
+        const params = new URLSearchParams("");
+        params.append("key", "value");
+        expect(params.toString()).toBe("key=value");
+    });
+
+    it("should delete a parameter", () => {
+        const params = new URLSearchParams("key=value");
+        params.delete("key");
+        expect(params.toString()).toBe("");
+    });
+
+    it("should get a parameter value", () => {
+        const params = new URLSearchParams("key=value");
+        expect(params.get("key")).toBe("value");
+    });
+
+    it("should get all values of a parameter", () => {
+        const params = new URLSearchParams("key=value1&key=value2");
+        const values = params.getAll("key");
+        expect(values).toBe(["value1", "value2"]);
+    });
+
+    it("should check if a parameter exists", () => {
+        const params = new URLSearchParams("key=value");
+        expect(params.has("key")).toBe(true);
+        expect(params.has("nonexistent")).toBe(false);
+    });
+
+    it("should set a parameter value", () => {
+        const params = new URLSearchParams("");
+        params.set("key", "value");
+        expect(params.toString()).toBe("key=value");
+    });
+
+    it("should update an existing parameter value with set", () => {
+        const params = new URLSearchParams("key=oldValue");
+        params.set("key", "newValue");
+        expect(params.toString()).toBe("key=newValue");
+    });
+
+    it("should handle multiple parameter values", () => {
+        const params = new URLSearchParams("");
+        params.append("key", "value1");
+        params.append("key", "value2");
+        expect(params.toString()).toBe("key=value1&key=value2");
+    });
+
+    it("should handle delete specific value of a parameter with multiple values", () => {
+        const params = new URLSearchParams("key=value1&key=value2");
+        params.delete("key", "value1");
+        expect(params.toString()).toBe("key=value2");
+    });
+
+    it("should return null for non-existent parameter", () => {
+        const params = new URLSearchParams("");
+        expect(params.get("key")).toBe(null);
+    });
+
+    it("should return empty array for getAll on non-existent parameter", () => {
+        const params = new URLSearchParams("");
+        expect(params.getAll("key")).toBe([]);
+    });
+});

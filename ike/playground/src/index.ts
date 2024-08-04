@@ -1,4 +1,4 @@
-const decoder = new TextDecoder("utf-8");
-const data = Ike.readTextFileSync("src/hello.txt");
+const paramsString = "q=URLUtils.searchParams&topic=api";
+const searchParams = new URLSearchParams(paramsString);
 
-console.log(data);
+console.log(searchParams)

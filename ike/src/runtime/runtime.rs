@@ -12,7 +12,7 @@ use super::{
     },
 };
 use crate::prepare::transpile;
-use crate::runtime::web::url::URL;
+use crate::runtime::web::url::{URLSearchParams, URL};
 use crate::{get_prototype_name, js_str_to_string, testing::js::JsTest, throw};
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
@@ -148,6 +148,8 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
         .expect("TextDecoder is already defined");
     ctx.register_global_class::<URL>()
         .expect("URL is already defined");
+    ctx.register_global_class::<URLSearchParams>()
+        .expect("URLSearchParams is already defined");
 
     for entry in entries.iter() {
         match entry.setup_type {

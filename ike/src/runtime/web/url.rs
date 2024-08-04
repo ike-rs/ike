@@ -1,9 +1,12 @@
 use crate::{js_str_to_string, throw};
 use boa_engine::class::{Class, ClassBuilder};
+use boa_engine::object::builtins::{JsArray, JsFunction};
 use boa_engine::{
-    js_string, Context, Finalize, JsData, JsNativeError, JsObject, JsResult, JsString, JsValue,
-    NativeFunction, Trace,
+    js_string, Context, Finalize, JsData, JsError, JsNativeError, JsObject, JsResult, JsString,
+    JsValue, NativeFunction, Trace,
 };
+use boa_gc::empty_trace;
+use indexmap::IndexMap;
 
 #[derive(Default, Trace, Finalize, JsData, Debug)]
 pub struct URL {
@@ -241,5 +244,260 @@ impl Class for URL {
 
         // TODO: implement searchParams
         Ok(())
+    }
+}
+
+#[derive(Default, Finalize, JsData, Debug)]
+pub struct URLSearchParams {
+    pub params: IndexMap<String, Vec<String>>,
+}
+
+unsafe impl Trace for URLSearchParams {
+    empty_trace!();
+}
+
+impl URLSearchParams {
+    pub fn stringify(this: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let mut search = String::new();
+        if this.params.is_empty() {
+            return Ok(JsValue::from(js_string!("")));
+        }
+
+        for (key, values) in &this.params {
+            for value in values {
+                search.push_str(&format!("{}={}&", key, value));
+            }
+        }
+
+        search.pop();
+
+        Ok(JsValue::from(js_string!(search)))
+    }
+
+    pub fn append(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let key = args.first().unwrap().to_string(ctx).unwrap();
+        let value = args.get(1).unwrap().to_string(ctx).unwrap();
+        this.params
+            .entry(key.to_std_string().unwrap())
+            .or_default()
+            .push(value.to_std_string().unwrap());
+        this.update_url();
+
+        Ok(JsValue::undefined())
+    }
+
+    pub fn delete(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let key = args.first().unwrap().to_string(ctx).unwrap();
+        let value = args.get(1);
+
+        if let Some(value) = value {
+            let value = value.to_string(ctx).unwrap();
+            if let Some(values) = this.params.get_mut(&key.to_std_string().unwrap()) {
+                values.retain(|v| v != &value.to_std_string().unwrap());
+                if values.is_empty() {
+                    this.params.swap_remove(&key.to_std_string().unwrap());
+                }
+            }
+        } else {
+            this.params.swap_remove(&key.to_std_string().unwrap());
+        }
+
+        this.update_url();
+        Ok(JsValue::undefined())
+    }
+
+    pub fn get(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let key = args.first().unwrap().to_string(ctx).unwrap();
+        let key = key.to_std_string().unwrap();
+
+        if let Some(values) = this.params.get(&key) {
+            if let Some(value) = values.first() {
+                return Ok(JsValue::from(js_string!(value.clone())));
+            }
+        }
+        Ok(JsValue::null())
+    }
+
+    pub fn get_all(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let key = args.first().unwrap().to_string(ctx).unwrap();
+        let key = key.to_std_string().unwrap();
+
+        let arr = JsArray::new(ctx);
+        if let Some(values) = this.params.get(&key) {
+            for value in values {
+                arr.push(JsValue::from(js_string!(value.clone())), ctx)?;
+            }
+            return Ok(JsValue::from(arr));
+        }
+
+        Ok(JsValue::from(arr))
+    }
+
+    pub fn has(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let key = args.first().unwrap().to_string(ctx).unwrap();
+        let key = key.to_std_string().unwrap();
+
+        if args.len() > 1 {
+            let value = args.get(1).unwrap().to_string(ctx).unwrap();
+            let value = value.to_std_string().unwrap();
+            if let Some(values) = this.params.get(&key) {
+                return Ok(JsValue::from(values.contains(&value)));
+            }
+            return Ok(JsValue::from(false));
+        }
+
+        Ok(JsValue::from(this.params.contains_key(&key)))
+    }
+
+    pub fn set(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let key = args.first().unwrap().to_string(ctx)?;
+        let value = args.get(1).unwrap().to_string(ctx)?;
+
+        if let Some(values) = this.params.get_mut(&key.to_std_string().unwrap()) {
+            values.clear();
+            values.push(value.to_std_string().unwrap());
+        } else {
+            this.params.insert(
+                key.to_std_string().unwrap(),
+                vec![value.to_std_string().unwrap()],
+            );
+        }
+
+        this.update_url();
+
+        Ok(JsValue::undefined())
+    }
+
+    pub fn for_each(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let obj = this.as_object().unwrap();
+        let mut borrowed = obj.borrow_mut();
+        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
+        let callback = JsFunction::from_object(args.first().unwrap().to_object(ctx)?).unwrap();
+        let this_ref = JsValue::from(obj.clone());
+        let mut index = 0;
+        for (key, values) in &this.params {
+            for value in values {
+                let key = JsValue::from(js_string!(key.clone()));
+                let value = JsValue::from(js_string!(value.clone()));
+                callback.call(&this_ref, &[value, key, JsValue::from(index)], ctx)?;
+                index += 1;
+            }
+        }
+
+        Ok(JsValue::undefined())
+    }
+
+    pub fn update_url(&self) {
+        //     TODO:
+    }
+}
+
+// TODO: forEach, values, size, keys, sort, values
+impl Class for URLSearchParams {
+    const NAME: &'static str = "URLSearchParams";
+    const LENGTH: usize = 0;
+
+    fn init(class: &mut ClassBuilder<'_>) -> JsResult<()> {
+        class.method(
+            js_string!("toString"),
+            0,
+            NativeFunction::from_fn_ptr(Self::stringify),
+        );
+        class.method(
+            js_string!("append"),
+            2,
+            NativeFunction::from_fn_ptr(Self::append),
+        );
+        class.method(
+            js_string!("delete"),
+            1,
+            NativeFunction::from_fn_ptr(Self::delete),
+        );
+        class.method(js_string!("get"), 1, NativeFunction::from_fn_ptr(Self::get));
+        class.method(
+            js_string!("getAll"),
+            1,
+            NativeFunction::from_fn_ptr(Self::get_all),
+        );
+        class.method(js_string!("has"), 1, NativeFunction::from_fn_ptr(Self::has));
+        class.method(js_string!("set"), 2, NativeFunction::from_fn_ptr(Self::set));
+
+        Ok(())
+    }
+
+    fn data_constructor(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<Self> {
+        let input = args.first();
+
+        if input.is_none() {
+            throw!(
+                typ,
+                "URLSearchParams constructor requires at least one argument"
+            );
+        }
+        let input = input.unwrap();
+
+        if !input.is_object() && !input.is_string() {
+            throw!(
+                typ,
+                "URLSearchParams constructor requires a string or an object"
+            );
+        }
+
+        let mut params: IndexMap<String, Vec<String>> = IndexMap::new();
+        if input.is_string() {
+            let input = input.to_string(ctx)?;
+            let input = js_str_to_string!(input);
+
+            if !input.is_empty() {
+                for pair in input.split('&') {
+                    let mut pair = pair.split('=');
+                    let key = pair.next().unwrap();
+                    let value = pair.next().unwrap_or("");
+                    params
+                        .entry(key.to_string())
+                        .or_default()
+                        .push(value.to_string());
+                }
+            }
+        }
+
+        if input.is_object() {
+            let obj = input.as_object().unwrap();
+            let properties = obj.own_property_keys(ctx).unwrap();
+            for prop in properties.iter() {
+                let key = prop.to_string();
+                let value = obj
+                    .get(js_string!(prop.to_string()), ctx)
+                    .unwrap()
+                    .to_string(ctx)
+                    .unwrap()
+                    .to_std_string_escaped();
+                params.entry(key).or_default().push(value);
+            }
+        }
+
+        println!("{:?}", params);
+        Ok(URLSearchParams { params })
     }
 }

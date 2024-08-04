@@ -54,7 +54,7 @@ impl TextEncoder {
         let buff = args.get(1).unwrap();
         let buffer = JsUint8Array::from_object(buff.as_object().unwrap().clone()).unwrap();
 
-        let mut input_iter = input.chars();
+        let input_iter = input.chars();
         let mut buffer_index = 0;
         let mut read = 0;
         let mut written = 0;

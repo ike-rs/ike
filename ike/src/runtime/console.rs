@@ -252,26 +252,39 @@ impl Console {
 
                             if i == 0 {
                                 Self::print_indent(console);
-                                Self::print_as(
-                                    &value,
-                                    ctx,
-                                    LogLevel::Normal,
-                                    console,
-                                    false,
-                                    false,
-                                );
+
+                                if value.is_string() {
+                                    let formatted = Self::format(&value, ctx).unwrap_or_default();
+
+                                    cond_log!(error, false, "<r><green>\"{}\"<r>", formatted);
+                                } else {
+                                    Self::print_as(
+                                        &value,
+                                        ctx,
+                                        LogLevel::Normal,
+                                        console,
+                                        false,
+                                        false,
+                                    );
+                                }
                             } else {
                                 cond_log!(error, false, "<r><d>,<r>");
                                 new_line!();
                                 Self::print_indent(console);
-                                Self::print_as(
-                                    &value,
-                                    ctx,
-                                    LogLevel::Normal,
-                                    console,
-                                    false,
-                                    false,
-                                );
+                                if value.is_string() {
+                                    let formatted = Self::format(&value, ctx).unwrap_or_default();
+
+                                    cond_log!(error, false, "<r><green>\"{}\"<r>", formatted);
+                                } else {
+                                    Self::print_as(
+                                        &value,
+                                        ctx,
+                                        LogLevel::Normal,
+                                        console,
+                                        false,
+                                        false,
+                                    );
+                                }
                             }
                         }
 
@@ -287,14 +300,43 @@ impl Console {
                             let value = arr.get(i, ctx).unwrap();
 
                             if i == 0 {
-                                Self::print_as(&value, ctx, LogLevel::Normal, console, false, true);
+                                if value.is_string() {
+                                    let formatted = Self::format(&value, ctx).unwrap_or_default();
+
+                                    cond_log!(error, false, "<r><green>\"{}\"<r>", formatted);
+                                } else {
+                                    cond_log!(error, false, "<r>");
+                                    Self::print_as(
+                                        &value,
+                                        ctx,
+                                        LogLevel::Normal,
+                                        console,
+                                        false,
+                                        true,
+                                    );
+                                }
                             } else {
                                 cond_log!(error, false, "<r><d>, <r>");
-                                Self::print_as(&value, ctx, LogLevel::Normal, console, false, true);
+
+                                if value.is_string() {
+                                    let formatted = Self::format(&value, ctx).unwrap_or_default();
+
+                                    cond_log!(error, false, "<r><green>\"{}\"<r>", formatted);
+                                } else {
+                                    cond_log!(error, false, "<r>");
+                                    Self::print_as(
+                                        &value,
+                                        ctx,
+                                        LogLevel::Normal,
+                                        console,
+                                        false,
+                                        true,
+                                    );
+                                }
                             }
                         }
 
-                        cond_log!(error, false, "<r> ]<r>");
+                        cond_log!(error, false, "<r> ]<r>\n");
                     }
                 } else if Self::is_typed_array(&str_name) {
                     let typed_arr = JsTypedArray::from_object(obj.clone()).unwrap();
@@ -318,7 +360,7 @@ impl Console {
                         }
                     }
 
-                    cond_log!(error, false, "<r> ]<r>");
+                    cond_log!(error, false, "<r> ]<r>\n");
                 } else {
                     Self::print_object(obj, ctx, console, in_array);
                 }

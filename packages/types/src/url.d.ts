@@ -96,4 +96,64 @@ declare global {
          */
         toJSON(): string;
     }
+
+    declare class URLSearchParams {
+        /**
+         * Creates an instance of URLSearchParams.
+         * @param {string | Record<string, string>} [init] - Initial search parameters as a string or an object.
+         */
+        constructor(init?: string | Record<string, string>);
+
+        /**
+         * Appends a specified key/value pair as a new search parameter.
+         *
+         * If the key is already present, the method appends the value to the key.
+         *
+         * @param {string} key - The name of the parameter to append.
+         * @param {string} value - The value of the parameter to append.
+         */
+        append(key: string, value: string): void;
+
+        /**
+         * Deletes the given search parameter, and its associated value, from the list of all search parameters.
+         * @param {string} key - The name of the parameter to delete.
+         * @param {string} [value] - The value of the parameter to delete.
+         */
+        delete(key: string, value?: string): void;
+
+        /**
+         * Returns the first value associated with the given search parameter.
+         * @param {string} key - The name of the parameter to return.
+         * @returns {string | null} The first value associated with the given search parameter.
+         */
+        get(key: string): string | null;
+
+        /**
+         * Returns all the values associated with a given search parameter.
+         * @param {string} key - The name of the parameter to return.
+         * @returns {string[]} An array of all the values associated with the given search parameter.
+         */
+        getAll(key: string): string[];
+
+        /**
+         * Returns a Boolean indicating if such a search parameter exists.
+         * @param {string} key - The name of the parameter to check.
+         * @param {string} [value] - The value of the parameter to check.
+         * @returns {boolean} True if the parameter exists, otherwise false.
+         */
+        has(key: string, value?: string): boolean;
+
+        /**
+         * Sets the value associated with a given search parameter to the specified value.
+         * @param {string} key - The name of the parameter to set.
+         * @param {string} value - The value of the parameter to set.
+         */
+        set(key: string, value: string): void;
+
+        /**
+         * Returns a string containing a query string suitable for use in a URL.
+         * @returns {string} A string representing the URL search parameters.
+         */
+        toString(): string;
+    }
 }
