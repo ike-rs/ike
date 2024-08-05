@@ -121,6 +121,13 @@ interface Ike {
     isLinux(): boolean;
 
     /**
+     * Returns the current working directory.
+     *
+     * @returns string
+     */
+    cwd(): string;
+
+    /**
      * Returns the name of the current operating system.
      *
      * @example 'linux'

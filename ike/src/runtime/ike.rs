@@ -36,6 +36,7 @@ impl IkeGlobalObject {
         obj.function(create_method!(Self::is_windows), js_string!("isWindows"), 0);
         obj.function(create_method!(Self::is_linux), js_string!("isLinux"), 0);
         obj.function(create_method!(Self::is_macos), js_string!("isMacOS"), 0);
+        obj.function(create_method!(Self::cwd), js_string!("cwd"), 0);
 
         obj.function(
             NativeFunction::from_fn_ptr(read_text_file_sync),
@@ -134,5 +135,10 @@ impl IkeGlobalObject {
 
     pub fn is_macos(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
         Ok(JsValue::from(std::env::consts::OS == "macos"))
+    }
+
+    pub fn cwd(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
+        let cwd = std::env::current_dir().unwrap();
+        Ok(JsValue::from(js_string!(cwd.to_string_lossy().to_string())))
     }
 }
