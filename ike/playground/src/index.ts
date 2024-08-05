@@ -1,4 +1,2 @@
-const paramsString = "q=URLUtils.searchParams&topic=api";
-const searchParams = new URLSearchParams(paramsString);
-
-console.log(searchParams)
+const url = new URL('https://example.com/?a=b ~');
+console.log(url.href);   // "https://example.com/?a=b%20~"

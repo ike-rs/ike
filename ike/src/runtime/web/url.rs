@@ -1,4 +1,4 @@
-use crate::{js_str_to_string, throw};
+use crate::{assert_arg_type, js_str_to_string, throw};
 use boa_engine::class::{Class, ClassBuilder};
 use boa_engine::object::builtins::{JsArray, JsFunction};
 use boa_engine::{
@@ -268,10 +268,13 @@ impl URLSearchParams {
 
         for (key, values) in &this.params {
             for value in values {
-                search.push_str(&format!("{}={}&", key, value));
+                let encoded_key = urlencoding::encode(key);
+                let encoded_value = urlencoding::encode(value);
+                search.push_str(&format!("{}={}&", encoded_key, encoded_value));
             }
         }
 
+        // Remove the trailing '&'
         search.pop();
 
         Ok(JsValue::from(js_string!(search)))
@@ -389,25 +392,6 @@ impl URLSearchParams {
         Ok(JsValue::undefined())
     }
 
-    pub fn for_each(this: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
-        let obj = this.as_object().unwrap();
-        let mut borrowed = obj.borrow_mut();
-        let this = borrowed.downcast_mut::<URLSearchParams>().unwrap();
-        let callback = JsFunction::from_object(args.first().unwrap().to_object(ctx)?).unwrap();
-        let this_ref = JsValue::from(obj.clone());
-        let mut index = 0;
-        for (key, values) in &this.params {
-            for value in values {
-                let key = JsValue::from(js_string!(key.clone()));
-                let value = JsValue::from(js_string!(value.clone()));
-                callback.call(&this_ref, &[value, key, JsValue::from(index)], ctx)?;
-                index += 1;
-            }
-        }
-
-        Ok(JsValue::undefined())
-    }
-
     pub fn update_url(&self) {
         //     TODO:
     }
@@ -468,6 +452,7 @@ impl Class for URLSearchParams {
         if input.is_string() {
             let input = input.to_string(ctx)?;
             let input = js_str_to_string!(input);
+            let input = urlencoding::decode(&input).unwrap();
 
             if !input.is_empty() {
                 for pair in input.split('&') {
@@ -493,11 +478,11 @@ impl Class for URLSearchParams {
                     .to_string(ctx)
                     .unwrap()
                     .to_std_string_escaped();
+                let value = urlencoding::decode(&value).unwrap().to_string();
                 params.entry(key).or_default().push(value);
             }
         }
 
-        println!("{:?}", params);
         Ok(URLSearchParams { params })
     }
 }

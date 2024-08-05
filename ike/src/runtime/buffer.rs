@@ -54,7 +54,7 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
 
     let typed_arr = typed_arr.unwrap();
     let arr_buf = typed_arr.buffer(ctx).unwrap();
-    let arr_buf = JsArrayBuffer::from_object(arr_buf.as_object().unwrap().clone()).unwrap();
+    let arr_buf = JsArrayBuffer::from_object(arr_buf.as_object().unwrap().clone())?;
     let arr_buf = arr_buf.data();
     let data_block = arr_buf.as_deref().unwrap();
 
@@ -85,7 +85,7 @@ pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
 
     let typed_arr = typed_arr.unwrap();
     let arr_buf = typed_arr.buffer(ctx).unwrap();
-    let arr_buf = JsArrayBuffer::from_object(arr_buf.as_object().unwrap().clone()).unwrap();
+    let arr_buf = JsArrayBuffer::from_object(arr_buf.as_object().unwrap().clone())?;
     let arr_buf = arr_buf.data();
     let data_block = arr_buf.as_deref().unwrap();
 

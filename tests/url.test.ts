@@ -142,4 +142,17 @@ describe("URLSearchParams", () => {
         const params = new URLSearchParams("");
         expect(params.getAll("key")).toBe([]);
     });
-});
+
+    it("should encode special characters", () => {
+        const params = new URLSearchParams("value=hello world&key=hello+world");
+        expect(params.toString()).toBe("value=hello%20world&key=hello%2Bworld");
+        const params1 = new URLSearchParams("val=👾 Exterminate!")
+        expect(params1.toString()).toBe("val=%F0%9F%91%BE%20Exterminate%21")
+    })
+
+    it("should decode special characters", () => {
+        const params = new URLSearchParams("value=hello%20world&key=hello%2Bworld");
+        expect(params.get("value")).toBe("hello world");
+        expect(params.get("key")).toBe("hello+world");
+    })
+})
