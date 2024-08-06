@@ -192,6 +192,19 @@ interface Ike {
      * @returns string Content of the file as string
      */
     readTextFileSync(path: string): string
+
+    /**
+     * Returns path to the executable.
+     *
+     * @returns string
+     */
+    which(executable: string, opts?: {
+        /**
+         * Current working directory.
+         */
+        cwd?: string
+        path?: string
+    }): string | null
 }
 
 declare namespace Ike {

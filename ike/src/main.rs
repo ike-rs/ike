@@ -1,3 +1,5 @@
+#![feature(let_chains)]
+
 pub mod cli;
 mod error;
 pub mod format;
@@ -9,6 +11,7 @@ pub mod prepare;
 pub mod runtime;
 pub mod testing;
 mod utils;
+mod which;
 
 use anyhow::Result;
 use cli::cli::Cli;

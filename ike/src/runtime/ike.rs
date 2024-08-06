@@ -1,14 +1,14 @@
+use super::meta::Meta;
+use crate::runtime::fs::files::{read_file_sync, read_text_file_sync};
+use crate::runtime::toml::parse_toml;
+use crate::which::which;
+use crate::{create_method, globals::VERSION, js_str_to_string, throw};
 use boa_engine::{
     js_str, js_string, object::ObjectInitializer, property::Attribute, value::Type, Context,
     JsData, JsNativeError, JsObject, JsResult, JsValue, NativeFunction,
 };
 use boa_gc::{Finalize, Trace};
 use std::path::PathBuf;
-
-use super::meta::Meta;
-use crate::runtime::fs::files::{read_file_sync, read_text_file_sync};
-use crate::runtime::toml::parse_toml;
-use crate::{create_method, globals::VERSION, throw};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
 pub struct IkeGlobalObject {}
@@ -53,6 +53,12 @@ impl IkeGlobalObject {
         obj.function(
             NativeFunction::from_fn_ptr(parse_toml),
             js_string!("parseToml"),
+            1,
+        );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(Self::which),
+            js_string!("which"),
             1,
         );
 
@@ -140,5 +146,52 @@ impl IkeGlobalObject {
     pub fn cwd(_: &JsValue, _: &[JsValue], _: &mut Context) -> JsResult<JsValue> {
         let cwd = std::env::current_dir().unwrap();
         Ok(JsValue::from(js_string!(cwd.to_string_lossy().to_string())))
+    }
+
+    pub fn which(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let command = args.first();
+
+        if command.is_none() {
+            throw!(typ, "which: Expected a command to look for");
+        }
+        let command = command.unwrap().to_string(ctx).unwrap();
+        let command = js_str_to_string!(command);
+
+        let options = args.get(1);
+        let options = if options.is_none() {
+            None
+        } else {
+            let options = options.unwrap().as_object().unwrap();
+            Some(options)
+        };
+
+        let cwd = options.and_then(|options| {
+            let cwd = options.get(js_string!("cwd"), ctx).unwrap();
+            if cwd.is_undefined() {
+                None
+            } else {
+                let cwd = cwd.to_string(ctx).unwrap();
+                Some(js_str_to_string!(cwd))
+            }
+        });
+
+        let path = options.and_then(|options| {
+            let path = options.get(js_string!("path"), ctx).unwrap();
+            if path.is_undefined() {
+                None
+            } else {
+                let path = path.to_string(ctx).unwrap();
+                Some(js_str_to_string!(path))
+            }
+        });
+
+        let cwd = cwd.map(PathBuf::from);
+
+        if let Some(result) = which(&command, path, cwd) {
+            let return_value = JsValue::from(js_string!(result.to_string_lossy().to_string()));
+            Ok(return_value)
+        } else {
+            Ok(JsValue::Null)
+        }
     }
 }
