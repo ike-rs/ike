@@ -290,7 +290,6 @@ impl URLSearchParams {
             .entry(key.to_std_string().unwrap())
             .or_default()
             .push(value.to_std_string().unwrap());
-        this.update_url();
 
         Ok(JsValue::undefined())
     }
@@ -314,7 +313,6 @@ impl URLSearchParams {
             this.params.swap_remove(&key.to_std_string().unwrap());
         }
 
-        this.update_url();
         Ok(JsValue::undefined())
     }
 
@@ -387,13 +385,7 @@ impl URLSearchParams {
             );
         }
 
-        this.update_url();
-
         Ok(JsValue::undefined())
-    }
-
-    pub fn update_url(&self) {
-        //     TODO:
     }
 }
 

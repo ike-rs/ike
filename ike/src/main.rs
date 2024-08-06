@@ -8,6 +8,7 @@ pub mod panic_handler;
 pub mod prepare;
 pub mod runtime;
 pub mod testing;
+mod utils;
 
 use anyhow::Result;
 use cli::cli::Cli;
