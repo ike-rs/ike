@@ -194,6 +194,23 @@ interface Ike {
   readTextFileSync(path: string): string;
 
   /**
+   * Synchronously creates a new directory.
+   *
+   * @param path Path to the directory
+   * @param opts Options for creating the directory
+   * @returns void
+   */
+  createDirSync(path: string, opts?: { recursive?: boolean }): void;
+
+  /**
+   * Synchronously removes a directory.
+   *
+   * @param path Path to the directory
+   * @returns void
+   */
+  removeDirSync(path: string): void;
+
+  /**
    * Returns path to the executable.
    *
    * @returns string

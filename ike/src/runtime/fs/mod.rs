@@ -1,15 +1,26 @@
 // Based on deno implementation
 
 use crate::fs::normalize_p;
+use crate::throw;
 use anyhow::{anyhow, Result};
-use boa_engine::Context;
+use boa_engine::{Context, JsNativeError, JsResult, JsString, JsValue};
 use std::env::current_dir;
 use std::io;
 use std::io::Read;
 use std::path::Path;
 use tokio::task::spawn_blocking;
 
+pub mod dir;
 pub mod files;
+
+pub fn resolve_path_from_args(args: &[JsValue], ctx: &mut Context) -> JsResult<JsString> {
+    if args.is_empty() {
+        throw!(err, "Expected a path in fs function");
+    }
+    let path = args.first().unwrap();
+    let path = path.to_string(ctx)?;
+    Ok(path)
+}
 
 pub struct FileSystem {}
 
@@ -22,6 +33,16 @@ impl FileSystem {
     pub async fn open_async(path: &Path) -> anyhow::Result<File> {
         let file = open_file(path)?;
         Ok(File::new(file))
+    }
+
+    pub fn create_dir_all_sync(path: &Path) -> anyhow::Result<()> {
+        std::fs::create_dir_all(path)?;
+        Ok(())
+    }
+
+    pub fn create_dir_sync(path: &Path) -> anyhow::Result<()> {
+        std::fs::create_dir(path)?;
+        Ok(())
     }
 }
 

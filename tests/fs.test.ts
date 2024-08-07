@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'test';
+import {afterAll, describe, expect, it} from 'test';
 
 describe('readFileSync', () => {
   // Might fail
@@ -43,3 +43,11 @@ describe('readTextFileSync', () => {
     expect(() => Ike.readTextFileSync()).toThrow();
   });
 });
+
+// TODO: add tests for fs, after implementing Path
+
+// describe('createDirSync', () => {
+//   afterAll(() => {
+//     Ike.removeDirSync('tests/new-dir');
+//   })
+// })
