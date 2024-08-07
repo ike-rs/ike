@@ -1,7 +1,3 @@
-import { describe, beforeAll } from 'test';
-
-beforeAll(() => {
-  console.log('beforeAll');
-});
+import { describe, beforeAll, afterAll, it } from 'test';
 
 describe('Ike.which', () => {});

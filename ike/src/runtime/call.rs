@@ -29,6 +29,9 @@ pub fn rust_function(
         m.insert("beforeAll", unsafe {
             NativeFunction::from_closure(before_all)
         });
+        m.insert("afterAll", unsafe {
+            NativeFunction::from_closure(before_all)
+        });
         m
     };
     if args.is_empty() {

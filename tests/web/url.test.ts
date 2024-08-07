@@ -1,10 +1,6 @@
 import { beforeAll, describe, expect, it } from 'test';
 
 describe('URL', () => {
-  beforeAll(() => {
-    console.log('====================================================');
-  });
-
   it('should construct without any errors', () => {
     expect(() => {
       new URL('http://localhost:8080');

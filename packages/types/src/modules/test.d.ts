@@ -48,6 +48,16 @@ declare module 'test' {
    */
   export const beforeAll: (fn: () => void) => void;
 
+  /**
+   * Lifecycle hooks that runs after all tests in a scope.
+   *
+   * Scope is defined by the nearest `describe` block or if no `describe` block is present, the file itself.
+   *
+   * @param fn The function that contains the teardown code.
+   * @returns {void}
+   */
+  export const afterAll: (fn: () => void) => void;
+
   export type Matchers = {
     /**
      * Asserts that the value is equal to the expected value.

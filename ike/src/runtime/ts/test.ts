@@ -3,6 +3,7 @@ import { assertEquals, assertNotEquals } from 'assert';
 const describe = $rustFunction('describe');
 const $it = $rustFunction('it');
 const beforeAll = $rustFunction('beforeAll');
+const afterAll = $rustFunction('afterAll');
 
 const it = (test: string, fn: () => void) => {
   return $it(test, () => {
@@ -451,4 +452,4 @@ const expect = <T = unknown>(value: any) => {
   };
 };
 
-export { describe, it, expect, beforeAll };
+export { describe, it, expect, beforeAll, afterAll };

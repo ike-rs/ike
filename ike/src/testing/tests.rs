@@ -137,7 +137,10 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let groups = JsArray::from_object(groups_obj.clone())?;
     let alone = JsArray::from_object(alone_obj.clone())?;
     let global_before_all_val = obj
-        .get(js_string!("fileHooks"), ctx)
+        .get(js_string!("beforeAll"), ctx)
+        .unwrap_or_else(|_| JsValue::undefined());
+    let global_after_all_val = obj
+        .get(js_string!("afterAll"), ctx)
         .unwrap_or_else(|_| JsValue::undefined());
 
     for i in 0..groups.length(ctx)? {
@@ -188,7 +191,7 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
         if !global_before_all_val.is_undefined() {
             let global_before_all =
                 JsArray::from_object(global_before_all_val.as_object().unwrap().clone())?;
-            run_before_all_hooks(&global_before_all, ctx, path_buf)?;
+            run_before_all_hooks(&global_before_all, ctx, path_buf.clone())?;
         }
 
         for (group_name, test_group) in tests {
@@ -206,6 +209,9 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
                     let tests = JsArray::from_object(tests_obj.clone())?;
                     let before_all_val = test_group
                         .get(js_string!("beforeAll"), ctx)
+                        .unwrap_or_else(|_| JsValue::undefined());
+                    let after_all_val = test_group
+                        .get(js_string!("afterAll"), ctx)
                         .unwrap_or_else(|_| JsValue::undefined());
 
                     print_indent!(1);
@@ -233,9 +239,29 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
                         results.tests += 1;
                         run_single_test(single_test, ctx, &mut results, 2);
                     }
+
+                    if !after_all_val.is_undefined() {
+                        let hooks_arr =
+                            JsArray::from_object(after_all_val.as_object().unwrap().clone())?;
+
+                        for i in 0..hooks_arr.length(ctx)? {
+                            let hook_val = hooks_arr.get(i, ctx)?;
+                            let hook = hook_val.as_object().unwrap().clone();
+                            let function = JsFunction::from_object(hook).unwrap();
+
+                            function.call(&JsValue::undefined(), &[], ctx)?;
+                        }
+                    }
                 }
             }
         }
+
+        if !global_after_all_val.is_undefined() {
+            let global_before_all =
+                JsArray::from_object(global_after_all_val.as_object().unwrap().clone())?;
+            run_after_all_hooks(&global_after_all_val, ctx, path_buf)?;
+        }
+
         new_line!();
     }
 
@@ -285,6 +311,29 @@ fn run_before_all_hooks(
     ctx: &mut Context,
     to_compare: PathBuf,
 ) -> JsResult<()> {
+    let length = hooks_array.length(ctx)?;
+
+    for i in 0..length {
+        let hook_val = hooks_array.get(i, ctx)?;
+        let hook = hook_val.as_object().unwrap().clone();
+        let func = hook.get(js_string!("func"), ctx).unwrap();
+        let path = hook.get(js_string!("path"), ctx).unwrap();
+        let path_buf = PathBuf::from(path.to_string(ctx).unwrap().to_std_string_escaped());
+
+        if compare_paths(path_buf, to_compare.clone()) {
+            let function = JsFunction::from_object(func.as_object().unwrap().clone()).unwrap();
+            function.call(&JsValue::undefined(), &[], ctx)?;
+        }
+    }
+    Ok(())
+}
+
+fn run_after_all_hooks(
+    hooks_array: &JsValue,
+    ctx: &mut Context,
+    to_compare: PathBuf,
+) -> JsResult<()> {
+    let hooks_array = JsArray::from_object(hooks_array.as_object().unwrap().clone())?;
     let length = hooks_array.length(ctx)?;
 
     for i in 0..length {
