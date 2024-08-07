@@ -1,1 +1,1 @@
-export const test = "wda"
+export const test = 'wda';

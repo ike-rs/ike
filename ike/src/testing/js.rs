@@ -16,6 +16,8 @@ impl JsTest {
             .expect("Failed to set groups");
         obj.set(js_string!("alone"), JsArray::new(ctx), false, ctx)
             .expect("Failed to set alone");
+        obj.set(js_string!("fileHooks"), JsArray::new(ctx), false, ctx)
+            .expect("Failed to set fileHooks");
 
         let _ =
             ctx.register_global_property(js_string!("IKE_INTERNAL_TEST"), obj, Attribute::all());
@@ -131,6 +133,90 @@ pub fn test_it(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
             .as_object()
             .unwrap()
             .set(js_string!("tests"), JsValue::from(tests), false, ctx)?;
+    }
+
+    Ok(JsValue::undefined())
+}
+
+pub fn before_all(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let test = ctx
+        .global_object()
+        .get(js_string!("IKE_INTERNAL_TEST"), ctx)
+        .expect("IKE_INTERNAL_TEST not found");
+
+    let obj = test
+        .as_object()
+        .expect("IKE_INTERNAL_TEST is not an object");
+
+    if args.is_empty() {
+        throw!(typ, "Expected arguments in 'beforeAll'");
+    }
+
+    let func = args.first().unwrap();
+    assert_arg_type!(function, func);
+
+    let last_describe_name = ctx
+        .global_object()
+        .get(js_string!("IKE_INTERNAL_DESCRIBE"), ctx)
+        .unwrap();
+
+    if last_describe_name.is_undefined() {
+        let file_hooks = obj.get(js_string!("fileHooks"), ctx).unwrap_or_else(|_| {
+            let new_array = JsArray::new(ctx);
+            obj.set(js_string!("fileHooks"), new_array.clone(), false, ctx)
+                .expect("Failed to set fileHooks");
+            JsValue::from(new_array)
+        });
+        println!("file_hooks: {:?}", file_hooks);
+
+        let file_hooks = JsArray::from_object(file_hooks.as_object().unwrap().clone())
+            .expect("fileHooks is not an array");
+
+        let hook_obj = JsObject::default();
+        hook_obj.set(js_string!("func"), func.clone(), false, ctx)?;
+        let current_path = get_current_path(ctx);
+        hook_obj.set(js_string!("path"), current_path, false, ctx)?;
+
+        file_hooks.push(hook_obj, ctx)?;
+
+        obj.set(
+            js_string!("fileHooks"),
+            JsValue::from(file_hooks),
+            false,
+            ctx,
+        )?;
+    } else {
+        let groups_temp = obj.get(js_string!("groups"), ctx)?;
+        let groups = JsArray::from_object(groups_temp.as_object().unwrap().clone())
+            .expect("groups is not an array");
+
+        let group = groups.get(groups.length(ctx)? - 1, ctx)?;
+        let mut hooks = group
+            .as_object()
+            .unwrap()
+            .get(js_string!("beforeAll"), ctx)
+            .unwrap();
+
+        if hooks.is_undefined() {
+            let new_array = JsArray::new(ctx);
+            group
+                .as_object()
+                .unwrap()
+                .set(js_string!("beforeAll"), new_array.clone(), false, ctx)
+                .expect("Failed to set beforeAll");
+            hooks = JsValue::from(new_array);
+        }
+
+        let hooks = JsArray::from_object(hooks.as_object().unwrap().clone())
+            .expect("beforeAll is not an array");
+
+        hooks.push(func.clone(), ctx)?;
+        group.as_object().unwrap().set(
+            js_string!("beforeAll"),
+            JsValue::from(hooks),
+            false,
+            ctx,
+        )?;
     }
 
     Ok(JsValue::undefined())

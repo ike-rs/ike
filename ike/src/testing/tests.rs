@@ -2,14 +2,15 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc, time::Instant};
 
 use boa_engine::{
     builtins::promise::PromiseState,
-    Context,
     js_string,
-    JsResult, JsValue, Module, object::builtins::{JsArray, JsFunction}, Source,
+    object::builtins::{JsArray, JsFunction},
+    Context, JsResult, JsValue, Module, Source,
 };
 use smol::LocalExecutor;
 
-use logger::{cond_log, log, Logger, new_line, print_indent};
+use logger::{cond_log, log, new_line, print_indent, Logger};
 
+use crate::utils::compare_paths;
 use crate::{
     cli::run_command::Entry,
     format::format_time,
@@ -135,6 +136,9 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let alone_obj = alone_val.as_object().unwrap();
     let groups = JsArray::from_object(groups_obj.clone())?;
     let alone = JsArray::from_object(alone_obj.clone())?;
+    let global_before_all_val = obj
+        .get(js_string!("fileHooks"), ctx)
+        .unwrap_or_else(|_| JsValue::undefined());
 
     for i in 0..groups.length(ctx)? {
         let test_val = groups.get(i, ctx)?;
@@ -177,8 +181,15 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     }
 
     for (path_str, tests) in tests_by_files {
-        let path = strip_prefix_from_path(root.clone(), PathBuf::from(path_str.clone()));
+        let path_buf = PathBuf::from(path_str.clone());
+        let path = strip_prefix_from_path(root.clone(), path_buf.clone());
         log!("{} <r><d>{}<r>", ICONS["skip"], path.display());
+
+        if !global_before_all_val.is_undefined() {
+            let global_before_all =
+                JsArray::from_object(global_before_all_val.as_object().unwrap().clone())?;
+            run_before_all_hooks(&global_before_all, ctx, path_buf)?;
+        }
 
         for (group_name, test_group) in tests {
             if group_name.eq("alone") {
@@ -193,6 +204,9 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
                     let tests_val = test_group.get(js_string!("tests"), ctx).unwrap();
                     let tests_obj = tests_val.as_object().unwrap();
                     let tests = JsArray::from_object(tests_obj.clone())?;
+                    let before_all_val = test_group
+                        .get(js_string!("beforeAll"), ctx)
+                        .unwrap_or_else(|_| JsValue::undefined());
 
                     print_indent!(1);
                     log!(
@@ -200,6 +214,19 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
                         ICONS["skip"],
                         name.to_string(ctx).unwrap().to_std_string_escaped()
                     );
+
+                    if !before_all_val.is_undefined() {
+                        let hooks_arr =
+                            JsArray::from_object(before_all_val.as_object().unwrap().clone())?;
+
+                        for i in 0..hooks_arr.length(ctx)? {
+                            let hook_val = hooks_arr.get(i, ctx)?;
+                            let hook = hook_val.as_object().unwrap().clone();
+                            let function = JsFunction::from_object(hook).unwrap();
+
+                            function.call(&JsValue::undefined(), &[], ctx)?;
+                        }
+                    }
 
                     for j in 0..tests.length(ctx)? {
                         let single_test = tests.get(j, ctx)?;
@@ -250,6 +277,28 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     );
 
     new_line!();
+    Ok(())
+}
+
+fn run_before_all_hooks(
+    hooks_array: &JsArray,
+    ctx: &mut Context,
+    to_compare: PathBuf,
+) -> JsResult<()> {
+    let length = hooks_array.length(ctx)?;
+
+    for i in 0..length {
+        let hook_val = hooks_array.get(i, ctx)?;
+        let hook = hook_val.as_object().unwrap().clone();
+        let func = hook.get(js_string!("func"), ctx).unwrap();
+        let path = hook.get(js_string!("path"), ctx).unwrap();
+        let path_buf = PathBuf::from(path.to_string(ctx).unwrap().to_std_string_escaped());
+
+        if compare_paths(path_buf, to_compare.clone()) {
+            let function = JsFunction::from_object(func.as_object().unwrap().clone()).unwrap();
+            function.call(&JsValue::undefined(), &[], ctx)?;
+        }
+    }
     Ok(())
 }
 

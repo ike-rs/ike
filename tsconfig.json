@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     // Enable latest features
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
@@ -24,9 +22,5 @@
     "noPropertyAccessFromIndexSignature": false,
     "outDir": "ike/src/runtime/js"
   },
-  "include": [
-    "ike/src/**/*",
-    "packages/types/src/index.d.ts",
-    "tests/**/*"
-  ]
+  "include": ["ike/src/**/*", "packages/types/src/index.d.ts", "tests/**/*"]
 }

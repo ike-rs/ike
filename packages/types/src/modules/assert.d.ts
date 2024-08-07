@@ -1,4 +1,4 @@
-declare module "assert" {
+declare module 'assert' {
   /**
    * Custom error class for assertion errors.
    * @class
@@ -24,7 +24,7 @@ declare module "assert" {
   export const assertEquals: <T = any>(
     actual: T,
     expected: T,
-    msg: string
+    msg: string,
   ) => void;
 
   /**
@@ -55,6 +55,6 @@ declare module "assert" {
   export const assertNotEquals: <T = any>(
     actual: T,
     expected: T,
-    msg: string
+    msg: string,
   ) => void;
 }

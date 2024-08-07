@@ -1,16 +1,16 @@
-import { defineBuildConfig } from "unbuild";
+import { defineBuildConfig } from 'unbuild';
 
 export default defineBuildConfig({
   entries: [
     {
-      input: "ike/src/runtime/ts/",
-      outDir: "ike/src/runtime/js/",
-      format: "esm",
+      input: 'ike/src/runtime/ts/',
+      outDir: 'ike/src/runtime/js/',
+      format: 'esm',
     },
   ],
   rollup: {
     esbuild: {
-      target: "esnext",
+      target: 'esnext',
       minify: true,
     },
   },

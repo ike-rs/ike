@@ -1,7 +1,8 @@
-import { assertEquals, assertNotEquals } from "assert";
+import { assertEquals, assertNotEquals } from 'assert';
 
-const describe = $rustFunction("describe");
-const $it = $rustFunction("it");
+const describe = $rustFunction('describe');
+const $it = $rustFunction('it');
+const beforeAll = $rustFunction('beforeAll');
 
 const it = (test: string, fn: () => void) => {
   return $it(test, () => {
@@ -14,11 +15,11 @@ const $try_it = (fn: () => void) => {
     fn();
 
     return {
-      status: "pass",
+      status: 'pass',
     };
   } catch (e) {
     return {
-      status: "fail",
+      status: 'fail',
       error: e,
     };
   }
@@ -27,7 +28,7 @@ const $try_it = (fn: () => void) => {
 it.skip = (test: string, fn: () => void) => {
   return $it(test, () => {
     return {
-      status: "skip",
+      status: 'skip',
     };
   });
 };
@@ -35,7 +36,7 @@ it.skip = (test: string, fn: () => void) => {
 it.todo = (test: string, fn: () => void) => {
   return $it(test, () => {
     return {
-      status: "todo",
+      status: 'todo',
     };
   });
 };
@@ -49,7 +50,7 @@ it.if = (condition: boolean, test: string, fn: () => void) => {
 };
 
 const expect = <T = unknown>(value: any) => {
-  const matchers = {
+  return {
     toBe: (expected: T) => {
       assertEquals(value, expected, `Expected ${expected}, but got ${value}`);
     },
@@ -69,7 +70,7 @@ const expect = <T = unknown>(value: any) => {
       assertNotEquals(
         value,
         undefined,
-        `Expected not to be undefined, but got ${value}`
+        `Expected not to be undefined, but got ${value}`,
       );
     },
     toBeTruthy: () => {
@@ -95,14 +96,14 @@ const expect = <T = unknown>(value: any) => {
     toBeOneOf: (expected: T[]) => {
       if (!expected.includes(value)) {
         throw new Error(
-          `Expected value to be one of ${expected}, but got ${value}`
+          `Expected value to be one of ${expected}, but got ${value}`,
         );
       }
     },
     notToBeOneOf: (expected: T[]) => {
       if (expected.includes(value)) {
         throw new Error(
-          `Expected value not to be one of ${expected}, but got ${value}`
+          `Expected value not to be one of ${expected}, but got ${value}`,
         );
       }
     },
@@ -133,14 +134,14 @@ const expect = <T = unknown>(value: any) => {
     toContainValue: (expected: T) => {
       if (!Object.values(value).includes(expected)) {
         throw new Error(
-          `Expected object to contain value ${expected}, but got ${value}`
+          `Expected object to contain value ${expected}, but got ${value}`,
         );
       }
     },
     notToContainValue: (expected: T) => {
       if (Object.values(value).includes(expected)) {
         throw new Error(
-          `Expected object not to contain value ${expected}, but got ${value}`
+          `Expected object not to contain value ${expected}, but got ${value}`,
         );
       }
     },
@@ -148,7 +149,7 @@ const expect = <T = unknown>(value: any) => {
       for (const val of expected) {
         if (!Object.values(value).includes(val)) {
           throw new Error(
-            `Expected object to contain value ${val}, but got ${value}`
+            `Expected object to contain value ${val}, but got ${value}`,
           );
         }
       }
@@ -157,7 +158,7 @@ const expect = <T = unknown>(value: any) => {
       for (const val of expected) {
         if (Object.values(value).includes(val)) {
           throw new Error(
-            `Expected object not to contain value ${val}, but got ${value}`
+            `Expected object not to contain value ${val}, but got ${value}`,
           );
         }
       }
@@ -165,14 +166,14 @@ const expect = <T = unknown>(value: any) => {
     toHaveLength: (length: number) => {
       if (value.length !== length) {
         throw new Error(
-          `Expected length to be ${length}, but got ${value.length}`
+          `Expected length to be ${length}, but got ${value.length}`,
         );
       }
     },
     notToHaveLength: (length: number) => {
       if (value.length === length) {
         throw new Error(
-          `Expected length not to be ${length}, but got ${value.length}`
+          `Expected length not to be ${length}, but got ${value.length}`,
         );
       }
     },
@@ -180,7 +181,7 @@ const expect = <T = unknown>(value: any) => {
       // @ts-ignore
       if (!(value instanceof expected)) {
         throw new Error(
-          `Expected value to be instance of ${expected}, but got ${value}`
+          `Expected value to be instance of ${expected}, but got ${value}`,
         );
       }
     },
@@ -188,21 +189,21 @@ const expect = <T = unknown>(value: any) => {
       // @ts-ignore
       if (value instanceof expected) {
         throw new Error(
-          `Expected value not to be instance of ${expected}, but got ${value}`
+          `Expected value not to be instance of ${expected}, but got ${value}`,
         );
       }
     },
     toBeNumber: () => {
-      if (typeof value !== "number") {
+      if (typeof value !== 'number') {
         throw new Error(
-          `Expected value to be a number, but got ${typeof value}`
+          `Expected value to be a number, but got ${typeof value}`,
         );
       }
     },
     notToBeNumber: () => {
-      if (typeof value === "number") {
+      if (typeof value === 'number') {
         throw new Error(
-          `Expected value not to be a number, but got ${typeof value}`
+          `Expected value not to be a number, but got ${typeof value}`,
         );
       }
     },
@@ -214,63 +215,63 @@ const expect = <T = unknown>(value: any) => {
     notToBeInteger: () => {
       if (Number.isInteger(value)) {
         throw new Error(
-          `Expected value not to be an integer, but got ${value}`
+          `Expected value not to be an integer, but got ${value}`,
         );
       }
     },
     toBeGreaterThan: (expected: T) => {
       if (value <= expected) {
         throw new Error(
-          `Expected value to be greater than ${expected}, but got ${value}`
+          `Expected value to be greater than ${expected}, but got ${value}`,
         );
       }
     },
     notToBeGreaterThan: (expected: T) => {
       if (value > expected) {
         throw new Error(
-          `Expected value not to be greater than ${expected}, but got ${value}`
+          `Expected value not to be greater than ${expected}, but got ${value}`,
         );
       }
     },
     toBeLessThan: (expected: T) => {
       if (value >= expected) {
         throw new Error(
-          `Expected value to be less than ${expected}, but got ${value}`
+          `Expected value to be less than ${expected}, but got ${value}`,
         );
       }
     },
     notToBeLessThan: (expected: T) => {
       if (value < expected) {
         throw new Error(
-          `Expected value not to be less than ${expected}, but got ${value}`
+          `Expected value not to be less than ${expected}, but got ${value}`,
         );
       }
     },
     toBeLessThanOrEqual: (expected: T) => {
       if (value > expected) {
         throw new Error(
-          `Expected value to be less than or equal ${expected}, but got ${value}`
+          `Expected value to be less than or equal ${expected}, but got ${value}`,
         );
       }
     },
     notToBeLessThanOrEqual: (expected: T) => {
       if (value <= expected) {
         throw new Error(
-          `Expected value not to be less than or equal ${expected}, but got ${value}`
+          `Expected value not to be less than or equal ${expected}, but got ${value}`,
         );
       }
     },
     toBeGreaterThanOrEqual: (expected: T) => {
       if (value < expected) {
         throw new Error(
-          `Expected value to be greater than or equal ${expected}, but got ${value}`
+          `Expected value to be greater than or equal ${expected}, but got ${value}`,
         );
       }
     },
     notToBeGreaterThanOrEqual: (expected: T) => {
       if (value >= expected) {
         throw new Error(
-          `Expected value not to be greater than or equal ${expected}, but got ${value}`
+          `Expected value not to be greater than or equal ${expected}, but got ${value}`,
         );
       }
     },
@@ -287,10 +288,10 @@ const expect = <T = unknown>(value: any) => {
     toThrow: () => {
       try {
         value();
-        throw new Error("Expected function to throw an error, but it did not");
+        throw new Error('Expected function to throw an error, but it did not');
       } catch (e: any) {
         if (
-          e.message === "Expected function to throw an error, but it did not"
+          e.message === 'Expected function to throw an error, but it did not'
         ) {
           throw e;
         }
@@ -301,95 +302,95 @@ const expect = <T = unknown>(value: any) => {
         value();
       } catch (e) {
         throw new Error(
-          "Expected function not to throw an error, but it did: " + e
+          'Expected function not to throw an error, but it did: ' + e,
         );
       }
     },
     toBeArray: () => {
       if (!Array.isArray(value)) {
         throw new Error(
-          `Expected value to be an array, but got ${typeof value}`
+          `Expected value to be an array, but got ${typeof value}`,
         );
       }
     },
     notToBeArray: () => {
       if (Array.isArray(value)) {
         throw new Error(
-          `Expected value not to be an array, but got ${typeof value}`
+          `Expected value not to be an array, but got ${typeof value}`,
         );
       }
     },
     toBeObject: () => {
-      if (typeof value !== "object" || value === null || Array.isArray(value)) {
+      if (typeof value !== 'object' || value === null || Array.isArray(value)) {
         throw new Error(
-          `Expected value to be an object, but got ${typeof value}`
+          `Expected value to be an object, but got ${typeof value}`,
         );
       }
     },
     notToBeObject: () => {
       if (
-        typeof value === "object" &&
+        typeof value === 'object' &&
         value !== null &&
         !Array.isArray(value)
       ) {
         throw new Error(
-          `Expected value not to be an object, but got ${typeof value}`
+          `Expected value not to be an object, but got ${typeof value}`,
         );
       }
     },
     toBeString: () => {
-      if (typeof value !== "string") {
+      if (typeof value !== 'string') {
         throw new Error(
-          `Expected value to be a string, but got ${typeof value}`
+          `Expected value to be a string, but got ${typeof value}`,
         );
       }
     },
     notToBeString: () => {
-      if (typeof value === "string") {
+      if (typeof value === 'string') {
         throw new Error(
-          `Expected value not to be a string, but got ${typeof value}`
+          `Expected value not to be a string, but got ${typeof value}`,
         );
       }
     },
     toBeBoolean: () => {
-      if (typeof value !== "boolean") {
+      if (typeof value !== 'boolean') {
         throw new Error(
-          `Expected value to be a boolean, but got ${typeof value}`
+          `Expected value to be a boolean, but got ${typeof value}`,
         );
       }
     },
     notToBeBoolean: () => {
-      if (typeof value === "boolean") {
+      if (typeof value === 'boolean') {
         throw new Error(
-          `Expected value not to be a boolean, but got ${typeof value}`
+          `Expected value not to be a boolean, but got ${typeof value}`,
         );
       }
     },
     toBeSymbol: () => {
-      if (typeof value !== "symbol") {
+      if (typeof value !== 'symbol') {
         throw new Error(
-          `Expected value to be a symbol, but got ${typeof value}`
+          `Expected value to be a symbol, but got ${typeof value}`,
         );
       }
     },
     notToBeSymbol: () => {
-      if (typeof value === "symbol") {
+      if (typeof value === 'symbol') {
         throw new Error(
-          `Expected value not to be a symbol, but got ${typeof value}`
+          `Expected value not to be a symbol, but got ${typeof value}`,
         );
       }
     },
     toBeFunction: () => {
-      if (typeof value !== "function") {
+      if (typeof value !== 'function') {
         throw new Error(
-          `Expected value to be a function, but got ${typeof value}`
+          `Expected value to be a function, but got ${typeof value}`,
         );
       }
     },
     notToBeFunction: () => {
-      if (typeof value === "function") {
+      if (typeof value === 'function') {
         throw new Error(
-          `Expected value not to be a function, but got ${typeof value}`
+          `Expected value not to be a function, but got ${typeof value}`,
         );
       }
     },
@@ -401,55 +402,53 @@ const expect = <T = unknown>(value: any) => {
     notToBeDate: () => {
       if (value instanceof Date) {
         throw new Error(
-          `Expected value not to be a date, but got ${typeof value}`
+          `Expected value not to be a date, but got ${typeof value}`,
         );
       }
     },
     toStartWith: (expected: T) => {
       if (!value.startsWith(expected)) {
         throw new Error(
-          `Expected value to start with ${expected}, but got ${value}`
+          `Expected value to start with ${expected}, but got ${value}`,
         );
       }
     },
     notToStartWith: (expected: T) => {
       if (value.startsWith(expected)) {
         throw new Error(
-          `Expected value not to start with ${expected}, but got ${value}`
+          `Expected value not to start with ${expected}, but got ${value}`,
         );
       }
     },
     toEndWith: (expected: T) => {
       if (!value.endsWith(expected)) {
         throw new Error(
-          `Expected value to end with ${expected}, but got ${value}`
+          `Expected value to end with ${expected}, but got ${value}`,
         );
       }
     },
     notToEndWith: (expected: T) => {
       if (value.endsWith(expected)) {
         throw new Error(
-          `Expected value not to end with ${expected}, but got ${value}`
+          `Expected value not to end with ${expected}, but got ${value}`,
         );
       }
     },
     toInclude: (expected: T) => {
       if (!value.includes(expected)) {
         throw new Error(
-          `Expected value to include ${expected}, but got ${value}`
+          `Expected value to include ${expected}, but got ${value}`,
         );
       }
     },
     notToInclude: (expected: T) => {
       if (value.includes(expected)) {
         throw new Error(
-          `Expected value not to include ${expected}, but got ${value}`
+          `Expected value not to include ${expected}, but got ${value}`,
         );
       }
     },
   };
-
-  return matchers;
 };
 
-export { describe, it, expect };
+export { describe, it, expect, beforeAll };

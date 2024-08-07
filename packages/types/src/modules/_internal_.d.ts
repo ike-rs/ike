@@ -1,4 +1,4 @@
-declare module "_internal_" {
+declare module '_internal_' {
   /**
    * Checks if a value is a typed array.
    *
@@ -14,12 +14,12 @@ declare module "_internal_" {
    * @returns `true` if the value is an array buffer, `false` otherwise.
    */
   export const isArrayBuffer: (
-    value: any
+    value: any,
   ) => value is ArrayBuffer | SharedArrayBuffer;
 
   export const InvalidArgTypeError: new (
     message: string,
     expected: string | string[],
-    actual: unknown
+    actual: unknown,
   ) => Error;
 }

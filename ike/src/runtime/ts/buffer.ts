@@ -1,9 +1,9 @@
-import { InvalidArgTypeError, isArrayBuffer, isTypedArray } from "_internal_";
+import { InvalidArgTypeError, isArrayBuffer, isTypedArray } from '_internal_';
 
-const $isAscii = $rustFunction("isAscii");
-const atob = $rustFunction("atob");
-const btoa = $rustFunction("btoa");
-const $isUtf8 = $rustFunction("isUtf8");
+const $isAscii = $rustFunction('isAscii');
+const atob = $rustFunction('atob');
+const btoa = $rustFunction('btoa');
+const $isUtf8 = $rustFunction('isUtf8');
 
 const isAscii = (data: TypedArray | ArrayBuffer): boolean => {
   if (isArrayBuffer(data) || isTypedArray(data)) {
@@ -11,9 +11,9 @@ const isAscii = (data: TypedArray | ArrayBuffer): boolean => {
   }
 
   throw new InvalidArgTypeError(
-    "data",
-    ["TypedArray", "ArrayBuffer", "SharedArrayBuffer"],
-    data
+    'data',
+    ['TypedArray', 'ArrayBuffer', 'SharedArrayBuffer'],
+    data,
   );
 };
 
@@ -23,9 +23,9 @@ const isUtf8 = (data: TypedArray | ArrayBuffer): boolean => {
   }
 
   throw new InvalidArgTypeError(
-    "data",
-    ["TypedArray", "ArrayBuffer", "SharedArrayBuffer"],
-    data
+    'data',
+    ['TypedArray', 'ArrayBuffer', 'SharedArrayBuffer'],
+    data,
   );
 };
 

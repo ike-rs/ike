@@ -14,5 +14,8 @@
   },
   "linter": {
     "enabled": false
+  },
+  "files": {
+    "ignore": [".vscode"]
   }
 }

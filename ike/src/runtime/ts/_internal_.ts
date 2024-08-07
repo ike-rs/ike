@@ -21,7 +21,7 @@ const isTypedArray = (value: any): value is TypedArray => {
 };
 
 const isArrayBuffer = (
-  value: any
+  value: any,
 ): value is ArrayBuffer | SharedArrayBuffer => {
   return value instanceof ArrayBuffer || value instanceof SharedArrayBuffer;
 };
@@ -29,28 +29,28 @@ const isArrayBuffer = (
 type ExpectedType = string | string[];
 
 const kTypes = [
-  "string",
-  "number",
-  "bigint",
-  "boolean",
-  "symbol",
-  "undefined",
-  "object",
-  "function",
+  'string',
+  'number',
+  'bigint',
+  'boolean',
+  'symbol',
+  'undefined',
+  'object',
+  'function',
 ];
 const classRegExp = /^([A-Z][a-z0-9]*)+$/;
 
 function formatList(arr: string[], conjunction: string): string {
   if (arr.length <= 2) return arr.join(` ${conjunction} `);
-  return `${arr.slice(0, -1).join(", ")}, ${conjunction} ${
+  return `${arr.slice(0, -1).join(', ')}, ${conjunction} ${
     arr[arr.length - 1]
   }`;
 }
 
 function determineSpecificType(value: unknown): string {
-  if (value === null) return "null";
-  if (Array.isArray(value)) return "array";
-  if (value instanceof RegExp) return "RegExp";
+  if (value === null) return 'null';
+  if (Array.isArray(value)) return 'array';
+  if (value instanceof RegExp) return 'RegExp';
   return typeof value;
 }
 
@@ -58,9 +58,9 @@ function determineSpecificType(value: unknown): string {
 function invalidArgTypeMessage(
   name: string,
   expected: ExpectedType,
-  actual: unknown
+  actual: unknown,
 ): string {
-  if (typeof name !== "string") {
+  if (typeof name !== 'string') {
     throw new TypeError("'name' must be a string");
   }
 
@@ -68,29 +68,29 @@ function invalidArgTypeMessage(
     expected = [expected];
   }
 
-  let msg = "The ";
-  if (name.endsWith(" argument")) {
+  let msg = 'The ';
+  if (name.endsWith(' argument')) {
     msg += `${name} `;
   } else {
-    const type = name.includes(".") ? "property" : "argument";
+    const type = name.includes('.') ? 'property' : 'argument';
     msg += `"${name}" ${type} `;
   }
-  msg += "must be ";
+  msg += 'must be ';
 
   const types: string[] = [];
   const instances: string[] = [];
   const other: string[] = [];
 
   for (const value of expected) {
-    if (typeof value !== "string") {
-      throw new TypeError("All expected entries have to be of type string");
+    if (typeof value !== 'string') {
+      throw new TypeError('All expected entries have to be of type string');
     }
     if (kTypes.includes(value.toLowerCase())) {
       types.push(value.toLowerCase());
     } else if (classRegExp.test(value)) {
       instances.push(value);
     } else {
-      if (value === "object") {
+      if (value === 'object') {
         throw new TypeError('The value "object" should be written as "Object"');
       }
       other.push(value);
@@ -98,31 +98,31 @@ function invalidArgTypeMessage(
   }
 
   if (instances.length > 0) {
-    const pos = types.indexOf("object");
+    const pos = types.indexOf('object');
     if (pos !== -1) {
       types.splice(pos, 1);
-      instances.push("Object");
+      instances.push('Object');
     }
   }
 
   if (types.length > 0) {
-    msg += `${types.length > 1 ? "one of type" : "of type"} ${formatList(
+    msg += `${types.length > 1 ? 'one of type' : 'of type'} ${formatList(
       types,
-      "or"
+      'or',
     )}`;
-    if (instances.length > 0 || other.length > 0) msg += " or ";
+    if (instances.length > 0 || other.length > 0) msg += ' or ';
   }
 
   if (instances.length > 0) {
-    msg += `an instance of ${formatList(instances, "or")}`;
-    if (other.length > 0) msg += " or ";
+    msg += `an instance of ${formatList(instances, 'or')}`;
+    if (other.length > 0) msg += ' or ';
   }
 
   if (other.length > 0) {
     if (other.length > 1) {
-      msg += `one of ${formatList(other, "or")}`;
+      msg += `one of ${formatList(other, 'or')}`;
     } else {
-      if (other[0].toLowerCase() !== other[0]) msg += "an ";
+      if (other[0].toLowerCase() !== other[0]) msg += 'an ';
       msg += `${other[0]}`;
     }
   }
@@ -135,7 +135,7 @@ function invalidArgTypeMessage(
 class InvalidArgTypeError extends TypeError {
   constructor(name: string, expected: ExpectedType, actual: unknown) {
     super(invalidArgTypeMessage(name, expected, actual));
-    this.name = "InvalidArgTypeError";
+    this.name = 'InvalidArgTypeError';
   }
 }
 

@@ -1,4 +1,4 @@
-declare module "buffer" {
+declare module 'buffer' {
   global {
     type TypedArray =
       | Int8Array
@@ -64,7 +64,7 @@ declare module "buffer" {
         options?: {
           fatal?: boolean | undefined;
           ignoreBOM?: boolean | undefined;
-        }
+        },
       );
 
       /**
@@ -81,7 +81,7 @@ declare module "buffer" {
        */
       decode(
         input?: ArrayBufferView | ArrayBuffer | null,
-        options?: { stream?: boolean | undefined }
+        options?: { stream?: boolean | undefined },
       ): string;
     }
 
@@ -90,7 +90,7 @@ declare module "buffer" {
      * The encoding used is always 'utf-8'.
      */
     class TextEncoder {
-      static readonly encoding: "utf-8";
+      static readonly encoding: 'utf-8';
 
       /**
        * Creates a new `TextEncoder` object.
@@ -127,7 +127,7 @@ declare module "buffer" {
        */
       encodeInto(
         input: string,
-        output: Uint8Array
+        output: Uint8Array,
       ): { read: number; written: number };
     }
   }
