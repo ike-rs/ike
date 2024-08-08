@@ -4,12 +4,13 @@ use boa_engine::{
     builtins::promise::PromiseState,
     js_string,
     object::builtins::{JsArray, JsFunction},
-    Context, JsResult, JsValue, Module, Source,
+    Context, JsNativeError, JsResult, JsValue, Module, Source,
 };
 use smol::LocalExecutor;
 
 use logger::{cond_log, log, new_line, print_indent, Logger};
 
+use crate::prepare::transpile;
 use crate::utils::compare_paths;
 use crate::{
     cli::run_command::Entry,
@@ -20,6 +21,7 @@ use crate::{
         queue::Queue,
         runtime::{setup_context, update_meta_property},
     },
+    throw,
 };
 
 lazy_static::lazy_static! {
@@ -83,12 +85,15 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     for path in paths {
         let entry = Entry::new(true, Some(path.clone()), None);
         update_meta_property(ctx, &entry.path.clone().unwrap());
+        let path = entry.path.unwrap().as_path().to_path_buf();
 
-        let module = Module::parse(
-            Source::from_filepath(entry.path.unwrap().as_path()).unwrap(),
-            None,
-            ctx,
-        )?;
+        let transpiled = match transpile(&path) {
+            Ok(transpiler) => transpiler,
+            Err(e) => throw!(typ, format!("Failed to transpile: {:?}", e)),
+        };
+        // Wait until #3941 is released in the next version, so we can specify the path
+        let reader = Source::from_bytes(transpiled.as_bytes());
+        let module = Module::parse(reader, None, ctx)?;
         let promise = module.load_link_evaluate(ctx);
 
         ctx.run_jobs();

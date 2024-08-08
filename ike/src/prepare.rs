@@ -1,3 +1,4 @@
+use crate::globals::CODE_TO_INJECT;
 use anyhow::Result;
 use ike_fs::read_to_string;
 use ike_fs::FsError::FailedToReadFile;
@@ -49,7 +50,7 @@ pub fn transpile_with_text(path: &PathBuf, source_text: String) -> Result<String
     .build(&mut program);
     let printed = CodeGenerator::new().build(&program).source_text;
 
-    Ok(printed)
+    Ok(format!("{} \n {}", CODE_TO_INJECT, printed))
 }
 
 pub fn transpile(path: &PathBuf) -> Result<String> {

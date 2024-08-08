@@ -1,12 +1,6 @@
-use crate::prepare::{transpile, transpile_with_text};
-use crate::throw;
+use crate::prepare::transpile;
 use boa_engine::{
-    job::NativeJob, module::ModuleLoader, Context, JsNativeError, JsResult, JsString, JsValue,
-    Module, Source,
-};
-use isahc::{
-    config::{Configurable, RedirectPolicy},
-    AsyncReadResponseExt, Request, RequestExt,
+    module::ModuleLoader, Context, JsNativeError, JsResult, JsString, JsValue, Module, Source,
 };
 use oxc_resolver::{EnforceExtension, ResolveOptions, Resolver};
 use std::{collections::HashMap, vec};
@@ -24,6 +18,7 @@ lazy_static::lazy_static! {
         m.insert("assert", include_str!("js\\assert.mjs").to_string());
         m.insert("inspect", include_str!("js\\inspect.mjs").to_string());
         m.insert("_internal_", include_str!("js\\_internal_.mjs").to_string());
+        m.insert("path", include_str!("js\\path.mjs").to_string());
         m
     };
 }

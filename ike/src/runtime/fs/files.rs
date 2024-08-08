@@ -1,4 +1,4 @@
-use crate::runtime::fs::{FileSystem, resolve_path_from_args};
+use crate::runtime::fs::{resolve_path_from_args, FileSystem};
 use crate::throw;
 use boa_engine::object::builtins::{JsArrayBuffer, JsUint8Array};
 use boa_engine::{js_string, Context, JsNativeError, JsResult, JsString, JsValue};
@@ -42,4 +42,3 @@ pub fn read_text_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> 
         }
     }
 }
-\

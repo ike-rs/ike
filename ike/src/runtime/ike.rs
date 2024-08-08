@@ -75,6 +75,8 @@ impl IkeGlobalObject {
             1,
         );
 
+        obj.property(js_string!("path"), JsObject::default(), Attribute::all());
+
         let obj = obj.build();
 
         if let Some(file) = file {

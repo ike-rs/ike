@@ -6,6 +6,7 @@ import './modules/_internal_';
 import './url';
 import './console';
 import './headers';
+import type Path from './modules/path';
 
 /**
  * The Meta interface contains information about the current file and its paths.
@@ -225,6 +226,25 @@ interface Ike {
       path?: string;
     },
   ): string | null;
+
+  /**
+   * Utilities for working with paths.
+   *
+   * @example
+   * ```ts
+   * console.log(Ike.path.join("path", "to", "file.txt"));
+   * ```
+   *
+   * Can be also used as a module
+   *
+   * @example
+   * ```ts
+   * import { join } from "path";
+   * console.log(join("path", "to", "file.txt"));
+   * ```
+   *
+   */
+  path: Path
 }
 
 declare namespace Ike {
