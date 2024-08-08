@@ -86,8 +86,18 @@ impl Console {
             return Ok(JsValue::undefined());
         }
 
+        let mut i = 0;
         for arg in args {
-            Self::print_as(arg, ctx, level, console, true, false);
+            i += 1;
+            if i > 1 {
+                print!(" ");
+            }
+
+            Self::print_as(arg, ctx, level, console, false, false);
+        
+            if i == args.len() {
+                new_line!();
+            }
         }
         Ok(JsValue::undefined())
     }

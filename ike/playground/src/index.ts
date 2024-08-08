@@ -1,4 +1,6 @@
 
 console.log(
-    Ike.env
-)
+false, true, 123, 123, 123n, "daw"
+    )
+
+console.log("dwa")
