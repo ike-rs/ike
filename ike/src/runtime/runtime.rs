@@ -189,6 +189,25 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
             _ => todo!(),
         }
     }
+
+    let ike = ctx.global_object().get(js_string!("Ike"), ctx).unwrap();
+    let ike = ike.as_object().unwrap();
+
+    let env_vars = std::env::vars();
+    let env_obj = JsObject::default();
+
+    for (key, value) in env_vars {
+        env_obj
+            .set(
+                js_string!(key),
+                JsValue::from(js_string!(value)),
+                false,
+                ctx,
+            )
+            .expect("Failed to set env var");
+    }
+    ike.set(js_string!("env"), env_obj, false, ctx)
+        .expect("Failed to set Ike.env");
 }
 
 pub fn get_current_path(ctx: &mut Context) -> JsValue {

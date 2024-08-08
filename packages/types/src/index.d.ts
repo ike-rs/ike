@@ -245,6 +245,16 @@ interface Ike {
    *
    */
   path: Path;
+
+  /**
+   * Environment variables.
+   *
+   * @example
+   * ```ts
+   * console.log(Ike.env.PATH);
+   * ```
+   */
+  env: Record<string, string>;
 }
 
 declare namespace Ike {
