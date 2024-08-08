@@ -244,7 +244,7 @@ interface Ike {
    * ```
    *
    */
-  path: Path
+  path: Path;
 }
 
 declare namespace Ike {

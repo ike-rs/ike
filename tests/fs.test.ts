@@ -1,4 +1,4 @@
-import {afterAll, describe, expect, it} from 'test';
+import { afterAll, describe, expect, it } from 'test';
 
 describe('readFileSync', () => {
   // Might fail
