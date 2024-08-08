@@ -138,7 +138,7 @@ export interface Path {
   extname(path: string): string;
 
   /**
-   * The platform-specific file separator. '\\' or '/'.
+   * '/' separator.
    */
   readonly sep: '/';
   /**
