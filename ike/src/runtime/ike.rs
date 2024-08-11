@@ -1,5 +1,6 @@
 use super::meta::Meta;
 use crate::runtime::fs::dir::{create_dir_sync, remove_dir_sync};
+use crate::runtime::fs::exists_sync;
 use crate::runtime::fs::files::{read_file_sync, read_text_file_sync};
 use crate::runtime::toml::parse_toml;
 use crate::which::which;
@@ -60,6 +61,12 @@ impl IkeGlobalObject {
         obj.function(
             NativeFunction::from_fn_ptr(remove_dir_sync),
             js_string!("removeDirSync"),
+            1,
+        );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(exists_sync),
+            js_string!("existsSync"),
             1,
         );
 

@@ -262,8 +262,6 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
         }
 
         if !global_after_all_val.is_undefined() {
-            let global_before_all =
-                JsArray::from_object(global_after_all_val.as_object().unwrap().clone())?;
             run_after_all_hooks(&global_after_all_val, ctx, path_buf)?;
         }
 

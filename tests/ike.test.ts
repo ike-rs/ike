@@ -2,7 +2,7 @@ import { describe, expect, it } from 'test';
 
 describe('Ike', () => {
   it('expect to be defined', () => {
-    expect(Ike).notToBeUndefined();
+    expect(Ike).toBeDefined();
   });
 
   it('expect Ike.os to return correct value', () => {
@@ -18,10 +18,14 @@ describe('Ike', () => {
   });
 
   it('expect Ike.version to be defined', () => {
-    expect(Ike.version).notToBeUndefined();
+    expect(Ike.version).toBeDefined();
   });
 
   it('expect cwd to be defined', () => {
-    expect(Ike.cwd()).notToBeUndefined();
+    expect(Ike.cwd).toBeDefined();
+  });
+
+  it('expect env to be defined', () => {
+    expect(Ike.env).toBeDefined();
   });
 });

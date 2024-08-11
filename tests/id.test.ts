@@ -20,8 +20,4 @@ describe('Ike.{uid,gid,pid}', () => {
   it.if(!Ike.isWindows(), 'expect gid to be a number on Unix platforms', () => {
     expect(Ike.gid()).toBeNumber();
   });
-
-  it("expect env to be defined", () => {
-    expect(Ike.env).notToBeUndefined()
-  })
 });

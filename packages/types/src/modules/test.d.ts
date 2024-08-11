@@ -91,6 +91,42 @@ declare module 'test' {
     toBeFalsy: () => void;
 
     /**
+     * Asserts that the value is true.
+     * @throws {Error} If the value is not true.
+     */
+    toBeTrue: () => void;
+
+    /**
+     * Asserts that the value is false.
+     * @throws {Error} If the value is not false.
+     */
+    toBeFalse: () => void;
+
+    /**
+     * Asserts that the value is not true.
+     * @throws {Error} If the value is true.
+     */
+    notToBeTrue: () => void;
+
+    /**
+     * Asserts that the value is not false.
+     * @throws {Error} If the value is false.
+     */
+    notToBeFalse: () => void;
+
+    /**
+     * Asserts that the values is defined.
+     * @throws {Error} If the value is not defined.
+     */
+    toBeDefined: () => void;
+
+    /**
+     * Asserts that the value is not defined.
+     * @throws {Error} If the value is defined.
+     */
+    notToBeDefined: () => void;
+
+    /**
      * Asserts that the value is one of the expected values.
      * @param {any[]} expected - The expected values.
      * @throws {Error} If the value is not one of the expected values.

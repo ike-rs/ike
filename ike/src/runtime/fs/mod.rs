@@ -35,15 +35,25 @@ impl FileSystem {
         Ok(File::new(file))
     }
 
-    pub fn create_dir_all_sync(path: &Path) -> anyhow::Result<()> {
-        std::fs::create_dir_all(path)?;
-        Ok(())
+    pub fn create_dir_all_sync(path: &Path) -> std::io::Result<()> {
+        std::fs::create_dir_all(path)
     }
 
-    pub fn create_dir_sync(path: &Path) -> anyhow::Result<()> {
-        std::fs::create_dir(path)?;
-        Ok(())
+    pub fn create_dir_sync(path: &Path) -> std::io::Result<()> {
+        std::fs::create_dir(path)
     }
+
+    pub fn exists_sync(path: &Path) -> bool {
+        path.exists()
+    }
+}
+
+pub fn exists_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = &str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+
+    Ok(JsValue::from(FileSystem::exists_sync(path)))
 }
 
 pub struct File {

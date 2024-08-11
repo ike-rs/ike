@@ -201,15 +201,33 @@ interface Ike {
    * @param opts Options for creating the directory
    * @returns void
    */
-  createDirSync(path: string, opts?: { recursive?: boolean }): void;
+  createDirSync(path: string, opts?: {
+    /**
+     * If set to true, all parent directories will be created.
+     */
+    recursive?: boolean }): void;
 
   /**
    * Synchronously removes a directory.
    *
    * @param path Path to the directory
+   * @param opts Options for removing the directory
    * @returns void
    */
-  removeDirSync(path: string): void;
+  removeDirSync(path: string, opts?: {
+    /**
+     * If set to true, path will be removed even if it's a non-empty directory.
+     */
+    recursive?: boolean;
+  }): void;
+
+  /**
+   * Synchronously checks if a path exists.
+   *
+   * @param path Path to the file or directory
+   * @returns boolean
+   */
+  existsSync(path: string): boolean;
 
   /**
    * Returns path to the executable.

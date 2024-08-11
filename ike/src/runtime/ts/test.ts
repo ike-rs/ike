@@ -94,6 +94,36 @@ const expect = <T = unknown>(value: any) => {
         throw new Error(`Expected value not to be falsy, but got ${value}`);
       }
     },
+    toBeDefined: () => {
+      if (value === undefined) {
+        throw new Error(`Expected value to be defined, but got ${value}`);
+      }
+    },
+    notToBeDefined: () => {
+      if (value !== undefined) {
+        throw new Error(`Expected value not to be defined, but got ${value}`);
+      }
+    },
+    toBeTrue: () => {
+      if (value !== true) {
+        throw new Error(`Expected value to be true, but got ${value}`);
+      }
+    },
+    notToBeTrue: () => {
+      if (value === true) {
+        throw new Error(`Expected value not to be true, but got ${value}`);
+      }
+    },
+    toBeFalse: () => {
+      if (value !== false) {
+        throw new Error(`Expected value to be false, but got ${value}`);
+      }
+    },
+    notToBeFalse: () => {
+      if (value === false) {
+        throw new Error(`Expected value not to be false, but got ${value}`);
+      }
+    },
     toBeOneOf: (expected: T[]) => {
       if (!expected.includes(value)) {
         throw new Error(
