@@ -195,6 +195,22 @@ interface Ike {
   readTextFileSync(path: string): string;
 
   /**
+   * Synchronously removes a file from the filesystem.
+    *
+   * @param path
+    * @returns void
+   */
+  removeFileSync(path: string): void;
+
+  /**
+   * Synchronously creates a new file or truncates an existing file.
+   *
+   * @param path
+   * @returns void
+   */
+  createFileSync(path: string): void;
+
+  /**
    * Synchronously creates a new directory.
    *
    * @param path Path to the directory

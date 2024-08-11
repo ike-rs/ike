@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it } from 'test';
+import {afterAll, beforeAll, describe, expect, it} from 'test';
 
 describe('readFileSync', () => {
   // Might fail
@@ -91,3 +91,35 @@ describe('existsSync', () => {
     expect(Ike.existsSync('tests/non-existent-dir')).toBe(false);
   });
 });
+
+describe("createFileSync", () => {
+    it("should create a new file", () => {
+        Ike.createFileSync('tests/new-file.txt');
+        expect(Ike.existsSync('tests/new-file.txt')).toBe(true);
+    });
+
+    it.skip("should truncate when file already exists", () => {
+        // TODO: finish this test when we implement writeFileSync
+    });
+
+    it("throw if no path is provided", () => {
+        // @ts-ignore
+        expect(() => Ike.createFileSync()).toThrow();
+    });
+})
+
+describe('removeFileSync', () => {
+    it('should remove a file', () => {
+        Ike.removeFileSync('tests/new-file.txt');
+        expect(Ike.existsSync('tests/new-file.txt')).toBe(false);
+    });
+
+    it('should throw an error if file does not exist', () => {
+        expect(() => Ike.removeFileSync('tests/non-existent-file.txt')).toThrow();
+    });
+
+    it('throw if no path is provided', () => {
+        // @ts-ignore
+        expect(() => Ike.removeFileSync()).toThrow();
+    });
+})
