@@ -42,3 +42,25 @@ pub fn read_text_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> 
         }
     }
 }
+
+pub fn remove_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = &str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+
+    match std::fs::remove_file(path) {
+        Ok(_) => Ok(JsValue::undefined()),
+        Err(err) => Err(JsNativeError::error().with_message(err.to_string()).into()),
+    }
+}
+
+pub fn create_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = &str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+
+    match std::fs::File::create(path) {
+        Ok(_) => Ok(JsValue::undefined()),
+        Err(err) => Err(JsNativeError::error().with_message(err.to_string()).into()),
+    }
+}

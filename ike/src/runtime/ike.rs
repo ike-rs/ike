@@ -1,7 +1,9 @@
 use super::meta::Meta;
 use crate::runtime::fs::dir::{create_dir_sync, remove_dir_sync};
 use crate::runtime::fs::exists_sync;
-use crate::runtime::fs::files::{read_file_sync, read_text_file_sync};
+use crate::runtime::fs::files::{
+    create_file_sync, read_file_sync, read_text_file_sync, remove_file_sync,
+};
 use crate::runtime::toml::parse_toml;
 use crate::which::which;
 use crate::{create_method, globals::VERSION, js_str_to_string, throw};
@@ -49,6 +51,18 @@ impl IkeGlobalObject {
         obj.function(
             NativeFunction::from_fn_ptr(read_file_sync),
             js_string!("readFileSync"),
+            1,
+        );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(remove_file_sync),
+            js_string!("removeFileSync"),
+            1,
+        );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(create_file_sync),
+            js_string!("createFileSync"),
             1,
         );
 
