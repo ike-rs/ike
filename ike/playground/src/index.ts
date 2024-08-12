@@ -1,1 +1,1 @@
-Ike.removeFileSync('not-exist.txt');
+console.log(Ike.env);

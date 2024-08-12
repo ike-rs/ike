@@ -38,6 +38,7 @@ ike-fs = { path = "../ike-fs" }
 ike-toml = { path = "../ike-toml" }
 indexmap = "2.3.0"
 urlencoding = "2.1.3"
+dotenvy = "0.15.7"
 
 [target.'cfg(unix)'.dependencies]
 nix = { version = "0.29.0", features = ["process", "user"] }
