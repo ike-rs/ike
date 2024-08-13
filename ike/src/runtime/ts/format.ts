@@ -292,3 +292,37 @@ export const colors = {
   bgCyanBright: (str: string) => applyStyle('bgCyanBright', str),
   bgWhiteBright: (str: string) => applyStyle('bgWhiteBright', str),
 };
+
+export type Rgb = {
+  r: number;
+  g: number;
+  b: number;
+};
+
+export const textRgb = (text: string, rgb: Rgb): string => {
+  return `\x1b[38;2;${rgb.r};${rgb.g};${rgb.b}m${text}\x1b[0m`;
+};
+
+export const backgroundRgb = (text: string, rgb: Rgb): string => {
+  return `\x1b[48;2;${rgb.r};${rgb.g};${rgb.b}m${text}\x1b[0m`;
+};
+
+export const hexToRgb = (hex: string): Rgb => {
+  const value = hex.startsWith('#') ? hex.slice(1) : hex;
+  const bigint = parseInt(value, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return { r, g, b };
+};
+
+export const textHex = (text: string, hex: string): string => {
+  const rgb = hexToRgb(hex);
+  return textRgb(text, rgb);
+};
+
+export const backgroundHex = (text: string, hex: string): string => {
+  const rgb = hexToRgb(hex);
+  return backgroundRgb(text, rgb);
+};

@@ -1,4 +1,11 @@
-import { colors, prettyFmt } from '@std/format';
+import {
+  backgroundHex,
+  backgroundRgb,
+  colors,
+  prettyFmt,
+  textHex,
+  textRgb,
+} from '@std/format';
 
 console.log(
   colors.bgBlueBright('Hello, World!'),
@@ -11,3 +18,9 @@ console.log(
 );
 
 console.log(new RegExp('a', 'g'), new Date(), [false]);
+
+console.log(textHex('purple text', '#5e32a8'));
+console.log(backgroundHex('purple bg', '#5e32a8'));
+
+console.log(textRgb('pink text', { r: 168, g: 50, b: 94 }));
+console.log(backgroundRgb('ping background!', { r: 168, g: 50, b: 94 }));

@@ -153,4 +153,57 @@ declare module '@std/format' {
   };
 
   export const RESET = '\x1b[0m';
+
+  /**
+   * Representation of an RGB color.
+   */
+  export type Rgb = {
+    r: number;
+    g: number;
+    b: number;
+  };
+
+  /**
+   * Colors the text using an RGB color.
+   *
+   * @param text The text to color.
+   * @param rgb The RGB color.
+   * @returns The text with the applied RGB color.
+   */
+  export const textRgb: (text: string, rgb: Rgb) => string;
+
+  /**
+   * Sets the background color using an RGB color.
+   *
+   * @param text The text to color the background of.
+   * @param rgb The RGB color.
+   * @returns The text with the applied RGB background color.
+   */
+  export const backgroundRgb: (text: string, rgb: Rgb) => string;
+
+  /**
+   * Converts a HEX color to an RGB color.
+   *
+   * @param hex The HEX color string.
+   * @returns The corresponding RGB color.
+   */
+  export const hexToRgb: (hex: string) => Rgb;
+
+  /**
+   * Colors the text using a HEX color.
+   *
+   * @param text The text to color.
+   * @param hex The HEX color string.
+   * @returns The text with the applied HEX color.
+   */
+  export const textHex: (text: string, hex: string) => string;
+
+  /**
+   * Sets the background color using a HEX color.
+   *
+   * @param text The text to color the background of.
+   * @param hex The HEX color string.
+   * @returns The text with the applied HEX background color.
+   */
+  export const backgroundHex: (text: string, hex: string) => string;
 }
