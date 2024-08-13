@@ -196,9 +196,9 @@ interface Ike {
 
   /**
    * Synchronously removes a file from the filesystem.
-    *
+   *
    * @param path
-    * @returns void
+   * @returns void
    */
   removeFileSync(path: string): void;
 
@@ -217,11 +217,15 @@ interface Ike {
    * @param opts Options for creating the directory
    * @returns void
    */
-  createDirSync(path: string, opts?: {
-    /**
-     * If set to true, all parent directories will be created.
-     */
-    recursive?: boolean }): void;
+  createDirSync(
+    path: string,
+    opts?: {
+      /**
+       * If set to true, all parent directories will be created.
+       */
+      recursive?: boolean;
+    },
+  ): void;
 
   /**
    * Synchronously removes a directory.
@@ -230,12 +234,15 @@ interface Ike {
    * @param opts Options for removing the directory
    * @returns void
    */
-  removeDirSync(path: string, opts?: {
-    /**
-     * If set to true, path will be removed even if it's a non-empty directory.
-     */
-    recursive?: boolean;
-  }): void;
+  removeDirSync(
+    path: string,
+    opts?: {
+      /**
+       * If set to true, path will be removed even if it's a non-empty directory.
+       */
+      recursive?: boolean;
+    },
+  ): void;
 
   /**
    * Synchronously checks if a path exists.
@@ -285,7 +292,7 @@ interface Ike {
    *
    * @example
    * ```ts
-   * console.log(Ike.env.PATH);
+   * console.log(Ike.env.Path);
    * ```
    */
   env: Record<string, string>;

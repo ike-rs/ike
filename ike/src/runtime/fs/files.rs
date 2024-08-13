@@ -1,7 +1,7 @@
 use crate::runtime::fs::{resolve_path_from_args, FileSystem};
 use crate::throw;
 use boa_engine::object::builtins::{JsArrayBuffer, JsUint8Array};
-use boa_engine::{js_string, Context, JsNativeError, JsResult, JsString, JsValue};
+use boa_engine::{js_string, Context, JsNativeError, JsResult, JsValue};
 use std::path::Path;
 
 pub fn read_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {

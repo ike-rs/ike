@@ -1,7 +1,7 @@
 use crate::globals::CODE_TO_INJECT;
 use anyhow::Result;
 use ike_fs::read_to_string;
-use ike_fs::FsError::FailedToReadFile;
+use ike_fs::FsError::FailedToReadFileWithError;
 use oxc_allocator::Allocator;
 use oxc_codegen::CodeGenerator;
 use oxc_parser::Parser;
@@ -57,7 +57,9 @@ pub fn transpile(path: &PathBuf) -> Result<String> {
     let source_text = match read_to_string(path) {
         Ok(content) => content,
         Err(e) => {
-            return Err(FailedToReadFile(path.clone()).into());
+            return Err(FailedToReadFileWithError(
+                e.to_string()
+            ).into());
         }
     };
 

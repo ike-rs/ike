@@ -7,7 +7,6 @@ use boa_engine::{
 };
 use boa_gc::{empty_trace, Trace};
 use indexmap::IndexMap;
-use std::fmt::format;
 
 const HEADERS: &[&str] = &[
     "accept",

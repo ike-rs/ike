@@ -104,6 +104,7 @@ fn convert_array(array: &[Value], ctx: &mut Context) -> JsResult<JsArray> {
 
     Ok(js_array)
 }
+
 pub fn parse_toml(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let arg = args.first();
     if arg.is_none() {

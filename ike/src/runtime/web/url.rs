@@ -1,8 +1,8 @@
-use crate::{assert_arg_type, js_str_to_string, throw};
+use crate::{js_str_to_string, throw};
 use boa_engine::class::{Class, ClassBuilder};
-use boa_engine::object::builtins::{JsArray, JsFunction};
+use boa_engine::object::builtins::JsArray;
 use boa_engine::{
-    js_string, Context, Finalize, JsData, JsError, JsNativeError, JsObject, JsResult, JsString,
+    js_string, Context, Finalize, JsData, JsNativeError, JsObject, JsResult, JsString,
     JsValue, NativeFunction, Trace,
 };
 use boa_gc::empty_trace;

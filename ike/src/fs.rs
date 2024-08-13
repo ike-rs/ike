@@ -1,6 +1,5 @@
-use anyhow::{format_err, Result};
+use anyhow::Result;
 use ike_fs::FsError::{FailedToReadFile, FailedToReadFileWithError, FileNotFound};
-use logger::{elog, Logger};
 use regex::Regex;
 use std::path::Component;
 use std::{
