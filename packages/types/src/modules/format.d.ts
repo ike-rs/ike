@@ -1,11 +1,11 @@
 /**
- * Utilities for converting values to human-readable byte strings.
+ * Utilities for formatting data.
  */
-declare module '@std/bytes' {
+declare module '@std/format' {
   /**
-   * Options for formatting byte values.
+   * ByteOptions for formatting byte values.
    */
-  interface Options {
+  interface ByteOptions {
     /**
      * The number of decimal places to include in the formatted string.
      */
@@ -34,9 +34,9 @@ declare module '@std/bytes' {
    * @param {string | number} value - The value to convert or parse.
    * @returns {string | number | null} - The formatted string or the parsed number in bytes.
    */
-  export function bytes(
+  export function convertBytes(
     value: string | number,
-    options?: Options,
+    options?: ByteOptions,
   ): string | number | null;
 
   /**
@@ -45,7 +45,10 @@ declare module '@std/bytes' {
    * @param {number} value - The value in bytes to format.
    * @returns {string | null} - The formatted string or `null` if the value is not a finite number.
    */
-  export function format(value: number, options?: Options): string | null;
+  export function formatBytes(
+    value: number,
+    options?: ByteOptions,
+  ): string | null;
 
   /**
    * Parses a string representing a data size (e.g., '1KB', '5MB') into a numeric value in bytes.
@@ -53,5 +56,12 @@ declare module '@std/bytes' {
    * @param {number | string} val - The string or number to parse.
    * @returns {number | null} - The parsed value in bytes or `null` if parsing fails.
    */
-  export function parse(val: number | string): number | null;
+
+  /**
+   * Parses a string or number into a numeric value.
+   *
+   * @param {number | string} val - The string or number to parse.
+   * @returns {number | null} - The parsed numeric value or `null` if parsing fails.
+   */
+  export function parseNumericValue(val: number | string): number | null;
 }

@@ -19,7 +19,7 @@ lazy_static::lazy_static! {
         m.insert("@std/inspect", include_str!("js\\inspect.mjs").to_string());
         m.insert("@std/_internal_", include_str!("js\\_internal_.mjs").to_string());
         m.insert("@std/path", include_str!("js\\path.mjs").to_string());
-        m.insert("@std/bytes", include_str!("js\\bytes.mjs").to_string());
+        m.insert("@std/format", include_str!("js\\format.mjs").to_string());
         m
     };
 }

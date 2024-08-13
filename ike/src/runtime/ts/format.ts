@@ -14,7 +14,7 @@ const map: { [key: string]: number } = {
 
 const parseRegExp = /^((-|\+)?(\d+(?:\.\d+)?)) *(kb|mb|gb|tb|pb)$/i;
 
-export const bytes = (
+export const convertBytes = (
   value: string | number,
   options?: {
     case?: string;
@@ -25,17 +25,17 @@ export const bytes = (
   },
 ): string | number | null => {
   if (typeof value === 'string') {
-    return parse(value);
+    return parseNumericValue(value);
   }
 
   if (typeof value === 'number') {
-    return format(value, options);
+    return formatBytes(value, options);
   }
 
   return null;
 };
 
-export const format = (
+export const formatBytes = (
   value: number,
   options?: {
     decimalPlaces?: number;
@@ -92,7 +92,7 @@ export const format = (
   return str + unitSeparator + unit;
 };
 
-export const parse = (val: number | string): number | null => {
+export const parseNumericValue = (val: number | string): number | null => {
   if (typeof val === 'number' && !isNaN(val)) {
     return val;
   }
