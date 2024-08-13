@@ -3,6 +3,7 @@ import './modules/test';
 import './modules/inspect';
 import './modules/assert';
 import './modules/_internal_';
+import './modules/bytes';
 import { URL as _URL, URLSearchParams as _URLSearchParams } from './url';
 import type { Console } from './console';
 import type { Headers as _Headers } from './headers';
