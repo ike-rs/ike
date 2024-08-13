@@ -9,15 +9,49 @@ lazy_static::lazy_static! {
         let mut m = HashMap::new();
         m.insert("black", ED.to_string() + "30m");
         m.insert("blue", ED.to_string() + "34m");
-        m.insert("b", ED.to_string() + "1m");
-        m.insert("d", ED.to_string() + "2m");
-        m.insert("i", ED.to_string() + "3m");
+        m.insert("b", ED.to_string() + "1m");  // bold
+        m.insert("d", ED.to_string() + "2m");  // dim
+        m.insert("i", ED.to_string() + "3m");  // italic
+        m.insert("u", ED.to_string() + "4m");  // underline
+        m.insert("o", ED.to_string() + "53m"); // overline
+        m.insert("h", ED.to_string() + "7m");  // hidden
+        m.insert("s", ED.to_string() + "9m");  // strikethrough
+        m.insert("inv", ED.to_string() + "7m"); // inverse
         m.insert("cyan", ED.to_string() + "36m");
         m.insert("green", ED.to_string() + "32m");
         m.insert("magenta", ED.to_string() + "35m");
         m.insert("red", ED.to_string() + "31m");
         m.insert("white", ED.to_string() + "37m");
         m.insert("yellow", ED.to_string() + "33m");
+        m.insert("reset", ED.to_string() + "0m");  // reset
+        m.insert("blackBright", ED.to_string() + "90m"); 
+        m.insert("gray", ED.to_string() + "90m");
+        m.insert("grey", ED.to_string() + "90m");
+        m.insert("redBright", ED.to_string() + "91m"); 
+        m.insert("greenBright", ED.to_string() + "92m"); 
+        m.insert("yellowBright", ED.to_string() + "93m"); 
+        m.insert("blueBright", ED.to_string() + "94m");
+        m.insert("magentaBright", ED.to_string() + "95m"); 
+        m.insert("cyanBright", ED.to_string() + "96m"); 
+        m.insert("whiteBright", ED.to_string() + "97m"); 
+        m.insert("bgBlack", ED.to_string() + "40m");
+        m.insert("bgRed", ED.to_string() + "41m");
+        m.insert("bgGreen", ED.to_string() + "42m");
+        m.insert("bgYellow", ED.to_string() + "43m"); 
+        m.insert("bgBlue", ED.to_string() + "44m"); 
+        m.insert("bgMagenta", ED.to_string() + "45m");
+        m.insert("bgCyan", ED.to_string() + "46m"); 
+        m.insert("bgWhite", ED.to_string() + "47m"); 
+        m.insert("bgBlackBright", ED.to_string() + "100m"); 
+        m.insert("bgGray", ED.to_string() + "100m"); 
+        m.insert("bgGrey", ED.to_string() + "100m"); 
+        m.insert("bgRedBright", ED.to_string() + "101m"); 
+        m.insert("bgGreenBright", ED.to_string() + "102m"); 
+        m.insert("bgYellowBright", ED.to_string() + "103m");
+        m.insert("bgBlueBright", ED.to_string() + "104m"); 
+        m.insert("bgMagentaBright", ED.to_string() + "105m");
+        m.insert("bgCyanBright", ED.to_string() + "106m");
+        m.insert("bgWhiteBright", ED.to_string() + "107m"); 
         m
     };
 }

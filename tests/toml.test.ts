@@ -1,8 +1,4 @@
-import { describe, expect, it, beforeAll } from '@std/test';
-
-beforeAll(() => {
-  console.log('toml');
-});
+import { describe, expect, it } from '@std/test';
 
 describe('fromToml function', () => {
   it('should parse simple key-value pairs correctly', () => {

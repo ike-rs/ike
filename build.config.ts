@@ -16,4 +16,5 @@ export default defineBuildConfig({
   },
   failOnWarn: false,
   clean: true,
+  declaration: true,
 });

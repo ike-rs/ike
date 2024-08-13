@@ -3,7 +3,7 @@
 import { describe, expect, it } from '@std/test';
 import { convertBytes, formatBytes, parseNumericValue } from '@std/format';
 
-describe('@std/format - convertBytes', () => {
+describe('@std/format \\> convertBytes', () => {
   it('should return null if input is invalid', () => {
     expect(convertBytes(undefined)).toBeNull();
     expect(convertBytes(null)).toBeNull();
@@ -28,7 +28,7 @@ describe('@std/format - convertBytes', () => {
   });
 });
 
-describe('@std/format ', () => {
+describe('@std/format \\> parseNumericValue', () => {
   it('should return null if input is invalid', () => {
     expect(parseNumericValue(undefined)).toBeNull();
     expect(parseNumericValue(null)).toBeNull();
@@ -135,7 +135,7 @@ describe('@std/format ', () => {
   });
 });
 
-describe('@std/format - formatBytes', () => {
+describe('@std/format \\> formatBytes', () => {
   const pb = Math.pow(1024, 5);
   const tb = (1 << 30) * 1024;
   const gb = 1 << 30;
