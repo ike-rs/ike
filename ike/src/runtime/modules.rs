@@ -19,6 +19,7 @@ lazy_static::lazy_static! {
         m.insert("@std/inspect", include_str!("js\\inspect.mjs").to_string());
         m.insert("@std/_internal_", include_str!("js\\_internal_.mjs").to_string());
         m.insert("@std/path", include_str!("js\\path.mjs").to_string());
+        m.insert("@std/uuid", include_str!("js\\uuid\\index.mjs").to_string());
         m
     };
 }
@@ -39,18 +40,31 @@ impl ModuleLoader for IkeModuleLoader {
 
             finish_load(module, context);
         } else {
-            let ref_path = match referrer.path().unwrap().parent() {
-                Some(parent) => parent,
+            println!("Loading module: {}", spec);
+            let ref_path = match referrer.path() {
+                Some(path) => match path.parent() {
+                    Some(parent) => parent,
+                    None => {
+                        finish_load(
+                            Err(JsNativeError::typ()
+                                .with_message("Failed to get parent directory")
+                                .into()),
+                            context,
+                        );
+                        return;
+                    }
+                },
                 None => {
                     finish_load(
                         Err(JsNativeError::typ()
-                            .with_message("Failed to get parent directory")
+                            .with_message("Failed to get path from referrer")
                             .into()),
                         context,
                     );
                     return;
                 }
             };
+            
 
             let options = ResolveOptions {
                 enforce_extension: EnforceExtension::Disabled,
