@@ -1,4 +1,8 @@
-import { InvalidArgTypeError, isArrayBuffer, isTypedArray } from '_internal_';
+import {
+  InvalidArgTypeError,
+  isArrayBuffer,
+  isTypedArray,
+} from '@std/_internal_';
 
 const $isAscii = $rustFunction('isAscii');
 const atob = $rustFunction('atob');

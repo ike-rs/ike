@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'test';
+import { beforeAll, describe, expect, it } from '@std/test';
 
 describe('URL', () => {
   it('should construct without any errors', () => {
@@ -55,8 +55,8 @@ describe('URL', () => {
 
   it('URL.parse should return the correct URL object', () => {
     const url = URL.parse('http://www.example.com?query=string');
-    expect(url.hostname).toBe('www.example.com');
-    expect(url.search).toBe('?query=string');
+    expect(url?.hostname).toBe('www.example.com');
+    expect(url?.search).toBe('?query=string');
   });
 
   it('URL.parse should return null when the URL is invalid', () => {

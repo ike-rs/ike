@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals } from 'assert';
+import { assertEquals, assertNotEquals } from '@std/assert';
 
 const describe = $rustFunction('describe');
 const $it = $rustFunction('it');

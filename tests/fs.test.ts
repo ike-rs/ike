@@ -1,4 +1,4 @@
-import {afterAll, beforeAll, describe, expect, it} from 'test';
+import { afterAll, beforeAll, describe, expect, it } from '@std/test';
 
 describe('readFileSync', () => {
   // Might fail
@@ -47,32 +47,32 @@ describe('readTextFileSync', () => {
 describe('createDirSync', () => {
   afterAll(() => {
     try {
-        Ike.removeDirSync('tests/new-dir');
-        Ike.removeDirSync('tests/new-dir-2');
+      Ike.removeDirSync('tests/new-dir');
+      Ike.removeDirSync('tests/new-dir-2');
     } catch (err) {
-        console.error("Failed to clean up directories", err);
+      console.error('Failed to clean up directories', err);
     }
-  })
+  });
 
-    it('should create a new directory', () => {
-        Ike.createDirSync('tests/new-dir');
-        expect(Ike.existsSync('tests/new-dir')).toBe(true);
-    });
+  it('should create a new directory', () => {
+    Ike.createDirSync('tests/new-dir');
+    expect(Ike.existsSync('tests/new-dir')).toBe(true);
+  });
 
-    it('should create a new directory recursively', () => {
-        Ike.createDirSync('tests/new-dir-2', { recursive: true });
-        expect(Ike.existsSync('tests/new-dir-2')).toBe(true);
-    });
+  it('should create a new directory recursively', () => {
+    Ike.createDirSync('tests/new-dir-2', { recursive: true });
+    expect(Ike.existsSync('tests/new-dir-2')).toBe(true);
+  });
 
-    it('should throw an error if directory already exists', () => {
-        expect(() => Ike.createDirSync('tests/new-dir')).toThrow();
-    });
+  it('should throw an error if directory already exists', () => {
+    expect(() => Ike.createDirSync('tests/new-dir')).toThrow();
+  });
 
-    it('throw if no path is provided', () => {
-        // @ts-ignore
-        expect(() => Ike.createDirSync()).toThrow();
-    });
-})
+  it('throw if no path is provided', () => {
+    // @ts-ignore
+    expect(() => Ike.createDirSync()).toThrow();
+  });
+});
 
 describe('existsSync', () => {
   it('should return true if file exists', () => {
@@ -92,34 +92,34 @@ describe('existsSync', () => {
   });
 });
 
-describe("createFileSync", () => {
-    it("should create a new file", () => {
-        Ike.createFileSync('tests/new-file.txt');
-        expect(Ike.existsSync('tests/new-file.txt')).toBe(true);
-    });
+describe('createFileSync', () => {
+  it('should create a new file', () => {
+    Ike.createFileSync('tests/new-file.txt');
+    expect(Ike.existsSync('tests/new-file.txt')).toBe(true);
+  });
 
-    it.skip("should truncate when file already exists", () => {
-        // TODO: finish this test when we implement writeFileSync
-    });
+  it.skip('should truncate when file already exists', () => {
+    // TODO: finish this test when we implement writeFileSync
+  });
 
-    it("throw if no path is provided", () => {
-        // @ts-ignore
-        expect(() => Ike.createFileSync()).toThrow();
-    });
-})
+  it('throw if no path is provided', () => {
+    // @ts-ignore
+    expect(() => Ike.createFileSync()).toThrow();
+  });
+});
 
 describe('removeFileSync', () => {
-    it('should remove a file', () => {
-        Ike.removeFileSync('tests/new-file.txt');
-        expect(Ike.existsSync('tests/new-file.txt')).toBe(false);
-    });
+  it('should remove a file', () => {
+    Ike.removeFileSync('tests/new-file.txt');
+    expect(Ike.existsSync('tests/new-file.txt')).toBe(false);
+  });
 
-    it('should throw an error if file does not exist', () => {
-        expect(() => Ike.removeFileSync('tests/non-existent-file.txt')).toThrow();
-    });
+  it('should throw an error if file does not exist', () => {
+    expect(() => Ike.removeFileSync('tests/non-existent-file.txt')).toThrow();
+  });
 
-    it('throw if no path is provided', () => {
-        // @ts-ignore
-        expect(() => Ike.removeFileSync()).toThrow();
-    });
-})
+  it('throw if no path is provided', () => {
+    // @ts-ignore
+    expect(() => Ike.removeFileSync()).toThrow();
+  });
+});

@@ -1,4 +1,4 @@
-declare module 'buffer' {
+declare module '@std/buffer' {
   global {
     type TypedArray =
       | Int8Array

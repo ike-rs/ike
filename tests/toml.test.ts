@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeAll } from 'test';
+import { describe, expect, it, beforeAll } from '@std/test';
 
 beforeAll(() => {
   console.log('toml');

@@ -1,6 +1,6 @@
 // https://github.com/unjs/pathe/blob/main/test/index.spec.ts
 
-import { describe, expect, it } from 'test';
+import { describe, expect, it } from '@std/test';
 
 runTest('normalize', Ike.path.normalize, {
   // POSIX

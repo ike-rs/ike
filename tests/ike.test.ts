@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'test';
+import { describe, expect, it } from '@std/test';
 
 describe('Ike', () => {
   it('expect to be defined', () => {

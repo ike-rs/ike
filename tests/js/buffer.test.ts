@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'test';
-import { isAscii, isUtf8 } from 'buffer';
+import { describe, it, expect } from '@std/test';
+import { isAscii, isUtf8 } from '@std/buffer';
 
 let encoder = new TextEncoder();
 

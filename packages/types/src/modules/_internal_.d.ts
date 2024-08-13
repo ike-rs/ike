@@ -1,4 +1,4 @@
-declare module '_internal_' {
+declare module '@std/_internal_' {
   /**
    * Checks if a value is a typed array.
    *

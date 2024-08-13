@@ -182,6 +182,6 @@ export interface Path {
  * console.log(isAbsolute("/home/user/file.txt"));
  * ```
  */
-declare module 'path' {
+declare module '@std/path' {
   export = Path;
 }

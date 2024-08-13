@@ -3,9 +3,9 @@ import './modules/test';
 import './modules/inspect';
 import './modules/assert';
 import './modules/_internal_';
-import './url';
-import './console';
-import './headers';
+import { URL as _URL, URLSearchParams as _URLSearchParams } from './url';
+import type { Console } from './console';
+import type { Headers as _Headers } from './headers';
 import type Path from './modules/path';
 
 /**
@@ -311,6 +311,16 @@ declare global {
    * @internal
    */
   function $rustFunction(name: string): Function;
+
+  /**
+   * The global `console` object provides access to the console, enabling methods for logging,
+   * informational output, and error reporting.
+   */
+  const console: Console;
+
+  const Headers: typeof _Headers;
+  const URL: typeof _URL;
+  const URLSearchParams: typeof _URLSearchParams;
 }
 
 export {};

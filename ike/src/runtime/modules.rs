@@ -12,13 +12,13 @@ pub struct IkeModuleLoader;
 lazy_static::lazy_static! {
     static ref BUILTIN_MODULES: HashMap<&'static str, String> = {
         let mut m = HashMap::new();
-        m.insert("util", include_str!("js\\util.mjs").to_string());
-        m.insert("buffer", include_str!("js\\buffer.mjs").to_string());
-        m.insert("test", include_str!("js\\test.mjs").to_string());
-        m.insert("assert", include_str!("js\\assert.mjs").to_string());
-        m.insert("inspect", include_str!("js\\inspect.mjs").to_string());
-        m.insert("_internal_", include_str!("js\\_internal_.mjs").to_string());
-        m.insert("path", include_str!("js\\path.mjs").to_string());
+        m.insert("@std/util", include_str!("js\\util.mjs").to_string());
+        m.insert("@std/buffer", include_str!("js\\buffer.mjs").to_string());
+        m.insert("@std/test", include_str!("js\\test.mjs").to_string());
+        m.insert("@std/assert", include_str!("js\\assert.mjs").to_string());
+        m.insert("@std/inspect", include_str!("js\\inspect.mjs").to_string());
+        m.insert("@std/_internal_", include_str!("js\\_internal_.mjs").to_string());
+        m.insert("@std/path", include_str!("js\\path.mjs").to_string());
         m
     };
 }
@@ -26,7 +26,7 @@ lazy_static::lazy_static! {
 impl ModuleLoader for IkeModuleLoader {
     fn load_imported_module(
         &self,
-        _referrer: boa_engine::module::Referrer,
+        referrer: boa_engine::module::Referrer,
         specifier: JsString,
         finish_load: Box<dyn FnOnce(JsResult<Module>, &mut Context)>,
         context: &mut Context,
@@ -34,13 +34,12 @@ impl ModuleLoader for IkeModuleLoader {
         let spec = specifier.to_std_string_escaped();
 
         if is_builtin_module(&spec) {
-            let stripped_spec = strip_spec(&spec);
-            let source = Source::from_bytes(BUILTIN_MODULES.get(stripped_spec).unwrap().as_bytes());
+            let source = Source::from_bytes(BUILTIN_MODULES.get(spec.as_str()).unwrap().as_bytes());
             let module = Module::parse(source, None, context);
 
             finish_load(module, context);
         } else {
-            let ref_path = match _referrer.path().unwrap().parent() {
+            let ref_path = match referrer.path().unwrap().parent() {
                 Some(parent) => parent,
                 None => {
                     finish_load(
@@ -93,16 +92,6 @@ impl ModuleLoader for IkeModuleLoader {
     }
 }
 
-pub fn strip_spec(specifier: &str) -> &str {
-    if let Some(stripped) = specifier.strip_prefix("ike:") {
-        stripped
-    } else {
-        specifier
-    }
-}
-
 pub fn is_builtin_module(specifier: &str) -> bool {
-    let name = strip_spec(specifier);
-
-    BUILTIN_MODULES.contains_key(name)
+    BUILTIN_MODULES.contains_key(specifier)
 }

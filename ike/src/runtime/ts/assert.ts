@@ -1,4 +1,4 @@
-import { inspect } from 'inspect';
+import { inspect } from '@std/inspect';
 
 export class AssertionError extends Error {
   constructor(message: string) {

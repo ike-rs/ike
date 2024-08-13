@@ -22,7 +22,8 @@ use panic_handler::setup_panic_handler;
 async fn main() -> Result<()> {
     setup_panic_handler();
 
-    dotenvy::dotenv()?;
+    // TODO: fix this
+    // dotenvy::dotenv()?;
 
     let cli = Cli::new();
     match cli.run().await {

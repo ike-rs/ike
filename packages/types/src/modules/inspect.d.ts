@@ -1,4 +1,4 @@
-declare module 'inspect' {
+declare module '@std/inspect' {
   /**
    * Options for customizing the inspection of an object.
    */

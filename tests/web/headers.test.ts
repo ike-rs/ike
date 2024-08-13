@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'test';
+import { describe, expect, it } from '@std/test';
 
 describe('Headers', () => {
   it('expect Headers to be defined', () => {

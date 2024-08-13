@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'test';
+import { describe, expect, it } from '@std/test';
 
 describe('Ike.{uid,gid,pid}', () => {
   it('expect pid to be a number', () => {
