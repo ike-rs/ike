@@ -329,7 +329,7 @@ dependencies = [
 [[package]]
 name = "boa_ast"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 dependencies = [
  "bitflags 2.6.0",
  "boa_interner",
@@ -342,7 +342,7 @@ dependencies = [
 [[package]]
 name = "boa_engine"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 dependencies = [
  "arrayvec",
  "bitflags 2.6.0",
@@ -386,7 +386,7 @@ dependencies = [
 [[package]]
 name = "boa_gc"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 dependencies = [
  "boa_macros",
  "boa_profiler",
@@ -398,7 +398,7 @@ dependencies = [
 [[package]]
 name = "boa_interner"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 dependencies = [
  "boa_gc",
  "boa_macros",
@@ -413,7 +413,7 @@ dependencies = [
 [[package]]
 name = "boa_macros"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -424,7 +424,7 @@ dependencies = [
 [[package]]
 name = "boa_parser"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 dependencies = [
  "bitflags 2.6.0",
  "boa_ast",
@@ -442,12 +442,12 @@ dependencies = [
 [[package]]
 name = "boa_profiler"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 
 [[package]]
 name = "boa_string"
 version = "0.19.0"
-source = "git+https://github.com/boa-dev/boa.git?rev=refs/pull/3941/head#f9ff7c0b21b2eb4065f383aa4618e3f312f3a2b0"
+source = "git+https://github.com/boa-dev/boa.git#c6c6e4c1ae9c88045b53ed4b0914a887182bdb1e"
 dependencies = [
  "fast-float",
  "paste",

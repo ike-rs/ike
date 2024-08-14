@@ -11,14 +11,14 @@ thiserror = "1.0.63"
 tokio = { version = "1", features = ["full"] }
 logger = { path = "../logger" }
 chrono = "0.4.38"
-boa_engine = { git = "https://github.com/boa-dev/boa.git", features = ["annex-b"], rev ='refs/pull/3941/head' }
+boa_engine = { git = "https://github.com/boa-dev/boa.git", features = ["annex-b"] }
 anstyle = "1.0.7"
 serde_json = "1.0.120"
 derive_builder = "0.20.0"
 os_info = "3.8.2"
 regex = "1.10.5"
 isahc = "1.7.2"
-boa_gc = { git = "https://github.com/boa-dev/boa.git", rev ='refs/pull/3941/head' }
+boa_gc = { git = "https://github.com/boa-dev/boa.git" }
 base64 = "0.22.1"
 simdutf = "0.4.17"
 lazy_static = "1.5.0"

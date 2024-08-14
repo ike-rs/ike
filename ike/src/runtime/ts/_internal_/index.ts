@@ -147,9 +147,23 @@ class RequiredArgumentError extends TypeError {
   }
 }
 
+const getArgument = (arg: any, name: string, prefix: string) => {
+  if (arg === undefined) {
+    throw new RequiredArgumentError(name, prefix);
+  }
+
+  return arg;
+};
+
+const isObject = (x: any): x is object => {
+  return (typeof x === 'object' && x !== null) || typeof x === 'function';
+};
+
 export {
   isTypedArray,
   isArrayBuffer,
   InvalidArgTypeError,
   RequiredArgumentError,
+  getArgument,
+  isObject,
 };

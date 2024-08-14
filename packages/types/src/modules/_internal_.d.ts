@@ -27,4 +27,12 @@ declare module '@std/_internal_' {
     name: string,
     prefix: string = '',
   ) => Error;
+
+  export function getArgument<T = any>(
+    arg: any,
+    name: string,
+    prefix: string,
+  ): T;
+
+  export function isObject(value: any): value is object;
 }

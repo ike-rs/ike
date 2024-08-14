@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { Glob } from 'bun';
 import path from 'node:path';
 
@@ -21,3 +20,5 @@ const res = await Bun.build({
   external: ['@std/*'],
   bundle: true,
 });
+
+console.log(res);

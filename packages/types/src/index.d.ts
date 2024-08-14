@@ -10,6 +10,7 @@ import { URL as _URL, URLSearchParams as _URLSearchParams } from './url';
 import type { Console } from './console';
 import type { Headers as _Headers } from './headers';
 import type Path from './modules/path';
+import { ReadableStream as _ReadableStream } from './modules/streams';
 
 /**
  * The Meta interface contains information about the current file and its paths.
@@ -355,6 +356,28 @@ declare global {
     prototype: _AbortSignal;
     new (): _AbortSignal;
   };
+
+  class ReadableStream<R = any> extends _ReadableStream<R> {}
+
+  /**
+   * The `setTimeout()` function sets a timer which executes a function or specified piece of code once the timer expires.
+   *
+   * @param callback - The function to execute.
+   * @param ms - The number of milliseconds to wait before executing the code.
+   * @param args - Additional arguments to pass to the function.
+   */
+  function setTimeout(
+    callback: (...args: any[]) => void,
+    ms: number,
+    ...args: any[]
+  ): number;
+
+  /**
+   * The `clearTimeout()` function cancels a timeout previously established by calling `setTimeout()`.
+   *
+   * @param id - The identifier of the timeout you want to cancel.
+   */
+  function clearTimeout(id: number): void;
 }
 
 export {};
