@@ -1,10 +1,7 @@
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
-pub const ALLOWED_EXTENSIONS: [&str; 6] = ["js", "mjs", "ts", "mts", "cjs", "cts"];
+pub const ALLOWED_EXTENSIONS: [&str; 8] = ["js", "mjs", "ts", "mts", "cjs", "cts", "jsx", "tsx"];
 
 pub const CODE_TO_INJECT: &str = r#"
-    import path from "@std/path"
-
-    globalThis.Ike.path = path
-
-    // globalThis.ReadbleStream = import("@std/streams").ReadableStream
+    globalThis.Ike.path = import("@std/path")
+    globalThis.ReadbleStream = import("@std/streams").ReadableStream
 "#;

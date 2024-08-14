@@ -12,9 +12,9 @@ use super::{
         timeouts::{clear_timeout, set_timeout},
     },
 };
-use crate::prepare::transpile;
 use crate::runtime::web::headers::Headers;
 use crate::runtime::web::url::{URLSearchParams, URL};
+use crate::transpiler::transpile;
 use crate::{get_prototype_name, js_str_to_string, testing::js::JsTest, throw};
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,

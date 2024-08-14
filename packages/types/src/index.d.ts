@@ -299,7 +299,15 @@ interface Ike {
    * ```
    */
   env: Record<string, string>;
+
+  /**
+   * Transpile TypeScript code to JavaScript.
+   */
+  transpile(loader: Loader): string;
+  transpile(loader: Loader, sourceText: string): string;
 }
+
+type Loader = 'js' | 'mjs' | 'ts' | 'mts' | 'cjs' | 'cts' | 'jsx' | 'tsx';
 
 declare namespace Ike {
   const meta: Meta;

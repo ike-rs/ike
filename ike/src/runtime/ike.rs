@@ -1,10 +1,12 @@
 use super::meta::Meta;
+use crate::globals::ALLOWED_EXTENSIONS;
 use crate::runtime::fs::dir::{create_dir_sync, remove_dir_sync};
 use crate::runtime::fs::exists_sync;
 use crate::runtime::fs::files::{
     create_file_sync, read_file_sync, read_text_file_sync, remove_file_sync,
 };
 use crate::runtime::toml::parse_toml;
+use crate::transpiler::{transpile, transpile_with_text};
 use crate::which::which;
 use crate::{create_method, globals::VERSION, js_str_to_string, throw};
 use boa_engine::{
@@ -85,6 +87,12 @@ impl IkeGlobalObject {
         obj.function(
             NativeFunction::from_fn_ptr(Self::which),
             js_string!("which"),
+            1,
+        );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(Self::transpile),
+            js_string!("transpile"),
             1,
         );
 
@@ -219,6 +227,47 @@ impl IkeGlobalObject {
             Ok(return_value)
         } else {
             Ok(JsValue::Null)
+        }
+    }
+
+    pub fn transpile(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+        let loader = args.first();
+        if loader.is_none() {
+            throw!(typ, "transpile: Expected a loader to a file");
+        }
+        let loader = loader.unwrap().to_string(ctx).unwrap();
+        let loader = js_str_to_string!(loader);
+        if !ALLOWED_EXTENSIONS.contains(&loader.as_str()) {
+            throw!(
+                typ,
+                format!(
+                    "transpile: Expected a loader to be one of {}<d>,<r> got {}",
+                    ALLOWED_EXTENSIONS.join("<d>,<r> "),
+                    loader
+                )
+            );
+        }
+
+        let path = PathBuf::from(format!("virtual-file.{}", loader));
+
+        let text = args.get(1);
+
+        if let Some(text) = text {
+            let text = text.to_string(ctx).unwrap();
+            let text = js_str_to_string!(text);
+            let result = transpile_with_text(&path, text);
+
+            match result {
+                Ok(transpiled) => Ok(JsValue::from(js_string!(transpiled))),
+                Err(e) => throw!(typ, e.to_string()),
+            }
+        } else {
+            let result = transpile(&path);
+
+            match result {
+                Ok(transpiled) => Ok(JsValue::from(js_string!(transpiled))),
+                Err(e) => throw!(typ, e.to_string()),
+            }
         }
     }
 }

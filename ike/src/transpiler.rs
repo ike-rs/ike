@@ -32,9 +32,6 @@ pub fn transpile_with_text(path: &PathBuf, source_text: String) -> Result<String
             arrow_function: Some(ArrowFunctionsOptions::default()),
         },
         react: ReactOptions {
-            jsx_plugin: true,
-            jsx_self_plugin: true,
-            jsx_source_plugin: true,
             ..Default::default()
         },
         ..Default::default()
@@ -57,9 +54,7 @@ pub fn transpile(path: &PathBuf) -> Result<String> {
     let source_text = match read_to_string(path) {
         Ok(content) => content,
         Err(e) => {
-            return Err(FailedToReadFileWithError(
-                e.to_string()
-            ).into());
+            return Err(FailedToReadFileWithError(e.to_string()).into());
         }
     };
 

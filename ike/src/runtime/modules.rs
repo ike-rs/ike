@@ -1,13 +1,9 @@
-use crate::prepare::transpile;
+use crate::transpiler::transpile;
 use boa_engine::{
     module::ModuleLoader, Context, JsNativeError, JsResult, JsString, Module, Source,
 };
 use oxc_resolver::{EnforceExtension, ResolveOptions, Resolver};
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-    vec,
-};
+use std::{collections::HashMap, path::Path, vec};
 
 #[derive(Debug, Default)]
 pub struct IkeModuleLoader;

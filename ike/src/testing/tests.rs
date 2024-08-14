@@ -15,7 +15,7 @@ use smol::LocalExecutor;
 
 use logger::{cond_log, log, new_line, print_indent, Logger};
 
-use crate::prepare::transpile;
+use crate::transpiler::transpile;
 use crate::utils::compare_paths;
 use crate::{
     cli::run_command::Entry,

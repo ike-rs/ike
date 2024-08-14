@@ -1,7 +1,3 @@
-import { ReadableStream } from '@std/streams';
-
-import { isFunction } from './test';
-
 // const asyncIterator = (async function* () {
 //   yield 1;
 //   yield 2;
@@ -14,7 +10,20 @@ import { isFunction } from './test';
 // for await (const chunk of myReadableStream) {
 //   console.log(chunk);
 // }
+const code = `
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+export function Home(props: {title: string}){
+  return <p>{props.title}</p>;
+}
 
-console.log(isFunction(() => {}));
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <Home title='test' />
+  </StrictMode>,
+)
+`;
 
-const stream = new ReadableStream();
+const transpiled = Ike.transpile('tsx', code);
+
+console.log(transpiled);

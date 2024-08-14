@@ -7,9 +7,9 @@ pub mod fs;
 pub mod globals;
 pub mod macros;
 pub mod panic_handler;
-pub mod prepare;
 pub mod runtime;
 pub mod testing;
+pub mod transpiler;
 mod utils;
 mod which;
 
