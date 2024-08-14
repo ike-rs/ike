@@ -3,6 +3,7 @@ use std::fmt::{self, Debug};
 use boa_engine::{
     class::{Class, ClassBuilder},
     error::JsNativeError,
+    gc::empty_trace,
     js_string,
     native_function::NativeFunction,
     object::builtins::{JsArrayBuffer, JsTypedArray, JsUint8Array},

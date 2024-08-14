@@ -1,8 +1,16 @@
 use super::{
-    buffer::{atob, btoa}, call::rust_function, console::Console, ike::IkeGlobalObject, meta::Meta, modules::IkeModuleLoader, queue::Queue, terminal::{Terminal, TerminalStdin}, web::{
+    buffer::{atob, btoa},
+    call::rust_function,
+    console::Console,
+    ike::IkeGlobalObject,
+    meta::Meta,
+    modules::IkeModuleLoader,
+    queue::Queue,
+    terminal::{Terminal, TerminalStdin},
+    web::{
         encoding::{TextDecoder, TextEncoder},
         timeouts::{clear_timeout, set_timeout},
-    }
+    },
 };
 use crate::prepare::transpile;
 use crate::runtime::web::headers::Headers;
@@ -14,7 +22,10 @@ use boa_engine::{
 };
 use logger::{cond_log, Logger};
 use smol::LocalExecutor;
-use std::{path::PathBuf, rc::Rc};
+use std::{
+    path::{Path, PathBuf},
+    rc::Rc,
+};
 
 pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));
@@ -32,8 +43,7 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
         Ok(transpiler) => transpiler,
         Err(e) => throw!(typ, format!("Failed to transpile: {:?}", e)),
     };
-    // Wait until #3941 is released in the next version, so we can specify the path
-    let reader = Source::from_bytes(transpiled.as_bytes());
+    let reader = Source::from_bytes(transpiled.as_bytes()).with_path(&Path::new(&file));
     let module = Module::parse(reader, None, ctx)?;
     let promise = module.load_link_evaluate(ctx);
 

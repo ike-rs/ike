@@ -94,7 +94,7 @@ impl Console {
             }
 
             Self::print_as(arg, ctx, level, console, false, false);
-        
+
             if i == args.len() {
                 new_line!();
             }

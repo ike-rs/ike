@@ -11,14 +11,14 @@ thiserror = "1.0.63"
 tokio = { version = "1", features = ["full"] }
 logger = { path = "../logger" }
 chrono = "0.4.38"
-boa_engine = { version = "0.19.0", features = ["annex-b"] }
+boa_engine = { git = "https://github.com/boa-dev/boa.git", features = ["annex-b"], rev ='refs/pull/3941/head' }
 anstyle = "1.0.7"
 serde_json = "1.0.120"
 derive_builder = "0.20.0"
 os_info = "3.8.2"
 regex = "1.10.5"
 isahc = "1.7.2"
-boa_gc = "0.19.0"
+boa_gc = { git = "https://github.com/boa-dev/boa.git", rev ='refs/pull/3941/head' }
 base64 = "0.22.1"
 simdutf = "0.4.17"
 lazy_static = "1.5.0"
@@ -29,11 +29,11 @@ once_cell = "1.19.0"
 futures-util = "*"
 url = "2.5.2"
 toml = { workspace = true }
-oxc_transformer = "0.23.0"
-oxc_parser = "0.23.0"
-oxc_span = "0.23.0"
-oxc_allocator = "0.23.0"
-oxc_codegen = "0.23.0"
+oxc_transformer = "0.24.2"
+oxc_parser = "0.24.2"
+oxc_span = "0.24.2"
+oxc_allocator = "0.24.2"
+oxc_codegen = "0.24.2"
 ike-fs = { path = "../ike-fs" }
 ike-toml = { path = "../ike-toml" }
 indexmap = "2.3.0"

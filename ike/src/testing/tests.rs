@@ -1,4 +1,9 @@
-use std::{collections::HashMap, path::PathBuf, rc::Rc, time::Instant};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    rc::Rc,
+    time::Instant,
+};
 
 use boa_engine::{
     builtins::promise::PromiseState,
@@ -91,8 +96,7 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
             Ok(transpiler) => transpiler,
             Err(e) => throw!(typ, format!("Failed to transpile: {:?}", e)),
         };
-        // Wait until #3941 is released in the next version, so we can specify the path
-        let reader = Source::from_bytes(transpiled.as_bytes());
+        let reader = Source::from_bytes(transpiled.as_bytes()).with_path(&Path::new(&path));
         let module = Module::parse(reader, None, ctx)?;
         let promise = module.load_link_evaluate(ctx);
 

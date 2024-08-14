@@ -1,4 +1,6 @@
-// import { ReadableStream } from 'web-streams-polyfill';
+import { ReadableStream } from '@std/streams';
+
+import { isFunction } from './test';
 
 // const asyncIterator = (async function* () {
 //   yield 1;
@@ -12,3 +14,7 @@
 // for await (const chunk of myReadableStream) {
 //   console.log(chunk);
 // }
+
+console.log(isFunction(() => {}));
+
+const stream = new ReadableStream();
