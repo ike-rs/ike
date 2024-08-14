@@ -3,6 +3,10 @@ name = "ike"
 version = "0.1.0"
 main = "src/index.ts"
 
+[exports.utils]
+import = "src/utils.ts"
+types = "src/utils.d.ts"
+
 [dependencies]
 yaml = "0.4.0"
-toml = { version = "0.5.8", features = ["utils"] }
+toml = { version = "0.5.8" }

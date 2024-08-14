@@ -15,7 +15,7 @@ pub struct IkeTomlStruct {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tasks: Option<HashMap<String, String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub features: Option<HashMap<String, Feature>>,
+    pub exports: Option<HashMap<String, HashMap<String, String>>>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -23,13 +23,6 @@ pub struct IkeTomlStruct {
 pub enum DependencyOrString {
     Dependency(Dependency),
     String(String),
-}
-
-#[derive(Deserialize, Debug, Clone)]
-pub struct Feature {
-    pub dependencies: HashMap<String, DependencyOrString>,
-    pub files: Vec<String>,
-    pub depends_on: Option<Vec<String>>,
 }
 
 #[derive(Deserialize, Debug, Default, Clone)]
@@ -53,6 +46,8 @@ pub struct IkePackage {
     pub types: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repository: Option<PackageRepository>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exports: Option<HashMap<String, HashMap<String, String>>>,
 }
 
 #[derive(Deserialize, Debug, Default, Clone)]
@@ -79,8 +74,13 @@ pub struct Dependency {
     pub branch: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rev: Option<String>,
+}
+
+#[derive(Deserialize, Debug, Default, Clone)]
+pub struct Export {
+    pub import: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub features: Option<Vec<String>>,
+    pub types: Option<String>,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -89,7 +89,7 @@ pub struct ParsedIkeTomlStruct {
     pub dependencies: HashMap<String, Dependency>,
     pub dev_dependencies: HashMap<String, Dependency>,
     pub tasks: HashMap<String, String>,
-    pub features: HashMap<String, ParsedFeature>,
+    pub exports: Option<HashMap<String, Export>>,
 }
 
 #[derive(Debug, Error)]
@@ -121,7 +121,6 @@ impl IkeTomlStruct {
                         git: None,
                         branch: None,
                         rev: None,
-                        features: None,
                     },
                 };
 
@@ -149,41 +148,36 @@ impl IkeTomlStruct {
         Ok(parsed_deps)
     }
 
-    fn parse_features(&self) -> Result<HashMap<String, ParsedFeature>, IkeTomlError> {
-        let mut parsed_features = HashMap::new();
-
-        if let Some(features) = &self.features {
-            for (name, feature) in features {
-                let parsed_feature = ParsedFeature {
-                    dependencies: self
-                        .parse_dependencies(Some(feature.dependencies.clone()))
-                        .map_err(|e| IkeTomlError::FailedToParseDependencies(e.to_string()))?,
-                    files: feature.files.clone(),
-                    depends_on: feature.depends_on.clone(),
-                };
-
-                parsed_features.insert(name.clone(), parsed_feature);
-            }
-        }
-
-        Ok(parsed_features)
-    }
-
     pub fn to_parsed(self) -> Result<ParsedIkeTomlStruct, IkeTomlError> {
         let parsed_dependencies = self
             .parse_dependencies(self.dependencies.clone())
             .map_err(|e| IkeTomlError::FailedToParseDependencies(e.to_string()))?;
+
         let parsed_dev_dependencies = self
             .parse_dependencies(self.dev_dependencies.clone())
             .map_err(|e| IkeTomlError::FailedToParseDependencies(e.to_string()))?;
-        let parsed_features = self.parse_features()?;
+
+        let parsed_exports = self.exports.map(|exports| {
+            exports
+                .iter()
+                .map(|(key, value)| {
+                    (
+                        key.clone(),
+                        Export {
+                            import: value.get("import").expect("Missing 'import' field").clone(),
+                            types: value.get("types").cloned(),
+                        },
+                    )
+                })
+                .collect()
+        });
 
         Ok(ParsedIkeTomlStruct {
             package: self.package,
             dependencies: parsed_dependencies,
             dev_dependencies: parsed_dev_dependencies,
             tasks: self.tasks.unwrap_or_default(),
-            features: parsed_features,
+            exports: parsed_exports,
         })
     }
 }

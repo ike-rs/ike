@@ -12,4 +12,3 @@
 // for await (const chunk of myReadableStream) {
 //   console.log(chunk);
 // }
-const signal = new AbortSignal();

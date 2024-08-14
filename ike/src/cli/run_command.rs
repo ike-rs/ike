@@ -16,12 +16,12 @@ pub fn run_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
         if entry.path.is_none() {
             panic!("Path is none");
         }
-        let entry_path= entry.path.unwrap();
+        let entry_path = entry.path.unwrap();
 
         if !entry_path.exists() {
             return Err(FileNotFound(entry_path).into());
         }
-        
+
         match start_runtime(&entry_path, None) {
             Ok(_) => {}
             Err(e) => {
