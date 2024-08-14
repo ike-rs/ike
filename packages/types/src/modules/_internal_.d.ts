@@ -22,4 +22,9 @@ declare module '@std/_internal_' {
     expected: string | string[],
     actual: unknown,
   ) => Error;
+
+  export const RequiredArgumentError: new (
+    name: string,
+    prefix: string = '',
+  ) => Error;
 }

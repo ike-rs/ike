@@ -47,49 +47,41 @@ impl IkeGlobalObject {
             js_string!("readTextFileSync"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(read_file_sync),
             js_string!("readFileSync"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(remove_file_sync),
             js_string!("removeFileSync"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(create_file_sync),
             js_string!("createFileSync"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(create_dir_sync),
             js_string!("createDirSync"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(remove_dir_sync),
             js_string!("removeDirSync"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(exists_sync),
             js_string!("existsSync"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(parse_toml),
             js_string!("parseToml"),
             1,
         );
-
         obj.function(
             NativeFunction::from_fn_ptr(Self::which),
             js_string!("which"),
@@ -97,7 +89,6 @@ impl IkeGlobalObject {
         );
 
         obj.property(js_string!("path"), JsObject::default(), Attribute::all());
-
         let obj = obj.build();
 
         if let Some(file) = file {

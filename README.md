@@ -19,6 +19,9 @@
 
 Pull requests and stars are always welcome. See [`contributing.md`](.github/contributing.md) for ways to get started.
 
+## Thanks to Deno!
+Deno helped a lot with building of Ike
+
 ## Contributors
 
 <a href="https://github.com/malezjaa/ike/graphs/contributors">

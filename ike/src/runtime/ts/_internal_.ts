@@ -139,4 +139,17 @@ class InvalidArgTypeError extends TypeError {
   }
 }
 
-export { isTypedArray, isArrayBuffer, InvalidArgTypeError };
+class RequiredArgumentError extends TypeError {
+  constructor(name: string, prefix: string = '') {
+    super(`${prefix ? `${prefix}: ` : ''}${name} is required`);
+
+    this.name = 'RequiredArgumentError';
+  }
+}
+
+export {
+  isTypedArray,
+  isArrayBuffer,
+  InvalidArgTypeError,
+  RequiredArgumentError,
+};

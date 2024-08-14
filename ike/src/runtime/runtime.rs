@@ -1,15 +1,8 @@
 use super::{
-    buffer::{atob, btoa},
-    call::rust_function,
-    console::Console,
-    ike::IkeGlobalObject,
-    meta::Meta,
-    modules::IkeModuleLoader,
-    queue::Queue,
-    web::{
+    buffer::{atob, btoa}, call::rust_function, console::Console, ike::IkeGlobalObject, meta::Meta, modules::IkeModuleLoader, queue::Queue, terminal::{Terminal, TerminalStdin}, web::{
         encoding::{TextDecoder, TextEncoder},
         timeouts::{clear_timeout, set_timeout},
-    },
+    }
 };
 use crate::prepare::transpile;
 use crate::runtime::web::headers::Headers;
@@ -208,6 +201,10 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
     }
     ike.set(js_string!("env"), env_obj, false, ctx)
         .expect("Failed to set Ike.env");
+
+    let stdin = TerminalStdin::init(ctx);
+    ike.set(js_string!("stdin"), stdin, false, ctx)
+        .expect("Failed to set Ike.stdin");
 }
 
 pub fn get_current_path(ctx: &mut Context) -> JsValue {

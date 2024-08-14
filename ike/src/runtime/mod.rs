@@ -9,3 +9,4 @@ pub mod queue;
 pub mod runtime;
 pub mod toml;
 pub mod web;
+pub mod terminal;

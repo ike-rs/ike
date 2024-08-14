@@ -5,4 +5,6 @@ pub const CODE_TO_INJECT: &str = r#"
     import path from "@std/path"
 
     globalThis.Ike.path = path
+
+    // globalThis.ReadbleStream = import("@std/streams").ReadableStream
 "#;

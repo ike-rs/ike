@@ -1,3 +1,5 @@
+/// <reference path="./globals.d.ts" />
+
 import './modules/buffer';
 import './modules/test';
 import './modules/inspect';
@@ -322,6 +324,29 @@ declare global {
   const Headers: typeof _Headers;
   const URL: typeof _URL;
   const URLSearchParams: typeof _URLSearchParams;
+
+  interface _AbortSignal {
+    /**
+     * Whether the request is aborted.
+     */
+    readonly aborted: boolean;
+    /**
+     * If aborted, returns the reason for aborting.
+     */
+    readonly reason?: any;
+    /**
+     * Add an event listener to be triggered when this signal becomes aborted.
+     */
+    addEventListener(type: 'abort', listener: () => void): void;
+    /**
+     * Remove an event listener that was previously added with {@link AbortSignal.addEventListener}.
+     */
+    removeEventListener(type: 'abort', listener: () => void): void;
+  }
+  const AbortSignal: {
+    prototype: _AbortSignal;
+    new (): _AbortSignal;
+  };
 }
 
 export {};
