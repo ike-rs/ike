@@ -1,4 +1,3 @@
-use crate::globals::CODE_TO_INJECT;
 use anyhow::Result;
 use ike_fs::read_to_string;
 use ike_fs::FsError::FailedToReadFileWithError;
@@ -32,6 +31,9 @@ pub fn transpile_with_text(path: &PathBuf, source_text: String) -> Result<String
             arrow_function: Some(ArrowFunctionsOptions::default()),
         },
         react: ReactOptions {
+            jsx_plugin: true,
+            jsx_self_plugin: true,
+            jsx_source_plugin: false,
             ..Default::default()
         },
         ..Default::default()

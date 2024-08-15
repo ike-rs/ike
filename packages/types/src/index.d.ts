@@ -317,9 +317,13 @@ interface Ike {
 
   /**
    * Transpile TypeScript code to JavaScript.
+   *
+   * @param loader - Loader type
+   * @param source - Source code
+   * @param inject - Inject runtime helpers
+   * @returns string
    */
-  transpile(loader: Loader): string;
-  transpile(loader: Loader, sourceText: string): string;
+  transpile(loader: Loader, sourceText: string, inject?: boolean): string;
 }
 
 type Loader = 'js' | 'mjs' | 'ts' | 'mts' | 'cjs' | 'cts' | 'jsx' | 'tsx';

@@ -1,5 +1,5 @@
 use super::meta::Meta;
-use crate::globals::ALLOWED_EXTENSIONS;
+use crate::globals::{ALLOWED_EXTENSIONS, CODE_TO_INJECT};
 use crate::runtime::fs::dir::{create_dir_sync, remove_dir_sync};
 use crate::runtime::fs::exists_sync;
 use crate::runtime::fs::files::{
@@ -247,10 +247,12 @@ impl IkeGlobalObject {
                 )
             );
         }
-
         let path = PathBuf::from(format!("virtual-file.{}", loader));
-
         let text = args.get(1);
+
+        let default = &JsValue::from(true);
+        let inject = args.get(2).unwrap_or(default);
+        let should_inject = inject.is_boolean() && inject.to_boolean() == true;
 
         if let Some(text) = text {
             let text = text.to_string(ctx).unwrap();
@@ -258,14 +260,22 @@ impl IkeGlobalObject {
             let result = transpile_with_text(&path, text);
 
             match result {
-                Ok(transpiled) => Ok(JsValue::from(js_string!(transpiled))),
+                Ok(transpiled) => Ok(JsValue::from(js_string!(if should_inject {
+                    format!("{} \n {}", CODE_TO_INJECT, transpiled)
+                } else {
+                    transpiled
+                }))),
                 Err(e) => throw!(typ, e.to_string()),
             }
         } else {
             let result = transpile(&path);
 
             match result {
-                Ok(transpiled) => Ok(JsValue::from(js_string!(transpiled))),
+                Ok(transpiled) => Ok(JsValue::from(js_string!(if should_inject {
+                    format!("{} \n {}", CODE_TO_INJECT, transpiled)
+                } else {
+                    transpiled
+                }))),
                 Err(e) => throw!(typ, e.to_string()),
             }
         }

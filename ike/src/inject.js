@@ -1,5 +1,3 @@
-globalThis.DEBUG = false;
-
 import {
   ByteLengthQueuingStrategy,
   CountQueuingStrategy,
