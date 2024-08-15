@@ -348,27 +348,6 @@ declare global {
    */
   const console: Console;
 
-  const Headers: typeof _Headers;
-  const URL: typeof _URL;
-  const URLSearchParams: typeof _URLSearchParams;
-
-  const ReadableStream: typeof _ReadableStream;
-  const ReadableStreamDefaultController: typeof _ReadableStreamDefaultController;
-  const ReadableByteStreamController: typeof _ReadableByteStreamController;
-  const ReadableStreamBYOBRequest: typeof _ReadableStreamBYOBRequest;
-  const ReadableStreamDefaultReader: typeof _ReadableStreamDefaultReader;
-  const ReadableStreamBYOBReader: typeof _ReadableStreamBYOBReader;
-
-  const WritableStream: typeof _WritableStream;
-  const WritableStreamDefaultController: typeof _WritableStreamDefaultController;
-  const WritableStreamDefaultWriter: typeof _WritableStreamDefaultWriter;
-
-  const ByteLengthQueuingStrategy: typeof _ByteLengthQueuingStrategy;
-  const CountQueuingStrategy: typeof _CountQueuingStrategy;
-
-  const TransformStream: typeof _TransformStream;
-  const TransformStreamDefaultController: typeof _TransformStreamDefaultController;
-
   /**
    * The `setTimeout()` function sets a timer which executes a function or specified piece of code once the timer expires.
    *
