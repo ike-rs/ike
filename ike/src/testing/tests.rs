@@ -15,7 +15,6 @@ use smol::LocalExecutor;
 
 use logger::{cond_log, log, new_line, print_indent, Logger};
 
-use crate::transpiler::transpile;
 use crate::utils::compare_paths;
 use crate::{
     cli::run_command::Entry,
@@ -28,6 +27,7 @@ use crate::{
     },
     throw,
 };
+use crate::{globals::CODE_TO_INJECT, transpiler::transpile};
 
 lazy_static::lazy_static! {
     static ref ICONS: HashMap<&'static str, &'static str> = {
@@ -86,6 +86,39 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let mut results = TestResults::new();
     let mut test_groups_by_file: HashMap<String, Vec<JsValue>> = HashMap::new();
     let mut alone_tests_by_file: HashMap<String, Vec<JsValue>> = HashMap::new();
+
+    // we evaulte injected code before, so it doesn't get executed every file, about 2s saved
+    let reader = Source::from_bytes(CODE_TO_INJECT.as_bytes());
+    let module = Module::parse(reader, None, ctx)?;
+    let promise = module.load_link_evaluate(ctx);
+
+    ctx.run_jobs();
+
+    match promise.state() {
+        PromiseState::Pending => panic!("module didn't execute!"),
+        PromiseState::Fulfilled(v) => {
+            assert_eq!(v, JsValue::undefined())
+        }
+        PromiseState::Rejected(err) => {
+            let obj = err.to_object(ctx).unwrap();
+            let proto = match obj.prototype() {
+                Some(proto) => proto,
+                None => {
+                    panic!("Error object has no prototype");
+                }
+            };
+            let str_name = get_prototype_name!(proto, ctx);
+
+            let message = obj.get(js_string!("message"), ctx).unwrap();
+            cond_log!(
+                true,
+                true,
+                "<r><red>error<r><d>({})<r>: {}",
+                str_name,
+                js_str_to_string!(message.to_string(ctx).unwrap())
+            );
+        }
+    }
 
     for path in paths {
         let entry = Entry::new(true, Some(path.clone()), None);

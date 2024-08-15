@@ -1,0 +1,3 @@
+[submodule "ike/src/runtime/ts/streams-polyfill"]
+	path = ike/src/runtime/ts/streams-polyfill
+	url = https://github.com/MattiasBuelens/web-streams-polyfill

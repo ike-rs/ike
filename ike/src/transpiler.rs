@@ -47,7 +47,7 @@ pub fn transpile_with_text(path: &PathBuf, source_text: String) -> Result<String
     .build(&mut program);
     let printed = CodeGenerator::new().build(&program).source_text;
 
-    Ok(format!("{} \n {}", CODE_TO_INJECT, printed))
+    Ok(printed)
 }
 
 pub fn transpile(path: &PathBuf) -> Result<String> {

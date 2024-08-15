@@ -21,5 +21,6 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "include": ["src/**/*", "../../packages/types/src/index.d.ts"]
+  "include": ["src/**/*", "../../packages/types/src/index.d.ts"],
+  "exclude": ["../src/runtime/ts/streams-polyfill/**/*"]
 }

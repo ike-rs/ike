@@ -10,7 +10,21 @@ import { URL as _URL, URLSearchParams as _URLSearchParams } from './url';
 import type { Console } from './console';
 import type { Headers as _Headers } from './headers';
 import type Path from './modules/path';
-import { ReadableStream as _ReadableStream } from './modules/streams';
+import {
+  ReadableStream as _ReadableStream,
+  ReadableStreamDefaultController as _ReadableStreamDefaultController,
+  ReadableByteStreamController as _ReadableByteStreamController,
+  ReadableStreamBYOBRequest as _ReadableStreamBYOBRequest,
+  ReadableStreamDefaultReader as _ReadableStreamDefaultReader,
+  ReadableStreamBYOBReader as _ReadableStreamBYOBReader,
+  WritableStream as _WritableStream,
+  WritableStreamDefaultController as _WritableStreamDefaultController,
+  WritableStreamDefaultWriter as _WritableStreamDefaultWriter,
+  ByteLengthQueuingStrategy as _ByteLengthQueuingStrategy,
+  CountQueuingStrategy as _CountQueuingStrategy,
+  TransformStream as _TransformStream,
+  TransformStreamDefaultController as _TransformStreamDefaultController,
+} from './modules/streams';
 
 /**
  * The Meta interface contains information about the current file and its paths.
@@ -334,30 +348,22 @@ declare global {
   const URL: typeof _URL;
   const URLSearchParams: typeof _URLSearchParams;
 
-  interface _AbortSignal {
-    /**
-     * Whether the request is aborted.
-     */
-    readonly aborted: boolean;
-    /**
-     * If aborted, returns the reason for aborting.
-     */
-    readonly reason?: any;
-    /**
-     * Add an event listener to be triggered when this signal becomes aborted.
-     */
-    addEventListener(type: 'abort', listener: () => void): void;
-    /**
-     * Remove an event listener that was previously added with {@link AbortSignal.addEventListener}.
-     */
-    removeEventListener(type: 'abort', listener: () => void): void;
-  }
-  const AbortSignal: {
-    prototype: _AbortSignal;
-    new (): _AbortSignal;
-  };
+  const ReadableStream: typeof _ReadableStream;
+  const ReadableStreamDefaultController: typeof _ReadableStreamDefaultController;
+  const ReadableByteStreamController: typeof _ReadableByteStreamController;
+  const ReadableStreamBYOBRequest: typeof _ReadableStreamBYOBRequest;
+  const ReadableStreamDefaultReader: typeof _ReadableStreamDefaultReader;
+  const ReadableStreamBYOBReader: typeof _ReadableStreamBYOBReader;
 
-  class ReadableStream<R = any> extends _ReadableStream<R> {}
+  const WritableStream: typeof _WritableStream;
+  const WritableStreamDefaultController: typeof _WritableStreamDefaultController;
+  const WritableStreamDefaultWriter: typeof _WritableStreamDefaultWriter;
+
+  const ByteLengthQueuingStrategy: typeof _ByteLengthQueuingStrategy;
+  const CountQueuingStrategy: typeof _CountQueuingStrategy;
+
+  const TransformStream: typeof _TransformStream;
+  const TransformStreamDefaultController: typeof _TransformStreamDefaultController;
 
   /**
    * The `setTimeout()` function sets a timer which executes a function or specified piece of code once the timer expires.

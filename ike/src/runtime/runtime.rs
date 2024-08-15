@@ -12,10 +12,10 @@ use super::{
         timeouts::{clear_timeout, set_timeout},
     },
 };
-use crate::runtime::web::headers::Headers;
 use crate::runtime::web::url::{URLSearchParams, URL};
 use crate::transpiler::transpile;
 use crate::{get_prototype_name, js_str_to_string, testing::js::JsTest, throw};
+use crate::{globals::CODE_TO_INJECT, runtime::web::headers::Headers};
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
@@ -43,6 +43,7 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
         Ok(transpiler) => transpiler,
         Err(e) => throw!(typ, format!("Failed to transpile: {:?}", e)),
     };
+    let transpiled = format!("{} \n {}", CODE_TO_INJECT, transpiled);
     let reader = Source::from_bytes(transpiled.as_bytes()).with_path(&Path::new(&file));
     let module = Module::parse(reader, None, ctx)?;
     let promise = module.load_link_evaluate(ctx);

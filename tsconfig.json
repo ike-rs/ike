@@ -22,5 +22,10 @@
     "noPropertyAccessFromIndexSignature": false,
     "outDir": "ike/src/runtime/js"
   },
-  "include": ["ike/src/**/*", "packages/types/src/**/*", "tests/**/*"]
+  "include": [
+    "ike/src/runtime/ts/**/*",
+    "packages/types/src/**/*",
+    "tests/**/*"
+  ],
+  "exclude": ["ike/src/runtime/ts/streams-polyfill/**/*"]
 }
