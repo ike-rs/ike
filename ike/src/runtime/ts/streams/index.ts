@@ -1,1 +1,1 @@
-export * from '../streams-polyfill/src/ponyfill.ts';
+export * from 'web-streams-polyfill';

@@ -20,6 +20,7 @@ lazy_static::lazy_static! {
         m.insert("@std/path", include_str!("js\\path\\index.js").to_string());
         m.insert("@std/format", include_str!("js\\format\\index.js").to_string());
         m.insert("@std/streams", include_str!("js\\streams\\index.js").to_string());
+        m.insert("@std/uuid", include_str!("js\\uuid\\index.js").to_string());
         m
     };
 }
@@ -41,7 +42,6 @@ impl ModuleLoader for IkeModuleLoader {
 
             finish_load(module, context);
         } else {
-            println!("\n {:?}, {} \n", referrer.path(), spec);
             let ref_path = match referrer.path().unwrap().parent() {
                 Some(parent) => parent,
                 None => {

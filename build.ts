@@ -14,7 +14,6 @@ for await (const file of glob.scan('ike/src/runtime/ts')) {
     paths.push(path.join(process.cwd(), 'ike/src/runtime/ts', file));
   }
 }
-console.log(paths);
 
 const result = await Bun.build({
   entrypoints: paths,
@@ -27,6 +26,8 @@ const result = await Bun.build({
     // for web-steams-polyfill
     DEBUG: 'false',
   },
+  target: 'bun',
+  format: 'esm',
 });
 
 for (const res of result.outputs) {

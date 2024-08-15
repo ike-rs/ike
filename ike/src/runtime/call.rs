@@ -1,6 +1,13 @@
 use std::collections::HashMap;
 
-use crate::{assert_arg_type, runtime::buffer::is_utf8, str_from_jsvalue, throw};
+use crate::{
+    assert_arg_type,
+    runtime::{
+        buffer::is_utf8,
+        uuid::{uuid_parse, uuid_stringify, uuidv4, uuidv5},
+    },
+    str_from_jsvalue, throw,
+};
 
 use super::buffer::{atob, btoa, is_ascii_string};
 use crate::testing::js::{after_all, before_all, describe, test_it};
@@ -32,6 +39,14 @@ pub fn rust_function(
         m.insert("afterAll", unsafe {
             NativeFunction::from_closure(after_all)
         });
+        m.insert("uuidParse", unsafe {
+            NativeFunction::from_closure(uuid_parse)
+        });
+        m.insert("uuidStringify", unsafe {
+            NativeFunction::from_closure(uuid_stringify)
+        });
+        m.insert("uuidv4", unsafe { NativeFunction::from_closure(uuidv4) });
+        m.insert("uuidv5", unsafe { NativeFunction::from_closure(uuidv5) });
         m
     };
     if args.is_empty() {

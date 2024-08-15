@@ -79,6 +79,18 @@ declare module '@std/test' {
     toBeUndefined: () => void;
 
     /**
+     * Matches the value against a regular expression.
+     * @param {RegExp} expected - The regular expression to match against.
+     */
+    toMatch: (expected: RegExp) => void;
+
+    /**
+     * Asserts that the value does not match the regular expression.
+     * @param {RegExp} expected - The regular expression to check against.
+     */
+    toNotMatch: (expected: RegExp) => void;
+
+    /**
      * Asserts that the value is truthy.
      * @throws {Error} If the value is not truthy.
      */

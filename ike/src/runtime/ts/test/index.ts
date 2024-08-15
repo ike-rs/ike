@@ -67,6 +67,16 @@ const expect = <T = unknown>(value: any) => {
     toBeUndefined: () => {
       assertEquals(value, undefined, `Expected undefined, but got ${value}`);
     },
+    toMatch: (expected: RegExp) => {
+      if (!expected.test(value)) {
+        throw new Error(`Expected ${value} to match ${expected}`);
+      }
+    },
+    notToMatch: (expected: RegExp) => {
+      if (expected.test(value)) {
+        throw new Error(`Expected ${value} not to match ${expected}`);
+      }
+    },
     notToBeUndefined: () => {
       assertNotEquals(
         value,
