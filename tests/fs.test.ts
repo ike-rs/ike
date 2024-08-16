@@ -91,16 +91,15 @@ describe('readTextFile', () => {
 describe('createDirSync', () => {
   afterAll(() => {
     try {
-      Ike.removeDirSync('tests/new-dir');
-      Ike.removeDirSync('tests/new-dir-2');
-    } catch (err) {
-      console.error('Failed to clean up directories', err);
-    }
+      Ike.removeSync('tests/new-dir312');
+      Ike.removeSync('tests/throw-if-exists');
+      Ike.removeSync('tests/new-dir-2');
+    } catch (err) {}
   });
 
   it('should create a new directory', () => {
-    Ike.createDirSync('tests/new-dir');
-    expect(Ike.existsSync('tests/new-dir')).toBe(true);
+    Ike.createDirSync('tests/new-dir312');
+    expect(Ike.existsSync('tests/new-dir312')).toBe(true);
   });
 
   it('should create a new directory recursively', () => {
@@ -109,7 +108,8 @@ describe('createDirSync', () => {
   });
 
   it('should throw an error if directory already exists', () => {
-    expect(() => Ike.createDirSync('tests/new-dir')).toThrow();
+    Ike.createDirSync('tests/throw-if-exists');
+    expect(() => Ike.createDirSync('tests/throw-if-exists')).toThrow();
   });
 
   it('throw if no path is provided', () => {
@@ -152,18 +152,39 @@ describe('createFileSync', () => {
   });
 });
 
-describe('removeFileSync', () => {
+describe('removeSync', () => {
+  afterAll(() => {
+    try {
+      Ike.removeSync('tests/new-file.txt');
+      Ike.removeSync('tests/new-dir123');
+      Ike.removeSync('tests/new-dir3');
+      Ike.removeSync('tests/new-dir4', { recursive: true });
+    } catch (err) {}
+  });
+
   it('should remove a file', () => {
-    Ike.removeFileSync('tests/new-file.txt');
+    Ike.removeSync('tests/new-file.txt');
     expect(Ike.existsSync('tests/new-file.txt')).toBe(false);
   });
 
+  it('should remove a directory', () => {
+    Ike.createDirSync('tests/new-dir123');
+    Ike.removeSync('tests/new-dir123');
+    expect(Ike.existsSync('tests/new-dir123')).toBe(false);
+  });
+
+  it('should throw if path is a non-empty directory and recursive is not set to true', () => {
+    Ike.createDirSync('tests/new-dir4');
+    Ike.createFileSync('tests/new-dir4/file.txt');
+    expect(() => Ike.removeSync('tests/new-dir4')).toThrow();
+  });
+
   it('should throw an error if file does not exist', () => {
-    expect(() => Ike.removeFileSync('tests/non-existent-file.txt')).toThrow();
+    expect(() => Ike.removeSync('tests/non-existent-file.txt')).toThrow();
   });
 
   it('throw if no path is provided', () => {
     // @ts-ignore
-    expect(() => Ike.removeFileSync()).toThrow();
+    expect(() => Ike.removeSync()).toThrow();
   });
 });

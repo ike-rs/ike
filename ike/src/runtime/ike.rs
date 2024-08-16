@@ -1,7 +1,8 @@
 use super::fs::files::{read_file_async, read_text_file_async};
+use super::fs::{remove_async, remove_sync};
 use super::meta::Meta;
 use crate::globals::{ALLOWED_EXTENSIONS, CODE_TO_INJECT};
-use crate::runtime::fs::dir::{create_dir_sync, remove_dir_sync};
+use crate::runtime::fs::dir::create_dir_sync;
 use crate::runtime::fs::exists_sync;
 use crate::runtime::fs::files::{
     create_file_sync, read_file_sync, read_text_file_sync, remove_file_sync,
@@ -85,20 +86,27 @@ impl IkeGlobalObject {
             1,
         );
         obj.function(
-            NativeFunction::from_fn_ptr(remove_dir_sync),
-            js_string!("removeDirSync"),
-            1,
-        );
-        obj.function(
             NativeFunction::from_fn_ptr(exists_sync),
             js_string!("existsSync"),
             1,
         );
         obj.function(
+            NativeFunction::from_fn_ptr(remove_sync),
+            js_string!("removeSync"),
+            1,
+        );
+        obj.function(
+            NativeFunction::from_fn_ptr(remove_async),
+            js_string!("remove"),
+            1,
+        );
+
+        obj.function(
             NativeFunction::from_fn_ptr(parse_toml),
             js_string!("parseToml"),
             1,
         );
+
         obj.function(
             NativeFunction::from_fn_ptr(Self::which),
             js_string!("which"),

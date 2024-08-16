@@ -69,6 +69,13 @@ type Os =
   | 'android'
   | 'windows';
 
+type RemoveOptions = {
+  /**
+   * If set to true, path will be removed even if it's a non-empty directory.
+   */
+  recursive?: boolean;
+};
+
 interface Ike {
   /**
    * Provides information for the module about itself.
@@ -242,14 +249,6 @@ interface Ike {
   readTextFile(path: string): Promise<string>;
 
   /**
-   * Synchronously removes a file from the filesystem.
-   *
-   * @param path
-   * @returns void
-   */
-  removeFileSync(path: string): void;
-
-  /**
    * Synchronously creates a new file or truncates an existing file.
    *
    * @param path
@@ -275,21 +274,36 @@ interface Ike {
   ): void;
 
   /**
-   * Synchronously removes a directory.
+   * Synchronously removes a file or directory.
    *
-   * @param path Path to the directory
+   * @example
+   * ```ts
+   * Ike.removeSync("file.txt");
+   * Ike.removeSync("dir/path", { recursive: true });
+   * ```
+   *
+   * @param path Path to the directory or file
    * @param opts Options for removing the directory
    * @returns void
+   * @throws Error if path does not exist, permission is denied or path is non-empty directory and `recursive` is not set to true.
    */
-  removeDirSync(
-    path: string,
-    opts?: {
-      /**
-       * If set to true, path will be removed even if it's a non-empty directory.
-       */
-      recursive?: boolean;
-    },
-  ): void;
+  removeSync(path: string, opts?: RemoveOptions): void;
+
+  /**
+   * Asynchronously removes a file or directory.
+   *
+   * @example
+   * ```ts
+   * await Ike.remove("file.txt");
+   * await Ike.remove("dir/path", { recursive: true });
+   * ```
+   *
+   * @param path Path to the directory or file
+   * @param opts Options for removing the directory
+   * @returns Promise<void>
+   * @throws Error if path does not exist, permission is denied or path is non-empty directory and `recursive` is not set to true.
+   */
+  remove(path: string, opts?: RemoveOptions): Promise<void>;
 
   /**
    * Synchronously checks if a path exists.

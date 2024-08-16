@@ -1,7 +1,7 @@
 async function readFile() {
   console.log('Start reading file');
-  const data = await Ike.readFile('src/hello.txt');
-  console.log(new TextDecoder().decode(data));
+  const data = await Ike.remove('testdir');
+  console.log(data);
 }
 
 console.log('Before calling readFile');

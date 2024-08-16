@@ -3,12 +3,18 @@
 use crate::fs::normalize_p;
 use crate::throw;
 use anyhow::{anyhow, Result};
+use boa_engine::builtins::promise::ResolvingFunctions;
+use boa_engine::object::builtins::JsPromise;
 use boa_engine::{Context, JsNativeError, JsResult, JsString, JsValue};
+use dir::get_recursive_flag;
+use smol::block_on;
 use std::env::current_dir;
-use std::io;
 use std::io::Read;
 use std::path::Path;
+use std::{fs, io};
 use tokio::task::spawn_blocking;
+
+use super::promise::base_promise;
 
 pub mod dir;
 pub mod files;
@@ -46,6 +52,79 @@ impl FileSystem {
     pub fn exists_sync(path: &Path) -> bool {
         path.exists()
     }
+
+    pub fn remove(path: &Path, recursive: bool) -> std::io::Result<()> {
+        let metadata = std::fs::symlink_metadata(path)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+
+        let res = if metadata.is_dir() {
+            if recursive {
+                std::fs::remove_dir_all(path)
+            } else {
+                std::fs::remove_dir(path)
+            }
+        } else if metadata.is_symlink() {
+            #[cfg(unix)]
+            {
+                fs::remove_file(path)
+            }
+            #[cfg(not(unix))]
+            {
+                use std::os::windows::prelude::MetadataExt;
+                use winapi::um::winnt::FILE_ATTRIBUTE_DIRECTORY;
+                if metadata.file_attributes() & FILE_ATTRIBUTE_DIRECTORY != 0 {
+                    fs::remove_dir(path)
+                } else {
+                    fs::remove_file(path)
+                }
+            }
+        } else {
+            fs::remove_file(path)
+        };
+
+        res.map_err(Into::into)
+    }
+}
+
+pub fn remove_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = &str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+    let recursive = get_recursive_flag(args, ctx)?;
+
+    match FileSystem::remove(path, recursive) {
+        Ok(_) => Ok(JsValue::undefined()),
+        Err(err) => Err(JsNativeError::error().with_message(err.to_string()).into()),
+    }
+}
+
+pub fn remove_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = &str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+    let recursive = get_recursive_flag(args, ctx)?;
+
+    let result = block_on(async {
+        FileSystem::remove(path, recursive)
+            .map_err(|e| e.to_string())
+            .unwrap();
+
+        let promise = JsPromise::new(
+            |resolvers: &ResolvingFunctions, context| {
+                resolvers
+                    .resolve
+                    .call(&JsValue::undefined(), &[JsValue::undefined()], context)?;
+                Ok(JsValue::undefined())
+            },
+            ctx,
+        );
+
+        let promise = base_promise(promise, ctx);
+
+        Ok(promise.into())
+    });
+
+    result
 }
 
 pub fn exists_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
