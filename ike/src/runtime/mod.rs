@@ -5,6 +5,7 @@ pub mod fs;
 pub mod ike;
 pub mod meta;
 pub mod modules;
+pub mod promise;
 pub mod queue;
 pub mod runtime;
 pub mod terminal;

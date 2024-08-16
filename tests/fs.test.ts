@@ -23,6 +23,29 @@ describe('readFileSync', () => {
   });
 });
 
+describe('readFile', () => {
+  it('should correctly read the file', async () => {
+    const content = await Ike.readFile('tests/hello.txt');
+    expect(new TextDecoder().decode(content)).toBe('hello');
+  });
+
+  it('returned value should be an array of bytes', async () => {
+    const content = await Ike.readFile('tests/hello.txt');
+    expect(content).toBeInstanceOf(Uint8Array);
+  });
+
+  it('should throw an error if file does not exist', async () => {
+    expect(
+      async () => await Ike.readFile('tests/non-existent-file.txt'),
+    ).toThrow();
+  });
+
+  it('throw if no path is provided', async () => {
+    // @ts-ignore
+    await expect(Ike.readFile()).rejects.toThrow();
+  });
+});
+
 describe('readTextFileSync', () => {
   it('should correctly read the file', () => {
     const content = Ike.readTextFileSync('tests/hello.txt');
@@ -41,6 +64,27 @@ describe('readTextFileSync', () => {
   it('throw if no path is provided', () => {
     // @ts-ignore
     expect(() => Ike.readTextFileSync()).toThrow();
+  });
+});
+
+describe('readTextFile', () => {
+  it('should correctly read the file', async () => {
+    const content = await Ike.readTextFile('tests/hello.txt');
+    expect(content).toBe('hello');
+  });
+
+  it('returned value should be a string', async () => {
+    const content = await Ike.readTextFile('tests/hello.txt');
+    expect(content).toBeString();
+  });
+
+  it('should throw an error if file does not exist', async () => {
+    await expect(Ike.readTextFile('tests/non-existent-file.txt')).toThrow();
+  });
+
+  it('throw if no path is provided', async () => {
+    // @ts-ignore
+    await expect(Ike.readTextFile()).rejects.toThrow();
   });
 });
 

@@ -1,3 +1,4 @@
+use super::fs::files::{read_file_async, read_text_file_async};
 use super::meta::Meta;
 use crate::globals::{ALLOWED_EXTENSIONS, CODE_TO_INJECT};
 use crate::runtime::fs::dir::{create_dir_sync, remove_dir_sync};
@@ -49,11 +50,25 @@ impl IkeGlobalObject {
             js_string!("readTextFileSync"),
             1,
         );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(read_text_file_async),
+            js_string!("readTextFile"),
+            1,
+        );
+
         obj.function(
             NativeFunction::from_fn_ptr(read_file_sync),
             js_string!("readFileSync"),
             1,
         );
+
+        obj.function(
+            NativeFunction::from_fn_ptr(read_file_async),
+            js_string!("readFile"),
+            1,
+        );
+
         obj.function(
             NativeFunction::from_fn_ptr(remove_file_sync),
             js_string!("removeFileSync"),

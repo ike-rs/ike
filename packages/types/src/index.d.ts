@@ -199,6 +199,20 @@ interface Ike {
   readFileSync(path: string): Uint8Array;
 
   /**
+   * Asynchronously reads a file and returns entire content as array of bytes.
+   *
+   * @example
+   * ```ts
+   * const content = await Ike.readFile("file.txt");
+   * console.log(new TextDecoder().decode(content));
+   * ```
+   *
+   * @param path Path to the file
+   * @returns Promise<Uint8Array> Content of the file as array of bytes
+   */
+  readFile(path: string): Promise<Uint8Array>;
+
+  /**
    * Synchronously reads a file and returns entire content as string.
    *
    *  @example
@@ -211,6 +225,21 @@ interface Ike {
    * @returns string Content of the file as string
    */
   readTextFileSync(path: string): string;
+
+  /**
+   * Asynchronously reads a file and returns entire content as string
+   *
+   * @example
+   * ```ts
+   * const content = await Ike.readFile("file.txt");
+   *
+   * console.log(content);
+   * ```
+   *
+   * @param path Path to the file
+   * @returns Promise<string> Content of the file as string
+   */
+  readTextFile(path: string): Promise<string>;
 
   /**
    * Synchronously removes a file from the filesystem.

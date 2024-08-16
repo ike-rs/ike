@@ -1,8 +1,13 @@
 use crate::runtime::fs::{resolve_path_from_args, FileSystem};
+use crate::runtime::promise::base_promise;
 use crate::throw;
-use boa_engine::object::builtins::{JsArrayBuffer, JsUint8Array};
+use boa_engine::builtins::promise::ResolvingFunctions;
+use boa_engine::object::builtins::{JsArrayBuffer, JsPromise, JsUint8Array};
 use boa_engine::{js_string, Context, JsNativeError, JsResult, JsValue};
+use smol::block_on;
 use std::path::Path;
+
+use super::{open_file, File};
 
 pub fn read_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
@@ -24,6 +29,48 @@ pub fn read_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRes
     }
 }
 
+pub async fn read_file_async_base(path: &Path, ctx: &mut Context) -> JsResult<JsValue> {
+    let file = match open_file(path) {
+        Ok(file) => file,
+        Err(e) => {
+            throw!(err, e.to_string());
+        }
+    };
+    let file = File::new(file);
+
+    let contents = file.read_async().await.unwrap();
+    let array_buffer = JsArrayBuffer::from_byte_block(contents, ctx).unwrap();
+    let uint8_array = JsUint8Array::from_array_buffer(array_buffer, ctx).unwrap();
+
+    Ok(JsValue::from(uint8_array))
+}
+
+pub fn read_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = &str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+
+    let result = block_on(async {
+        let result = read_file_async_base(path, ctx).await?;
+
+        let promise = JsPromise::new(
+            |resolvers: &ResolvingFunctions, context| {
+                resolvers
+                    .resolve
+                    .call(&JsValue::undefined(), &[result], context)?;
+                Ok(JsValue::undefined())
+            },
+            ctx,
+        );
+
+        let promise = base_promise(promise, ctx);
+
+        Ok(promise.into())
+    });
+
+    result
+}
+
 pub fn read_text_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
@@ -41,6 +88,48 @@ pub fn read_text_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> 
             throw!(err, e.to_string());
         }
     }
+}
+
+pub async fn read_text_file_async_base(path: &Path) -> JsResult<JsValue> {
+    let file = match open_file(path) {
+        Ok(file) => file,
+        Err(e) => {
+            throw!(err, e.to_string());
+        }
+    };
+    let file = File::new(file);
+
+    let contents = file.read_async().await.unwrap();
+
+    Ok(JsValue::from(js_string!(
+        String::from_utf8(contents).unwrap()
+    )))
+}
+
+pub fn read_text_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = &str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+
+    let result = block_on(async {
+        let result = read_text_file_async_base(path).await?;
+
+        let promise = JsPromise::new(
+            |resolvers: &ResolvingFunctions, context| {
+                resolvers
+                    .resolve
+                    .call(&JsValue::undefined(), &[result], context)?;
+                Ok(JsValue::undefined())
+            },
+            ctx,
+        );
+
+        let promise = base_promise(promise, ctx);
+
+        Ok(promise.into())
+    });
+
+    result
 }
 
 pub fn remove_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
