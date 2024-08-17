@@ -76,6 +76,17 @@ type RemoveOptions = {
   recursive?: boolean;
 };
 
+type CreateDirOptions = {
+  /**
+   * If set to true, all parent directories will be created.
+   */
+  recursive?: boolean;
+  /**
+   * Mode to use when creating the directory. Defaults to 0o777.
+   */
+  mode?: number;
+};
+
 interface Ike {
   /**
    * Provides information for the module about itself.
@@ -263,15 +274,16 @@ interface Ike {
    * @param opts Options for creating the directory
    * @returns void
    */
-  createDirSync(
-    path: string,
-    opts?: {
-      /**
-       * If set to true, all parent directories will be created.
-       */
-      recursive?: boolean;
-    },
-  ): void;
+  createDirSync(path: string, opts?: CreateDirOptions): void;
+
+  /**
+   * Asynchronously creates a new directory.
+   *
+   * @param path Path to the directory
+   * @param opts Options for creating the directory
+   * @returns Promise<void>
+   */
+  createDir(path: string, opts?: CreateDirOptions): Promise<void>;
 
   /**
    * Synchronously removes a file or directory.

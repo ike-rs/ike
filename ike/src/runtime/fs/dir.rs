@@ -1,23 +1,70 @@
-use crate::runtime::fs::{resolve_path_from_args, FileSystem};
-use boa_engine::{js_string, Context, JsNativeError, JsResult, JsValue};
+use crate::runtime::{
+    fs::{resolve_path_from_args, FileSystem},
+    promise::base_promise,
+};
+use boa_engine::{
+    builtins::promise::ResolvingFunctions, js_string, object::builtins::JsPromise, Context,
+    JsNativeError, JsResult, JsValue,
+};
 use std::path::Path;
 
 pub fn create_dir_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
-    let str_path = resolve_path_from_args(args, ctx)?;
-    let str_path = &str_path.to_std_string().unwrap();
-    let path = Path::new(&str_path);
-    let recursive = get_recursive_flag(args, ctx)?;
-
-    let result = if recursive {
-        FileSystem::create_dir_all_sync(path)
-    } else {
-        FileSystem::create_dir_sync(path)
-    };
+    let (path, recursive, mode) = resolve_create_dir_args(args, ctx)?;
+    let path = Path::new(&path);
+    let result = FileSystem::create_dir(path, recursive, mode);
 
     match result {
         Ok(_) => Ok(JsValue::undefined()),
         Err(err) => Err(JsNativeError::error().with_message(err.to_string()).into()),
     }
+}
+
+pub fn create_dir_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let (path, recursive, mode) = resolve_create_dir_args(args, ctx)?;
+    let path = Path::new(&path);
+
+    let result = smol::block_on(async {
+        let promise = JsPromise::new(
+            |resolvers: &ResolvingFunctions, context| {
+                let result = FileSystem::create_dir(path, recursive, mode)
+                    .map_err(|e| JsNativeError::error().with_message(e.to_string()))
+                    .err();
+
+                if result.is_some() {
+                    return Err(result.unwrap().into());
+                }
+
+                resolvers
+                    .resolve
+                    .call(&JsValue::undefined(), &[JsValue::undefined()], context)?;
+                Ok(JsValue::undefined())
+            },
+            ctx,
+        );
+
+        let promise = base_promise(promise, ctx);
+
+        Ok(promise.into())
+    });
+
+    result
+}
+
+pub fn resolve_create_dir_args(
+    args: &[JsValue],
+    ctx: &mut Context,
+) -> JsResult<(String, bool, u32)> {
+    let path = resolve_path_from_args(args, ctx)?;
+    let path = &path.to_std_string().unwrap();
+    let recursive = get_recursive_flag(args, ctx)?;
+    let mode = args
+        .get(2)
+        .and_then(|mode| mode.as_number())
+        .map(|mode| mode as u32)
+        .unwrap_or(0o777)
+        & 0o777;
+
+    Ok((path.clone(), recursive, mode))
 }
 
 pub fn get_recursive_flag(args: &[JsValue], ctx: &mut Context) -> JsResult<bool> {

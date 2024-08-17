@@ -41,14 +41,6 @@ impl FileSystem {
         Ok(File::new(file))
     }
 
-    pub fn create_dir_all_sync(path: &Path) -> std::io::Result<()> {
-        std::fs::create_dir_all(path)
-    }
-
-    pub fn create_dir_sync(path: &Path) -> std::io::Result<()> {
-        std::fs::create_dir(path)
-    }
-
     pub fn exists_sync(path: &Path) -> bool {
         path.exists()
     }
@@ -84,6 +76,19 @@ impl FileSystem {
 
         res.map_err(Into::into)
     }
+
+    pub fn create_dir(path: &Path, recursive: bool, mode: u32) -> std::io::Result<()> {
+        let mut builder = fs::DirBuilder::new();
+        builder.recursive(recursive);
+
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::DirBuilderExt;
+            builder.mode(mode);
+        }
+
+        builder.create(path)
+    }
 }
 
 pub fn remove_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
@@ -105,12 +110,16 @@ pub fn remove_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResul
     let recursive = get_recursive_flag(args, ctx)?;
 
     let result = block_on(async {
-        FileSystem::remove(path, recursive)
-            .map_err(|e| e.to_string())
-            .unwrap();
-
         let promise = JsPromise::new(
             |resolvers: &ResolvingFunctions, context| {
+                let result = FileSystem::remove(path, recursive)
+                    .map_err(|e| JsNativeError::error().with_message(e.to_string()))
+                    .err();
+
+                if result.is_some() {
+                    return Err(result.unwrap().into());
+                }
+
                 resolvers
                     .resolve
                     .call(&JsValue::undefined(), &[JsValue::undefined()], context)?;
