@@ -24,12 +24,13 @@ pub fn create_dir_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsR
     let path = Path::new(&path);
 
     let result = smol::block_on(async {
+        let result = FileSystem::create_dir_async(path, recursive, mode)
+            .await
+            .map_err(|e| JsNativeError::error().with_message(e.to_string()))
+            .err();
+
         let promise = JsPromise::new(
             |resolvers: &ResolvingFunctions, context| {
-                let result = FileSystem::create_dir(path, recursive, mode)
-                    .map_err(|e| JsNativeError::error().with_message(e.to_string()))
-                    .err();
-
                 if result.is_some() {
                     return Err(result.unwrap().into());
                 }

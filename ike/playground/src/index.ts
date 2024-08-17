@@ -1,6 +1,6 @@
 async function readFile() {
   console.log('Start reading file');
-  const data = Ike.createFile('src/hello.1txt');
+  const data = await Ike.remove('testdir');
   console.log(data);
 }
 

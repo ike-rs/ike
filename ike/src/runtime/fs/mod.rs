@@ -77,6 +77,11 @@ impl FileSystem {
         res.map_err(Into::into)
     }
 
+    pub async fn remove_async(path: &Path, recursive: bool) -> std::io::Result<()> {
+        let path = path.to_owned();
+        spawn_blocking(move || Self::remove(path.as_path(), recursive)).await?
+    }
+
     pub fn create_dir(path: &Path, recursive: bool, mode: u32) -> std::io::Result<()> {
         let mut builder = fs::DirBuilder::new();
         builder.recursive(recursive);
@@ -88,6 +93,11 @@ impl FileSystem {
         }
 
         builder.create(path)
+    }
+
+    pub async fn create_dir_async(path: &Path, recursive: bool, mode: u32) -> std::io::Result<()> {
+        let path = path.to_owned();
+        spawn_blocking(move || Self::create_dir(path.as_path(), recursive, mode)).await?
     }
 
     pub fn create_file_sync(path: &Path) -> std::io::Result<fs::File> {
@@ -119,12 +129,12 @@ pub fn remove_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResul
     let recursive = get_recursive_flag(args, ctx)?;
 
     let result = block_on(async {
+        let result = FileSystem::remove_async(path, recursive)
+            .await
+            .map_err(|e| JsNativeError::error().with_message(e.to_string()))
+            .err();
         let promise = JsPromise::new(
             |resolvers: &ResolvingFunctions, context| {
-                let result = FileSystem::remove(path, recursive)
-                    .map_err(|e| JsNativeError::error().with_message(e.to_string()))
-                    .err();
-
                 if result.is_some() {
                     return Err(result.unwrap().into());
                 }
