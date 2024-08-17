@@ -228,7 +228,7 @@ impl Console {
 
                     cond_log!(error, false, "<r><green>Promise<r> <r><d>{{ ");
                     cond_log!(error, false, "<r><yellow><{}><r>", string_state);
-                    cond_log!(error, false, "<r><d> }}<r>\n");
+                    cond_log!(error, false, "<r><d> }}<r>");
                 } else if str_name.contains("Function") {
                     let name = obj
                         .get(js_string!("name"), ctx)

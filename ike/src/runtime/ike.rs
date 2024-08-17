@@ -1,5 +1,5 @@
 use super::fs::dir::create_dir_async;
-use super::fs::files::{read_file_async, read_text_file_async};
+use super::fs::files::{create_file_async, read_file_async, read_text_file_async};
 use super::fs::{remove_async, remove_sync};
 use super::meta::Meta;
 use crate::globals::{ALLOWED_EXTENSIONS, CODE_TO_INJECT};
@@ -72,6 +72,11 @@ impl IkeGlobalObject {
         obj.function(
             NativeFunction::from_fn_ptr(create_file_sync),
             js_string!("createFileSync"),
+            1,
+        );
+        obj.function(
+            NativeFunction::from_fn_ptr(create_file_async),
+            js_string!("createFile"),
             1,
         );
         obj.function(

@@ -89,6 +89,15 @@ impl FileSystem {
 
         builder.create(path)
     }
+
+    pub fn create_file_sync(path: &Path) -> std::io::Result<fs::File> {
+        fs::File::create(path)
+    }
+
+    pub async fn create_file_async(path: &Path) -> std::io::Result<fs::File> {
+        let path = path.to_owned();
+        spawn_blocking(move || fs::File::create(&path)).await?
+    }
 }
 
 pub fn remove_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {

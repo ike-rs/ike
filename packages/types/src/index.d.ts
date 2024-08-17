@@ -268,6 +268,14 @@ interface Ike {
   createFileSync(path: string): void;
 
   /**
+   * Asynchronously creates a new file or truncates an existing file.
+   *
+   * @param path
+   * @returns Promise<void>
+   */
+  createFile(path: string): Promise<void>;
+
+  /**
    * Synchronously creates a new directory.
    *
    * @param path Path to the directory

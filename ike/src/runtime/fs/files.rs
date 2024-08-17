@@ -143,13 +143,47 @@ pub fn read_text_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) ->
     result
 }
 
+// TODO: implement FsFile and return it in both create_file_sync and create_file_async
+
 pub fn create_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
 
-    match std::fs::File::create(path) {
+    match FileSystem::create_file_sync(path) {
         Ok(_) => Ok(JsValue::undefined()),
         Err(err) => Err(JsNativeError::error().with_message(err.to_string()).into()),
     }
+}
+
+pub fn create_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+    let str_path = resolve_path_from_args(args, ctx)?;
+    let str_path = str_path.to_std_string().unwrap();
+    let path = Path::new(&str_path);
+
+    let result = block_on(async move {
+        let result = FileSystem::create_file_async(path)
+            .await
+            .map_err(|e| JsNativeError::error().with_message(e.to_string()))
+            .err();
+        let promise = JsPromise::new(
+            |resolvers: &ResolvingFunctions, context| {
+                if let Some(err) = result {
+                    return Err(err.into());
+                }
+
+                resolvers
+                    .resolve
+                    .call(&JsValue::undefined(), &[JsValue::undefined()], context)?;
+                Ok(JsValue::undefined())
+            },
+            ctx,
+        );
+
+        let promise = base_promise(promise, ctx);
+
+        Ok(promise.into())
+    });
+
+    result
 }

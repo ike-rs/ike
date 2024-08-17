@@ -159,6 +159,7 @@ describe('removeSync', () => {
       Ike.removeSync('tests/new-dir123');
       Ike.removeSync('tests/new-dir3');
       Ike.removeSync('tests/new-dir4', { recursive: true });
+      Ike.removeSync('tests/new-file111.txt');
     } catch (err) {}
   });
 
@@ -186,5 +187,17 @@ describe('removeSync', () => {
   it('throw if no path is provided', () => {
     // @ts-ignore
     expect(() => Ike.removeSync()).toThrow();
+  });
+});
+
+describe('createFile', () => {
+  it('should create a new file', async () => {
+    await Ike.createFile('tests/new-file111.txt');
+    expect(Ike.existsSync('tests/new-file111.txt')).toBe(true);
+  });
+
+  it('throw if no path is provided', async () => {
+    // @ts-ignore
+    await expect(Ike.createFile()).rejects.toThrow();
   });
 });
