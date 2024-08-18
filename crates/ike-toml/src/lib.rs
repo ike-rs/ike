@@ -1,5 +1,5 @@
 use ike_fs::{find_nearest_file, read_to_string};
-use logger::{elog, Logger};
+use ike_logger::{elog, Logger};
 use serde::Deserialize;
 use std::{collections::HashMap, path::PathBuf};
 use thiserror::Error;

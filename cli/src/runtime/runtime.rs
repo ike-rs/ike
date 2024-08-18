@@ -20,7 +20,7 @@ use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
 };
-use logger::{cond_log, Logger};
+use ike_logger::{cond_log, Logger};
 use smol::LocalExecutor;
 use std::{
     path::{Path, PathBuf},

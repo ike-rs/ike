@@ -8,7 +8,7 @@ use std::{fs::read_dir, path::PathBuf};
 use super::cli::Cli;
 use crate::error::IkeError::FailedToConvertPath;
 use anyhow::Result;
-use logger::{log, new_line, Logger};
+use ike_logger::{log, new_line, Logger};
 
 // TODO: pattern handling
 pub fn test_command(cli: Cli, sub_matches: &clap::ArgMatches) -> Result<()> {
@@ -66,7 +66,9 @@ impl Scanner {
 
         let stem = path.file_stem().unwrap().to_str().unwrap();
 
-        Self::NAME_SUFFIXES.iter().any(|suffix| stem.ends_with(suffix))
+        Self::NAME_SUFFIXES
+            .iter()
+            .any(|suffix| stem.ends_with(suffix))
     }
 
     pub fn scan(dir: PathBuf, patterns: Vec<&str>) -> Result<Vec<PathBuf>> {

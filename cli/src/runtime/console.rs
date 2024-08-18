@@ -9,7 +9,7 @@ use boa_engine::{
     Context, JsData, JsResult,
 };
 use boa_gc::{Finalize, Trace};
-use logger::{cond_log, log, new_line, Logger};
+use ike_logger::{cond_log, log, new_line, Logger};
 use std::{cell::RefCell, rc::Rc};
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]

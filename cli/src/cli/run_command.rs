@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use ike_fs::FsError::FileNotFound;
-use logger::{elog, Logger};
+use ike_logger::{elog, Logger};
 
 use super::cli::Cli;
 use crate::error::IkeError::CouldNotResolveEntry;

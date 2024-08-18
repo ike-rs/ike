@@ -1,6 +1,6 @@
 [workspace]
 
-members = ["ike", "ike-fs", "ike-toml", "logger"]
+members = ["cli", "crates/ike-fs", "crates/ike-toml", "crates/ike-logger"]
 resolver = "1"
 
 [workspace.dependencies]
@@ -9,3 +9,7 @@ anyhow = "1.0.86"
 toml = "0.8.19"
 serde = { version = "1", features = ["derive", "std"] }
 thiserror = "1.0.63"
+
+ike-fs = {version = "0.1.0", path = "crates/ike-fs"}
+ike-toml = {version = "0.1.0", path = "crates/ike-toml"}
+ike-logger = {version = "0.1.0", path = "crates/ike-logger"}

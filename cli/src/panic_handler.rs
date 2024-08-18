@@ -1,4 +1,4 @@
-use logger::{elog, pretty_fmt, Logger};
+use ike_logger::{elog, pretty_fmt, Logger};
 
 pub fn setup_panic_handler() {
     let original_panic_handler = std::panic::take_hook();

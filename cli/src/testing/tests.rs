@@ -13,7 +13,7 @@ use boa_engine::{
 };
 use smol::LocalExecutor;
 
-use logger::{cond_log, log, new_line, print_indent, Logger};
+use ike_logger::{cond_log, log, new_line, print_indent, Logger};
 
 use crate::utils::compare_paths;
 use crate::{

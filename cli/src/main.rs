@@ -16,7 +16,7 @@ mod which;
 
 use anyhow::Result;
 use cli::cli::Cli;
-use logger::{elog, Logger};
+use ike_logger::{elog, Logger};
 use panic_handler::setup_panic_handler;
 
 #[tokio::main]

@@ -9,7 +9,7 @@ serde = { workspace = true }
 clap = { version = "4.5.11", features = ["derive"] }
 thiserror = "1.0.63"
 tokio = { version = "1", features = ["full"] }
-logger = { path = "../logger" }
+ike-logger = { workspace = true }
 chrono = "0.4.38"
 boa_engine = { git = "https://github.com/boa-dev/boa.git", features = ["annex-b"] }
 anstyle = "1.0.7"
@@ -34,8 +34,8 @@ oxc_parser = "0.24.2"
 oxc_span = "0.24.2"
 oxc_allocator = "0.24.2"
 oxc_codegen = "0.24.2"
-ike-fs = { path = "../ike-fs" }
-ike-toml = { path = "../ike-toml" }
+ike-fs = { workspace = true }
+ike-toml = { workspace = true }
 indexmap = "2.3.0"
 urlencoding = "2.1.3"
 dotenvy = "0.15.7"
