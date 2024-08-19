@@ -26,17 +26,32 @@ use std::{
     path::{Path, PathBuf},
     rc::Rc,
 };
+use web::WebModule;
 
 pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));
+    let module_loader = Rc::new(IkeModuleLoader::new(std::env::current_dir().unwrap())?);
     let ctx = match context {
         Some(ctx) => ctx,
         None => &mut Context::builder()
             .job_queue(queue)
-            .module_loader(Rc::new(IkeModuleLoader))
+            .module_loader(module_loader.clone())
             .build()
             .unwrap(),
     };
+    let modules = vec![WebModule::new()];
+    // TODO: make this a function and add it to tests
+    for module in modules {
+        let files = module.js_files;
+
+        for (file, content) in files {
+            let path = Path::new(module.cwd()).join(file);
+            let result = Source::from_bytes(content.as_bytes()).with_path(&path);
+
+            let parsed_module = Module::parse(result, None, ctx)?;
+            module_loader.insert(PathBuf::from(module.name_for(file)), parsed_module);
+        }
+    }
 
     setup_context(ctx, Some(file));
     let transpiled = match transpile(file) {

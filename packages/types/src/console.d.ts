@@ -24,6 +24,12 @@ declare global {
      */
     error(...data: any): void;
   }
+
+  /**
+   * The global `console` object provides access to the console, enabling methods for logging,
+   * informational output, and error reporting.
+   */
+  const console: Console;
 }
 
 export {};

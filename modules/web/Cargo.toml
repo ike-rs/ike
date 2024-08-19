@@ -1,0 +1,11 @@
+[package]
+name = "web"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ike-core = { workspace = true }
+boa_engine = { workspace = true }
+
+[lib]
+path = "lib.rs"

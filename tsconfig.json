@@ -19,13 +19,12 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false,
-    "outDir": "ike/src/runtime/js"
+    "noPropertyAccessFromIndexSignature": false
   },
   "include": [
-    "ike/src/runtime/ts/**/*",
-    "packages/types/src/**/*",
-    "tests/**/*"
-  ],
-  "exclude": ["ike/src/runtime/ts/streams-polyfill/**/*"]
+    "cli/src/runtime/ts/**/*",
+    "packages/types/dist/index.d.ts",
+    "tests/**/*",
+    "modules/**/*"
+  ]
 }

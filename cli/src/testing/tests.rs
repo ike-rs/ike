@@ -78,7 +78,9 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));
     let ctx = &mut Context::builder()
         .job_queue(queue)
-        .module_loader(Rc::new(IkeModuleLoader))
+        .module_loader(Rc::new(
+            IkeModuleLoader::new(std::env::current_dir().unwrap()).unwrap(),
+        ))
         .build()
         .unwrap();
     setup_context(ctx, None);

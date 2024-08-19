@@ -1,1 +1,1 @@
-export * from 'web-streams-polyfill';
+export * from 'module:web/streams.js';

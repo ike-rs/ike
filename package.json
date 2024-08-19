@@ -8,8 +8,5 @@
   "scripts": {
     "format": "biome format --write"
   },
-  "type": "module",
-  "dependencies": {
-    "web-streams-polyfill": "^4.0.0"
-  }
+  "type": "module"
 }

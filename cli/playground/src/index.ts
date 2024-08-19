@@ -1,9 +1,24 @@
-async function readFile() {
-  console.log('Start reading file');
-  const data = await Ike.remove('testdir');
-  console.log(data);
-}
+const async_gen = async function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+};
 
-console.log('Before calling readFile');
-await readFile();
-console.log('After calling readFile');
+const stream = new ReadableStream({
+  async start(controller) {
+    for await (const chunk of async_gen()) {
+      controller.enqueue(chunk);
+    }
+    controller.close();
+  },
+});
+
+const reader = stream.getReader();
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) {
+    break;
+  }
+  console.log(value);
+}

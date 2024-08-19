@@ -1250,6 +1250,7 @@ dependencies = [
  "oxc_span",
  "oxc_transformer",
  "regex",
+ "rustc-hash",
  "serde",
  "serde_json",
  "simdutf",
@@ -1260,7 +1261,15 @@ dependencies = [
  "url",
  "urlencoding",
  "uuid",
+ "web",
  "winapi",
+]
+
+[[package]]
+name = "ike-core"
+version = "0.1.0"
+dependencies = [
+ "boa_engine",
 ]
 
 [[package]]
@@ -2892,6 +2901,14 @@ name = "wasm-bindgen-shared"
 version = "0.2.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af190c94f2773fdb3729c55b007a722abb5384da03bc0986df4c289bf5567e96"
+
+[[package]]
+name = "web"
+version = "0.1.0"
+dependencies = [
+ "boa_engine",
+ "ike-core",
+]
 
 [[package]]
 name = "winapi"

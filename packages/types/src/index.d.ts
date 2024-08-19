@@ -1,30 +1,11 @@
-/// <reference path="./globals.d.ts" />
-
-import './modules/buffer';
-import './modules/test';
-import './modules/inspect';
-import './modules/assert';
-import './modules/_internal_';
-import './modules/format';
-import { URL as _URL, URLSearchParams as _URLSearchParams } from './url';
-import type { Console } from './console';
-import type { Headers as _Headers } from './headers';
-import type Path from './modules/path';
-import {
-  ReadableStream as _ReadableStream,
-  ReadableStreamDefaultController as _ReadableStreamDefaultController,
-  ReadableByteStreamController as _ReadableByteStreamController,
-  ReadableStreamBYOBRequest as _ReadableStreamBYOBRequest,
-  ReadableStreamDefaultReader as _ReadableStreamDefaultReader,
-  ReadableStreamBYOBReader as _ReadableStreamBYOBReader,
-  WritableStream as _WritableStream,
-  WritableStreamDefaultController as _WritableStreamDefaultController,
-  WritableStreamDefaultWriter as _WritableStreamDefaultWriter,
-  ByteLengthQueuingStrategy as _ByteLengthQueuingStrategy,
-  CountQueuingStrategy as _CountQueuingStrategy,
-  TransformStream as _TransformStream,
-  TransformStreamDefaultController as _TransformStreamDefaultController,
-} from './modules/streams';
+import '../../../modules/web/lib.web.d.ts';
+import './modules/buffer.d.ts';
+import './modules/test.d.ts';
+import './modules/inspect.d.ts';
+import './modules/assert.d.ts';
+import './modules/_internal_.d.ts';
+import './modules/format.d.ts';
+import './modules/path.d.ts';
 
 /**
  * The Meta interface contains information about the current file and its paths.
@@ -361,12 +342,12 @@ interface Ike {
    *
    * @example
    * ```ts
-   * import { join } from "path";
+   * import { join } from "@std/path";
    * console.log(join("path", "to", "file.txt"));
    * ```
    *
    */
-  path: Path;
+  path: typeof import('@std/path');
 
   /**
    * Environment variables.
@@ -404,12 +385,6 @@ declare global {
    * @internal
    */
   function $rustFunction(name: string): Function;
-
-  /**
-   * The global `console` object provides access to the console, enabling methods for logging,
-   * informational output, and error reporting.
-   */
-  const console: Console;
 
   /**
    * The `setTimeout()` function sets a timer which executes a function or specified piece of code once the timer expires.

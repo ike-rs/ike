@@ -25,7 +25,7 @@ declare module '@std/_internal_' {
 
   export const RequiredArgumentError: new (
     name: string,
-    prefix: string = '',
+    prefix: string,
   ) => Error;
 
   export function getArgument<T = any>(
