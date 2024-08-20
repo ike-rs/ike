@@ -4,7 +4,7 @@ use proc_macro::TokenStream;
 mod function;
 mod parse;
 
-#[doc = "This is proc macro for generating boa.rs function. This code is adapted from Deno."]
+#[doc = include_str!("../README.md")]
 #[proc_macro_attribute]
 pub fn ike_function(attr: TokenStream, item: TokenStream) -> TokenStream {
     match macro_function(attr.into(), item.into()) {
