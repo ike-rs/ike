@@ -1,0 +1,17 @@
+[package]
+name = "ike-function"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+ike-core = { workspace = true }
+boa_engine = { workspace = true }
+proc-macro-rules = "0.4.0"
+proc-macro2 = "1.0.86"
+syn = { version = "*", features = ["extra-traits"] }
+quote = "*"
+thiserror = { workspace = true }
+anyhow = { workspace = true }

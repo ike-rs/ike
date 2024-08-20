@@ -1,6 +1,15 @@
 [workspace]
 
-members = ["cli", "crates/ike-fs", "crates/ike-toml", "crates/ike-logger", "crates/ike-core", "modules/web"]
+members = [
+    "cli",
+    "crates/ike-fs",
+    "crates/ike-toml",
+    "crates/ike-logger",
+    "crates/ike-core",
+    "modules/web",
+    "crates/proc/ike-function",
+    "crates/proc/proc-test",
+]
 resolver = "1"
 
 [workspace.dependencies]
@@ -9,13 +18,17 @@ anyhow = "1.0.86"
 toml = "0.8.19"
 serde = { version = "1", features = ["derive", "std"] }
 thiserror = "1.0.63"
-boa_engine = { git = "https://github.com/boa-dev/boa.git", features = ["annex-b"] }
+boa_engine = { git = "https://github.com/boa-dev/boa.git", features = [
+    "annex-b",
+] }
+smol = "2.0.0"
 
 # Creates
-ike-fs = {version = "0.1.0", path = "crates/ike-fs"}
-ike-toml = {version = "0.1.0", path = "crates/ike-toml"}
-ike-logger = {version = "0.1.0", path = "crates/ike-logger"}
-ike-core = {version = "0.1.0", path = "crates/ike-core"}
+ike-fs = { version = "0.1.0", path = "crates/ike-fs" }
+ike-toml = { version = "0.1.0", path = "crates/ike-toml" }
+ike-logger = { version = "0.1.0", path = "crates/ike-logger" }
+ike-core = { version = "0.1.0", path = "crates/ike-core" }
+ike-function = { version = "0.1.0", path = "crates/proc/ike-function" }
 
 # Modules
-web = {version = "0.1.0", path = "modules/web"}
+web = { version = "0.1.0", path = "modules/web" }

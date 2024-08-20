@@ -1,0 +1,11 @@
+[package]
+name = "proc-test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ike-function = { workspace = true }
+ike-core = { workspace = true }
+boa_engine = { workspace = true }
+proc-macro-rules = "0.4.0"
+anyhow = { workspace = true }
