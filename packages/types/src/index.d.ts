@@ -365,20 +365,15 @@ interface Ike {
    *
    * @param loader - Loader type
    * @param source - Source code
-   * @param inject - Inject runtime helpers
    * @returns string
    */
-  transpile(loader: Loader, sourceText: string, inject?: boolean): string;
+  transpile(loader: Loader, sourceText: string): string;
 }
 
 type Loader = 'js' | 'mjs' | 'ts' | 'mts' | 'cjs' | 'cts' | 'jsx' | 'tsx';
 
-declare namespace Ike {
-  const meta: Meta;
-}
-
 declare global {
-  const Ike: Ike;
+  export const Ike: Ike;
 
   /**
    * Function allows to call internal rust functions.
