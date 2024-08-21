@@ -1,6 +1,5 @@
 use crate::runtime::fs::{resolve_path_from_args, FileSystem};
 use crate::runtime::promise::base_promise;
-use crate::throw;
 use boa_engine::builtins::promise::ResolvingFunctions;
 use boa_engine::object::builtins::{JsArrayBuffer, JsPromise, JsUint8Array};
 use boa_engine::{js_string, Context, JsNativeError, JsResult, JsValue};
@@ -8,6 +7,7 @@ use smol::block_on;
 use std::path::Path;
 
 use super::{open_file, File};
+use ike_core::throw;
 
 pub fn read_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
@@ -24,7 +24,7 @@ pub fn read_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRes
             Ok(JsValue::from(uint8_array))
         }
         Err(e) => {
-            throw!(err, e.to_string());
+            throw!(err, "{}", e.to_string());
         }
     }
 }
@@ -91,7 +91,7 @@ pub fn read_text_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> 
             Ok(JsValue::from(js_string!(contents)))
         }
         Err(e) => {
-            throw!(err, e.to_string());
+            throw!(err, "{}", e.to_string());
         }
     }
 }

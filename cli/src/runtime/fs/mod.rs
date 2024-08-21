@@ -1,12 +1,12 @@
 // Based on deno implementation
 
 use crate::fs::normalize_p;
-use crate::throw;
 use anyhow::{anyhow, Result};
 use boa_engine::builtins::promise::ResolvingFunctions;
 use boa_engine::object::builtins::JsPromise;
 use boa_engine::{Context, JsNativeError, JsResult, JsString, JsValue};
 use dir::get_recursive_flag;
+use ike_core::throw;
 use smol::block_on;
 use std::env::current_dir;
 use std::io::Read;

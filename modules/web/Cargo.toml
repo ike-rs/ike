@@ -9,6 +9,7 @@ ike-function = { workspace = true }
 boa_engine = { workspace = true }
 smol = { workspace = true }
 futures-util = { workspace = true }
+base64 = "0.22.1"
 
 [lib]
 path = "lib.rs"

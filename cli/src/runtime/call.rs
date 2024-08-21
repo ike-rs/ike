@@ -6,14 +6,14 @@ use crate::{
         buffer::is_utf8,
         uuid::{uuid_parse, uuid_stringify, uuidv4, uuidv5},
     },
-    str_from_jsvalue, throw,
 };
 
-use super::buffer::{atob, btoa, is_ascii_string};
+use super::buffer::is_ascii_string;
 use crate::testing::js::{after_all, before_all, describe, test_it};
 use boa_engine::{
     js_string, object::FunctionObjectBuilder, Context, JsNativeError, JsValue, NativeFunction,
 };
+use ike_core::{str_from_jsvalue, throw};
 
 // This allows us to all rust functions from the js
 pub fn rust_function(
@@ -26,8 +26,6 @@ pub fn rust_function(
         m.insert("isAscii", unsafe {
             NativeFunction::from_closure(is_ascii_string)
         });
-        m.insert("atob", unsafe { NativeFunction::from_closure(atob) });
-        m.insert("btoa", unsafe { NativeFunction::from_closure(btoa) });
         m.insert("isUtf8", unsafe { NativeFunction::from_closure(is_utf8) });
         m.insert("describe", unsafe {
             NativeFunction::from_closure(describe)

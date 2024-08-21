@@ -1,8 +1,6 @@
 // Thanks to https://github.com/jedel1043 for help with implementing timeouts
 
-use boa_engine::{
-    error::JsNativeError, job::NativeJob, object::builtins::JsFunction, Context, JsResult, JsValue,
-};
+use boa_engine::{job::NativeJob, object::builtins::JsFunction, JsResult, JsValue};
 use futures_util::future::{AbortHandle, Abortable};
 use ike_function::ike_function;
 use smol::Timer;

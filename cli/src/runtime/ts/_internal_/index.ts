@@ -159,6 +159,12 @@ const isObject = (x: any): x is object => {
   return (typeof x === 'object' && x !== null) || typeof x === 'function';
 };
 
+const toString = (val: unknown): string => {
+  if (typeof val === 'string') return val;
+
+  return String(val);
+};
+
 export {
   isTypedArray,
   isArrayBuffer,
@@ -166,4 +172,5 @@ export {
   RequiredArgumentError,
   getArgument,
   isObject,
+  toString,
 };

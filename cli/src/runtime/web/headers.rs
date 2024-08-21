@@ -1,11 +1,11 @@
 use crate::utils::is_array;
-use crate::{js_str_to_string, str_from_jsvalue, throw};
 use boa_engine::class::{Class, ClassBuilder};
 use boa_engine::object::builtins::JsArray;
 use boa_engine::{
     js_string, Context, Finalize, JsData, JsNativeError, JsResult, JsValue, NativeFunction,
 };
 use boa_gc::{empty_trace, Trace};
+use ike_core::{js_str_to_string, str_from_jsvalue, throw};
 use indexmap::IndexMap;
 
 const HEADERS: &[&str] = &[
@@ -200,9 +200,9 @@ impl Headers {
             throw!(typ, "Headers.set requires header key");
         }
         let key = str_from_jsvalue!(key.unwrap(), ctx).to_lowercase();
-        
+
         if !HEADERS.contains(&key.as_str()) {
-            throw!(typ, format!("Invalid header name. Got: {}", key));
+            throw!(typ, "Invalid header name. Got: {}", key);
         }
 
         let value = args.get(1);
@@ -299,7 +299,7 @@ pub fn add_entry(headers: &mut HeadersMap, key: String, value: String) -> JsResu
     let key = key.to_lowercase();
 
     if !HEADERS.contains(&key.as_str()) {
-        throw!(typ, format!("Invalid header name. Got: {}", key));
+        throw!(typ, "Invalid header name. Got: {}", key);
     }
 
     let value_clone = value.clone();

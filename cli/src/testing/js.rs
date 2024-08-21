@@ -4,8 +4,9 @@ use boa_engine::{
     property::Attribute,
     Context, JsNativeError, JsObject, JsResult, JsValue,
 };
+use ike_core::throw;
 
-use crate::{assert_arg_type, runtime::runtime::get_current_path, throw};
+use crate::{assert_arg_type, runtime::runtime::get_current_path};
 
 pub struct JsTest;
 

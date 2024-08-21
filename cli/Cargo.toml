@@ -2,6 +2,7 @@
 name = "ike"
 version = "0.1.0"
 edition = "2021"
+default-run = "ike"
 
 [dependencies]
 anyhow = { workspace = true }
@@ -19,7 +20,6 @@ os_info = "3.8.2"
 regex = "1.10.5"
 isahc = "1.7.2"
 boa_gc = { git = "https://github.com/boa-dev/boa.git" }
-base64 = "0.22.1"
 simdutf = "0.4.17"
 lazy_static = "1.5.0"
 glob = "0.3.1"
@@ -49,6 +49,8 @@ uuid = { version = "1.10.0", features = [
     "v8",
 ] }
 rustc-hash = "2.0.0"
+
+ike-core = { workspace = true }
 
 # Modules
 web = { workspace = true }

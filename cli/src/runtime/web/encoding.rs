@@ -13,7 +13,7 @@ use boa_engine::{
 use boa_gc::{Finalize, GcRef, Trace};
 use std::collections::HashMap;
 
-use crate::throw;
+use ike_core::throw;
 
 #[derive(Debug, Trace, Finalize, JsData)]
 pub struct TextEncoder;
@@ -368,7 +368,7 @@ impl TextDecoder {
                 if let Some(_encoding) = EncodingLabel::label_from_string(&arg_val) {
                     encoding = arg_val;
                 } else {
-                    throw!(typ, format!("Unsupported encoding label: {}", arg_val));
+                    throw!(typ, "Unsupported encoding label: {}", arg_val);
                 }
             } else if arg_0.is_undefined() {
             } else {

@@ -1225,7 +1225,6 @@ version = "0.1.0"
 dependencies = [
  "anstyle",
  "anyhow",
- "base64",
  "boa_engine",
  "boa_gc",
  "chrono",
@@ -1234,6 +1233,7 @@ dependencies = [
  "dotenvy",
  "futures-util",
  "glob",
+ "ike-core",
  "ike-fs",
  "ike-logger",
  "ike-toml",
@@ -2954,6 +2954,7 @@ checksum = "af190c94f2773fdb3729c55b007a722abb5384da03bc0986df4c289bf5567e96"
 name = "web"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "boa_engine",
  "futures-util",
  "ike-core",

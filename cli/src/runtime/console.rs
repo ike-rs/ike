@@ -1,4 +1,4 @@
-use crate::{create_method_with_state, get_prototype_name, js_str_to_string, str_from_jsvalue};
+use crate::{create_method_with_state, get_prototype_name};
 use boa_engine::builtins::promise::PromiseState;
 use boa_engine::object::builtins::{JsArray, JsPromise, JsTypedArray};
 use boa_engine::{
@@ -9,6 +9,7 @@ use boa_engine::{
     Context, JsData, JsResult,
 };
 use boa_gc::{Finalize, Trace};
+use ike_core::{js_str_to_string, str_from_jsvalue};
 use ike_logger::{cond_log, log, new_line, Logger};
 use std::{cell::RefCell, rc::Rc};
 

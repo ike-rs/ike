@@ -9,12 +9,13 @@ use crate::runtime::fs::files::{create_file_sync, read_file_sync, read_text_file
 use crate::runtime::toml::parse_toml;
 use crate::transpiler::{transpile, transpile_with_text};
 use crate::which::which;
-use crate::{create_method, globals::VERSION, js_str_to_string, throw};
+use crate::{create_method, globals::VERSION};
 use boa_engine::{
     js_str, js_string, object::ObjectInitializer, property::Attribute, value::Type, Context,
     JsData, JsNativeError, JsObject, JsResult, JsValue, NativeFunction,
 };
 use boa_gc::{Finalize, Trace};
+use ike_core::{js_str_to_string, throw};
 use std::path::PathBuf;
 
 #[derive(Debug, Default, Trace, Finalize, JsData)]
@@ -267,11 +268,9 @@ impl IkeGlobalObject {
         if !ALLOWED_EXTENSIONS.contains(&loader.as_str()) {
             throw!(
                 typ,
-                format!(
-                    "transpile: Expected a loader to be one of {}<d>,<r> got {}",
-                    ALLOWED_EXTENSIONS.join("<d>,<r> "),
-                    loader
-                )
+                "transpile: Expected a loader to be one of {}<d>,<r> got {}",
+                ALLOWED_EXTENSIONS.join("<d>,<r> "),
+                loader
             );
         }
         let path = PathBuf::from(format!("virtual-file.{}", loader));
@@ -284,14 +283,14 @@ impl IkeGlobalObject {
 
             match result {
                 Ok(transpiled) => Ok(JsValue::from(js_string!(transpiled))),
-                Err(e) => throw!(typ, e.to_string()),
+                Err(e) => throw!(typ, "{}", e.to_string()),
             }
         } else {
             let result = transpile(&path);
 
             match result {
                 Ok(transpiled) => Ok(JsValue::from(js_string!(transpiled))),
-                Err(e) => throw!(typ, e.to_string()),
+                Err(e) => throw!(typ, "{}", e.to_string()),
             }
         }
     }

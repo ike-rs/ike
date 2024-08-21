@@ -22,7 +22,6 @@ describe('WritableStream', () => {
     }
     await writer.close();
 
-    console.log(writtenData, data);
     expect(writtenData).toBe(data);
   });
 

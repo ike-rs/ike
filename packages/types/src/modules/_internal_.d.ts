@@ -35,4 +35,6 @@ declare module '@std/_internal_' {
   ): T;
 
   export function isObject(value: any): value is object;
+
+  export function toString(value: unknown): string;
 }

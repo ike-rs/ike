@@ -1,4 +1,3 @@
-use crate::{js_str_to_string, throw};
 use boa_engine::class::{Class, ClassBuilder};
 use boa_engine::object::builtins::JsArray;
 use boa_engine::{
@@ -6,6 +5,7 @@ use boa_engine::{
     NativeFunction, Trace,
 };
 use boa_gc::empty_trace;
+use ike_core::{js_str_to_string, throw};
 use indexmap::IndexMap;
 
 #[derive(Default, Trace, Finalize, JsData, Debug)]

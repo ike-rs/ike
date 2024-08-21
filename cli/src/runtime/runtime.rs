@@ -1,5 +1,4 @@
 use super::{
-    buffer::{atob, btoa},
     call::rust_function,
     console::Console,
     ike::IkeGlobalObject,
@@ -12,11 +11,12 @@ use super::{
 use crate::runtime::web::headers::Headers;
 use crate::runtime::web::url::{URLSearchParams, URL};
 use crate::transpiler::transpile;
-use crate::{get_prototype_name, js_str_to_string, testing::js::JsTest, throw};
+use crate::{get_prototype_name, testing::js::JsTest};
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
 };
+use ike_core::{js_str_to_string, throw};
 use ike_logger::{cond_log, Logger};
 use smol::LocalExecutor;
 use std::{
@@ -36,9 +36,29 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
             .build()
             .unwrap(),
     };
+
+    load_modules(ctx, module_loader)?;
+    setup_context(ctx, Some(file));
+
+    let script_source = Source::from_bytes(include_bytes!("./runtime.js"));
+    let script_module = Module::parse(script_source, None, ctx)?;
+    evaulte_module(ctx, script_module)?;
+
+    let transpiled = match transpile(file) {
+        Ok(transpiler) => transpiler,
+        Err(e) => throw!(typ, "Failed to transpile: {:?}", e),
+    };
+    let reader = Source::from_bytes(transpiled.as_bytes()).with_path(&Path::new(&file));
+    let module = Module::parse(reader, None, ctx)?;
+
+    evaulte_module(ctx, module)?;
+
+    Ok(())
+}
+
+pub fn load_modules(ctx: &mut Context, module_loader: Rc<IkeModuleLoader>) -> JsResult<()> {
     let modules = vec![WebModule::new()];
 
-    // TODO: make this a function and add it to tests
     for module in modules {
         let files = module.js_files;
         let exposed = module.exposed_functions;
@@ -62,20 +82,6 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
             module_loader.insert(PathBuf::from(module.name_for(file)), parsed_module);
         }
     }
-    setup_context(ctx, Some(file));
-
-    let script_source = Source::from_bytes(include_bytes!("./runtime.js"));
-    let script_module = Module::parse(script_source, None, ctx)?;
-    evaulte_module(ctx, script_module)?;
-
-    let transpiled = match transpile(file) {
-        Ok(transpiler) => transpiler,
-        Err(e) => throw!(typ, format!("Failed to transpile: {:?}", e)),
-    };
-    let reader = Source::from_bytes(transpiled.as_bytes()).with_path(&Path::new(&file));
-    let module = Module::parse(reader, None, ctx)?;
-
-    evaulte_module(ctx, module)?;
 
     Ok(())
 }
@@ -148,18 +154,6 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
             setup_type: SetupType::Property,
             value: SetupValue::Object(ike),
             name: js_str!("Ike"),
-            length: None,
-        },
-        SetupEntry {
-            setup_type: SetupType::BuiltinCallable,
-            value: SetupValue::Function(unsafe { NativeFunction::from_closure(atob) }),
-            name: js_str!("atob"),
-            length: None,
-        },
-        SetupEntry {
-            setup_type: SetupType::BuiltinCallable,
-            value: SetupValue::Function(unsafe { NativeFunction::from_closure(btoa) }),
-            name: js_str!("btoa"),
             length: None,
         },
         SetupEntry {

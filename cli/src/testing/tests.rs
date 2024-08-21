@@ -11,23 +11,23 @@ use boa_engine::{
     object::builtins::{JsArray, JsFunction},
     Context, JsNativeError, JsResult, JsValue, Module, Source,
 };
+use ike_core::{js_str_to_string, throw};
 use smol::LocalExecutor;
 
 use ike_logger::{cond_log, log, new_line, print_indent, Logger};
 
-use crate::utils::compare_paths;
 use crate::{
     cli::run_command::Entry,
     format::format_time,
-    get_prototype_name, js_str_to_string,
+    get_prototype_name,
     runtime::{
         modules::IkeModuleLoader,
         queue::Queue,
         runtime::{setup_context, update_meta_property},
     },
-    throw,
 };
 use crate::{runtime::runtime::evaulte_module, transpiler::transpile};
+use crate::{runtime::runtime::load_modules, utils::compare_paths};
 
 lazy_static::lazy_static! {
     static ref ICONS: HashMap<&'static str, &'static str> = {
@@ -76,13 +76,14 @@ impl TestResults {
 
 pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
     let queue = Rc::new(Queue::new(LocalExecutor::new()));
+    let module_loader = Rc::new(IkeModuleLoader::new(std::env::current_dir().unwrap())?);
     let ctx = &mut Context::builder()
         .job_queue(queue)
-        .module_loader(Rc::new(
-            IkeModuleLoader::new(std::env::current_dir().unwrap()).unwrap(),
-        ))
+        .module_loader(module_loader.clone())
         .build()
         .unwrap();
+
+    load_modules(ctx, module_loader)?;
     setup_context(ctx, None);
     let start_time = Instant::now();
     let mut results = TestResults::new();
@@ -102,7 +103,7 @@ pub fn run_tests(paths: Vec<PathBuf>, root: PathBuf) -> JsResult<()> {
 
         let transpiled = match transpile(&path) {
             Ok(transpiler) => transpiler,
-            Err(e) => throw!(typ, format!("Failed to transpile: {:?}", e)),
+            Err(e) => throw!(typ, "Failed to transpile: {:?}", e),
         };
         let reader = Source::from_bytes(transpiled.as_bytes()).with_path(&Path::new(&path));
         let module = Module::parse(reader, None, ctx)?;

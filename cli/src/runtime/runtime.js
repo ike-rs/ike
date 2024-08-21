@@ -14,6 +14,7 @@ import {
     WritableStreamDefaultWriter,
 } from "@std/streams";
 import { clearTimeout, setTimeout } from "module:web/timeouts.js";
+import { atob, btoa } from "module:web/base64.js";
 
 const registerGlobal = (name, value) => {
     Object.defineProperty(globalThis, name, {
@@ -43,6 +44,9 @@ const exports = {
 
     setTimeout,
     clearTimeout,
+
+    atob,
+    btoa,
 };
 
 for (const prop in exports) {

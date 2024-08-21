@@ -3,8 +3,7 @@ use boa_engine::{
     object::builtins::{JsArrayBuffer, JsTypedArray, JsUint8Array},
     Context, JsNativeError, JsResult, JsValue,
 };
-
-use crate::throw;
+use ike_core::throw;
 
 pub fn uuid_parse(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let uuid = args.get(0).unwrap();
@@ -13,7 +12,7 @@ pub fn uuid_parse(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<
     let uuid = uuid.to_std_string().unwrap();
     let parsed_uuid = match uuid::Uuid::try_parse(uuid.as_str()) {
         Ok(uuid) => uuid,
-        Err(err) => throw!(err, format!("Failed to parse UUID: {}", err.to_string())),
+        Err(err) => throw!(err, "Failed to parse UUID: {}", err.to_string()),
     };
 
     let arr_buf = JsArrayBuffer::from_byte_block(parsed_uuid.as_bytes().to_vec(), ctx)
@@ -47,10 +46,7 @@ pub fn uuid_stringify(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRes
 
     let uuid = match uuid::Uuid::from_slice(data_block) {
         Ok(uuid) => uuid,
-        Err(err) => throw!(
-            err,
-            format!("Failed to stringify UUID: {}", err.to_string())
-        ),
+        Err(err) => throw!(err, "Failed to stringify UUID: {}", err.to_string()),
     };
 
     Ok(JsValue::from(js_string!(uuid.to_string())))
@@ -77,7 +73,7 @@ pub fn uuidv5(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsVa
         _ => {
             let parsed_uuid = match uuid::Uuid::try_parse(namespace.as_str()) {
                 Ok(uuid) => uuid,
-                Err(err) => throw!(err, format!("Failed to parse UUID: {}", err.to_string())),
+                Err(err) => throw!(err, "Failed to parse UUID: {}", err.to_string()),
             };
 
             parsed_uuid

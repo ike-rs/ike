@@ -1,6 +1,6 @@
-use crate::throw;
 use boa_engine::object::builtins::{JsArray, JsDate};
 use boa_engine::{js_string, Context, JsNativeError, JsObject, JsResult, JsValue};
+use ike_core::throw;
 use toml::value::Datetime;
 use toml::{Table, Value};
 
@@ -116,14 +116,14 @@ pub fn parse_toml(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<
     let toml = match content.parse::<Table>() {
         Ok(toml) => toml,
         Err(e) => {
-            throw!(typ, format!("Failed to parse TOML: {}", e));
+            throw!(typ, "Failed to parse TOML: {}", e);
         }
     };
 
     let toml = match from_toml(toml, ctx) {
         Ok(toml) => toml,
         Err(e) => {
-            throw!(typ, format!("Failed to convert TOML to JS object: {}", e));
+            throw!(typ, "Failed to convert TOML to JS object: {}", e);
         }
     };
 
