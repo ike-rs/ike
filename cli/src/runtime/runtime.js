@@ -13,19 +13,15 @@ import {
     WritableStreamDefaultController,
     WritableStreamDefaultWriter,
 } from "@std/streams";
+import { clearTimeout, setTimeout } from "module:web/timeouts.js";
 
-function getGlobals() {
-    if (typeof globalThis !== "undefined") {
-        return globalThis;
-    } else if (typeof self !== "undefined") {
-        return self;
-    } else if (typeof global !== "undefined") {
-        return global;
-    }
-    return undefined;
-}
-
-const globals = getGlobals();
+const registerGlobal = (name, value) => {
+    Object.defineProperty(globalThis, name, {
+        value,
+        writable: true,
+        configurable: true,
+    });
+};
 
 const exports = {
     ReadableStream,
@@ -44,24 +40,15 @@ const exports = {
 
     TransformStream,
     TransformStreamDefaultController,
+
+    setTimeout,
+    clearTimeout,
 };
 
 for (const prop in exports) {
     if (Object.prototype.hasOwnProperty.call(exports, prop)) {
-        Object.defineProperty(globals, prop, {
-            value: exports[prop],
-            writable: true,
-            configurable: true,
-        });
+        registerGlobal(prop, exports[prop]);
     }
 }
 
 globalThis.Ike.path = await import("@std/path");
-
-import {
-    clearTimeout as _clearTimeout,
-    setTimeout as _setTimeout,
-} from "module:web/timeouts.js";
-
-globalThis.setTimeout = _setTimeout;
-globalThis.clearTimeout = _clearTimeout;

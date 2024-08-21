@@ -19,7 +19,6 @@ macro_rules! module {
         #[allow(dead_code)]
         impl $name {
             pub fn new() -> Self {
-                // Inicjalizowanie js_files jako stała, ponieważ include_str! jest const
                 const JS_FILES: &[(&'static str, &'static str)] = &[
                     $(
                         $(
