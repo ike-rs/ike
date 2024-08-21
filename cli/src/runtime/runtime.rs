@@ -7,10 +7,7 @@ use super::{
     modules::IkeModuleLoader,
     queue::Queue,
     terminal::{Terminal, TerminalStdin},
-    web::{
-        encoding::{TextDecoder, TextEncoder},
-        timeouts::{clear_timeout, set_timeout},
-    },
+    web::encoding::{TextDecoder, TextEncoder},
 };
 use crate::runtime::web::url::{URLSearchParams, URL};
 use crate::transpiler::transpile;
@@ -43,6 +40,18 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
     // TODO: make this a function and add it to tests
     for module in modules {
         let files = module.js_files;
+        let exposed = module.exposed_functions;
+        for exposed_fn in exposed.iter() {
+            ctx.register_global_builtin_callable(
+                js_string!(exposed_fn.name),
+                0,
+                NativeFunction::from_fn_ptr(exposed_fn.function),
+            )
+            .expect(&format!(
+                "Failed to set exposed function {:?}",
+                exposed_fn.name
+            ));
+        }
 
         for (file, content) in files {
             let path = Path::new(module.cwd()).join(file);
@@ -146,18 +155,6 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
             setup_type: SetupType::BuiltinCallable,
             value: SetupValue::Function(unsafe { NativeFunction::from_closure(rust_function) }),
             name: js_str!("$rustFunction"),
-            length: None,
-        },
-        SetupEntry {
-            setup_type: SetupType::BuiltinCallable,
-            value: SetupValue::Function(unsafe { NativeFunction::from_closure(set_timeout) }),
-            name: js_str!("setTimeout"),
-            length: None,
-        },
-        SetupEntry {
-            setup_type: SetupType::BuiltinCallable,
-            value: SetupValue::Function(unsafe { NativeFunction::from_closure(clear_timeout) }),
-            name: js_str!("clearTimeout"),
             length: None,
         },
     ];

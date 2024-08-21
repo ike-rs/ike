@@ -5,7 +5,7 @@ use quote::{format_ident, quote};
 use syn::{parse2, parse_str, Ident, ItemFn, Type};
 use thiserror::Error;
 
-use crate::parse::{parse_signature, Arg, ArgError, SignatureError, Strings};
+use crate::parse::{parse_signature, Arg, ArgError, NumberType, SignatureError, Strings};
 use std::iter::Iterator;
 
 #[derive(Debug, Error)]
@@ -76,6 +76,75 @@ pub fn macro_function(
                                 ::boa_engine::JsNativeError::error().with_message(#msg),
                             ));
                         }
+                    };
+                }
+            }
+            Arg::OptionString(Strings::String) => {
+                quote! {
+                    let #ident = match args.get(#index_out) {
+                        Some(arg) => Some(arg.to_string(ctx)?.to_std_string_escaped()),
+                        None => None,
+                    };
+                }
+            }
+            Arg::Function => {
+                let msg = format!("Missing function argument: {}", name_in);
+                quote! {
+                    let func = args.get(#index_out);
+                    if func.is_none() {
+                        return Err(::boa_engine::JsError::from_native(
+                            ::boa_engine::JsNativeError::error()
+                            .with_message(#msg)
+                            .into()));
+                    }
+
+                    let func = func.unwrap();
+                    let func = func.as_object().unwrap();
+                    let func = JsFunction::from_object(func.clone()).expect("Function not found");
+
+                    let #ident = func;
+                }
+            }
+            Arg::OptionFunction => {
+                quote! {
+                    let func = args.get(#index_out);
+                    let #ident = if let Some(func) = func {
+                        let func = func.as_object().unwrap();
+                        let func = JsFunction::from_object(func.clone()).expect("Function not found");
+                        Some(func)
+                    } else {
+                        None
+                    };
+                }
+            }
+            Arg::Number(typ) => {
+                let msg = format!("Missing number argument: {}", name_in);
+                let number_type = match typ {
+                    NumberType::I32 => quote! { to_i32 },
+                    // NumberType::U32 => quote! { to_u32 },
+                    // NumberType::F64 => quote! { to_f64 },
+                };
+                quote! {
+                    let #ident = match args.get(#index_out) {
+                        Some(arg) => arg.#number_type(ctx).expect("Failed to convert to number"),
+                        None => {
+                            return Err(::boa_engine::JsError::from_native(
+                                ::boa_engine::JsNativeError::error().with_message(#msg),
+                            ));
+                        }
+                    };
+                }
+            }
+            Arg::OptionNumber(typ) => {
+                let number_type = match typ {
+                    NumberType::I32 => quote! { to_i32 },
+                    // NumberType::U32 => quote! { to_u32 },
+                    // NumberType::F64 => quote! { to_f64 },
+                };
+                quote! {
+                    let #ident = match args.get(#index_out) {
+                        Some(arg) => Some(arg.#number_type(ctx).expect("Failed to convert to number")),
+                        None => None,
                     };
                 }
             }

@@ -897,3 +897,28 @@ declare module 'module:web/streams.js' {
     WritableStreamDefaultWriter,
   };
 }
+
+declare module 'module:web/timeouts.js' {
+  declare global {
+    /**
+     * The `setTimeout()` function sets a timer which executes a function or specified piece of code once the timer expires.
+     *
+     * @param callback - The function to execute.
+     * @param ms - The number of milliseconds to wait before executing the code.
+     * @param args - Additional arguments to pass to the function.
+     */
+    export declare function setTimeout(
+      callback: (...args: any[]) => void,
+      ms: number,
+      ...args: any[]
+    ): number;
+
+    /**
+     * The `clearTimeout()` function cancels a timeout previously established by calling `setTimeout()`.
+     *
+     * @param id - The identifier of the timeout you want to cancel.
+     */
+    export declare function clearTimeout(id: number): void;
+  }
+  export { setTimeout, clearTimeout };
+}

@@ -5,7 +5,10 @@ edition = "2021"
 
 [dependencies]
 ike-core = { workspace = true }
+ike-function = { workspace = true }
 boa_engine = { workspace = true }
+smol = { workspace = true }
+futures-util = { workspace = true }
 
 [lib]
 path = "lib.rs"

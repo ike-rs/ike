@@ -6,6 +6,7 @@ import './modules/assert.d.ts';
 import './modules/_internal_.d.ts';
 import './modules/format.d.ts';
 import './modules/path.d.ts';
+import './console.d.ts';
 
 /**
  * The Meta interface contains information about the current file and its paths.
@@ -385,26 +386,6 @@ declare global {
    * @internal
    */
   function $rustFunction(name: string): Function;
-
-  /**
-   * The `setTimeout()` function sets a timer which executes a function or specified piece of code once the timer expires.
-   *
-   * @param callback - The function to execute.
-   * @param ms - The number of milliseconds to wait before executing the code.
-   * @param args - Additional arguments to pass to the function.
-   */
-  function setTimeout(
-    callback: (...args: any[]) => void,
-    ms: number,
-    ...args: any[]
-  ): number;
-
-  /**
-   * The `clearTimeout()` function cancels a timeout previously established by calling `setTimeout()`.
-   *
-   * @param id - The identifier of the timeout you want to cancel.
-   */
-  function clearTimeout(id: number): void;
 }
 
 export {};

@@ -2478,9 +2478,9 @@ checksum = "b7c388c1b5e93756d0c740965c41e8822f866621d41acbdf6336a6a168f8840c"
 
 [[package]]
 name = "smol"
-version = "2.0.0"
+version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e635339259e51ef85ac7aa29a1cd991b957047507288697a690e80ab97d07cad"
+checksum = "aad24f41392790e6ac67f4f4cd871da61f7d758e07b5622431e491e897d9c8a7"
 dependencies = [
  "async-channel 2.3.1",
  "async-executor",
@@ -2955,7 +2955,10 @@ name = "web"
 version = "0.1.0"
 dependencies = [
  "boa_engine",
+ "futures-util",
  "ike-core",
+ "ike-function",
+ "smol",
 ]
 
 [[package]]

@@ -29,7 +29,7 @@ declare global {
    * The global `console` object provides access to the console, enabling methods for logging,
    * informational output, and error reporting.
    */
-  const console: Console;
+  export declare const console: Console;
 }
 
 export {};

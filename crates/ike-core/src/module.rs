@@ -4,17 +4,22 @@ macro_rules! module {
         $name:ident,
         $spec:expr
         $(, js = [ $($js:expr),* ] )?
+        $(, exposed = { $($exposed_name:expr => $exposed_fn:expr),* $(,)? } )?
         $(,)?
     ) => {
+        use ike_core::exposed::ExposedFunction;
+
         #[derive(Debug, Clone, Copy)]
         pub struct $name {
             pub js_files: &'static [(&'static str, &'static str)],
-            pub spec: &'static str
+            pub spec: &'static str,
+            pub exposed_functions: &'static [ExposedFunction],
         }
 
         #[allow(dead_code)]
         impl $name {
             pub fn new() -> Self {
+                // Inicjalizowanie js_files jako stała, ponieważ include_str! jest const
                 const JS_FILES: &[(&'static str, &'static str)] = &[
                     $(
                         $(
@@ -22,7 +27,23 @@ macro_rules! module {
                         )*
                     )?
                 ];
-                Self { js_files: JS_FILES, spec: $spec }
+
+                let exposed_functions: &'static [ExposedFunction] = &[
+                    $(
+                        $(
+                            ExposedFunction {
+                                name: $exposed_name,
+                                function: $exposed_fn,
+                            },
+                        )*
+                    )?
+                ];
+
+                Self {
+                    js_files: JS_FILES,
+                    spec: $spec,
+                    exposed_functions,
+                }
             }
 
             #[inline(always)]

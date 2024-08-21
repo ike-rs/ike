@@ -21,7 +21,8 @@ thiserror = "1.0.63"
 boa_engine = { git = "https://github.com/boa-dev/boa.git", features = [
     "annex-b",
 ] }
-smol = "2.0.0"
+smol = "2.0.1"
+futures-util = "0.3.30"
 
 # Creates
 ike-fs = { version = "0.1.0", path = "crates/ike-fs" }

@@ -57,3 +57,11 @@ for (const prop in exports) {
 }
 
 globalThis.Ike.path = await import("@std/path");
+
+import {
+  clearTimeout as _clearTimeout,
+  setTimeout as _setTimeout,
+} from "module:web/timeouts.js";
+
+globalThis.setTimeout = _setTimeout;
+globalThis.clearTimeout = _clearTimeout;

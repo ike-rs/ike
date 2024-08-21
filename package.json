@@ -6,7 +6,8 @@
   },
   "private": true,
   "scripts": {
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "types": "cd packages/types && bun unbuild"
   },
   "type": "module"
 }

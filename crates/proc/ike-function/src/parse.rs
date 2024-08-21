@@ -102,6 +102,15 @@ pub enum Arg {
     Void,
     Special(Special),
     Option(Special),
+    Function,
+    OptionFunction,
+    Number(NumberType),
+    OptionNumber(NumberType),
+}
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum NumberType {
+    I32,
 }
 
 impl Arg {
@@ -114,6 +123,10 @@ impl Arg {
             COption(TString(string)) => Ok(Arg::OptionString(string)),
             CBare(TSpecial(special)) => Ok(Arg::Special(special)),
             COption(TSpecial(special)) => Ok(Arg::Option(special)),
+            CBare(TFunction) => Ok(Arg::Function),
+            COption(TFunction) => Ok(Arg::OptionFunction),
+            CBare(TNumber(typ)) => Ok(Arg::Number(typ)),
+            COption(TNumber(typ)) => Ok(Arg::OptionNumber(typ)),
             _ => unreachable!(),
         }
     }
@@ -135,6 +148,8 @@ pub enum Special {
 pub enum ParsedType {
     TString(Strings),
     TSpecial(Special),
+    TFunction,
+    TNumber(NumberType),
 }
 
 impl ParsedType {
@@ -143,6 +158,11 @@ impl ParsedType {
         match self {
             TString(Strings::CowByte) => Some(&[AttributeModifier::String(StringMode::OneByte)]),
             TString(..) => Some(&[AttributeModifier::String(StringMode::Default)]),
+            TFunction => match position {
+                Position::Arg => Some(&[AttributeModifier::Function]),
+                _ => None,
+            },
+            TNumber(..) => Some(&[AttributeModifier::Number(NumberType::I32)]),
             _ => None,
         }
     }
@@ -276,10 +296,15 @@ fn parse_type_path(
         ( Option < $ty:ty $(,)? > ) => {
           match parse_type(position, attrs, &ty)? {
             Arg::String(string) => Ok(COption(TString(string))),
+            Arg::Function => Ok(COption(TFunction)),
+            Arg::Number(typ) => Ok(COption(TNumber(typ))),
             _ => Err(ArgError::InvalidType(stringify_token(ty), "for option"))
           }
         }
-        (JsValue ) => Ok(CBare(TSpecial(Special::JsValue))),
+        ( i32 ) => Ok(CBare(TNumber(NumberType::I32))),
+        ( Option < i32 $(,)? > ) => Ok(COption(TNumber(NumberType::I32))),
+        ( JsValue ) => Ok(CBare(TSpecial(Special::JsValue))),
+        ( JsFunction ) => Ok(CBare(TFunction)),
         ( $any:ty ) => {
           Err(ArgError::InvalidTypePath(stringify_token(any)))
         }
@@ -318,7 +343,7 @@ pub(crate) fn parse_type(
 
     if let Some(primary) = attrs.primary {
         match primary {
-            AttributeModifier::String(_) => {}
+            _ => {}
         }
     };
     match ty {
@@ -329,70 +354,28 @@ pub(crate) fn parse_type(
                 Err(ArgError::InvalidType(stringify_token(ty), "for tuple"))
             }
         }
-        Type::Reference(of) => {
-            let mut_type = if of.mutability.is_some() {
-                RefType::Mut
-            } else {
-                RefType::Ref
-            };
-            match &*of.elem {
-                // Type::Slice(of) => {
-                //     if let Type::Path(path) = &*of.elem {
-                //         match parse_numeric_type(&path.path)? {
-                //             NumericArg::__VOID__ => Ok(Arg::External(External::Ptr(mut_type))),
-                //             numeric => {
-                //                 let res = CBare(TBuffer(BufferType::Slice(mut_type, numeric)));
-                //                 res.validate_attributes(position, attrs, &of)?;
-                //                 Arg::from_parsed(res, attrs).map_err(|_| {
-                //                     ArgError::InvalidType(stringify_token(ty), "for slice")
-                //                 })
-                //             }
-                //         }
-                //     } else {
-                //         Err(ArgError::InvalidType(stringify_token(ty), "for slice"))
-                //     }
-                // }
-                Type::Path(of) => {
-                    match parse_type_path(position, attrs, TypePathContext::Ref, of)? {
-                        CBare(TString(Strings::RefStr)) => Ok(Arg::String(Strings::RefStr)),
-                        COption(TString(Strings::RefStr)) => Ok(Arg::OptionString(Strings::RefStr)),
-                        _ => Err(ArgError::InvalidType(
-                            stringify_token(ty),
-                            "for reference path",
-                        )),
-                    }
-                }
-                _ => Err(ArgError::InvalidType(stringify_token(ty), "for reference")),
-            }
-        }
-        Type::Ptr(of) => {
-            let mut_type = if of.mutability.is_some() {
-                RefType::Mut
-            } else {
-                RefType::Ref
-            };
-            match &*of.elem {
-                Type::Path(of) => {
-                    match parse_type_path(position, attrs, TypePathContext::Ptr, of)? {
-                        // CBare(TNumeric(NumericArg::__VOID__)) => {
-                        //     Ok(Arg::External(External::Ptr(mut_type)))
-                        // }
-                        // CBare(TNumeric(numeric)) => {
-                        //     let res = CBare(TBuffer(BufferType::Ptr(mut_type, numeric)));
-                        //     res.validate_attributes(position, attrs, &of)?;
-                        //     Arg::from_parsed(res, attrs).map_err(|_| {
-                        //         ArgError::InvalidType(stringify_token(ty), "for numeric pointer")
-                        //     })
-                        // }
-                        _ => Err(ArgError::InvalidType(
-                            stringify_token(of),
-                            "for pointer to type path",
-                        )),
-                    }
-                }
-                _ => Err(ArgError::InvalidType(stringify_token(ty), "for pointer")),
-            }
-        }
+        Type::Reference(of) => match &*of.elem {
+            Type::Path(of) => match parse_type_path(position, attrs, TypePathContext::Ref, of)? {
+                CBare(TString(Strings::RefStr)) => Ok(Arg::String(Strings::RefStr)),
+                COption(TString(Strings::RefStr)) => Ok(Arg::OptionString(Strings::RefStr)),
+                CBare(TString(Strings::String)) => Ok(Arg::String(Strings::String)),
+                COption(TString(Strings::String)) => Ok(Arg::OptionString(Strings::String)),
+                CBare(TString(Strings::CowStr)) => Ok(Arg::String(Strings::CowStr)),
+                COption(TString(Strings::CowStr)) => Ok(Arg::OptionString(Strings::CowStr)),
+                CBare(TString(Strings::CowByte)) => Ok(Arg::String(Strings::CowByte)),
+                COption(TString(Strings::CowByte)) => Ok(Arg::OptionString(Strings::CowByte)),
+                CBare(TSpecial(Special::Context)) => Ok(Arg::Special(Special::Context)),
+                CBare(TSpecial(Special::JsValue)) => Ok(Arg::Special(Special::JsValue)),
+                CBare(TFunction) => Ok(Arg::Function),
+                COption(TFunction) => Ok(Arg::OptionFunction),
+
+                _ => Err(ArgError::InvalidType(
+                    stringify_token(ty),
+                    "for reference path",
+                )),
+            },
+            _ => Err(ArgError::InvalidType(stringify_token(ty), "for reference")),
+        },
         Type::Path(of) => Arg::from_parsed(
             parse_type_path(position, attrs, TypePathContext::None, of)?,
             attrs,
@@ -437,29 +420,36 @@ fn parse_attributes(attributes: &[Attribute]) -> Result<Attributes, AttributeErr
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum AttributeModifier {
     String(StringMode),
+    Function,
+    Number(NumberType),
 }
 
 impl AttributeModifier {
     fn name(&self) -> &'static str {
         match self {
             AttributeModifier::String(_) => "string",
+            AttributeModifier::Function => "function",
+            AttributeModifier::Number(typ) => match typ {
+                NumberType::I32 => "i32",
+            },
         }
     }
 }
 
 fn parse_attribute(attr: &Attribute) -> Result<Option<AttributeModifier>, AttributeError> {
     let tokens = attr.into_token_stream();
-    if matches!(attr.style, AttrStyle::Inner(_)) {
-        return Err(AttributeError::InvalidInnerAttribute);
-    }
     let res = std::panic::catch_unwind(|| {
         rules!(tokens => {
-          (#[string]) => Some(AttributeModifier::String(StringMode::Default)),
-          (#[string(onebyte)]) => Some(AttributeModifier::String(StringMode::OneByte)),
-          (#[allow ($_rule:path)]) => None,
-          (#[doc = $_attr:literal]) => None,
-          (#[cfg $_cfg:tt]) => None,
-          (#[meta ($($_key: ident = $_value: literal),*)]) => None,
+            (#[string]) => Some(AttributeModifier::String(StringMode::Default)),
+            (#[string(onebyte)]) => Some(AttributeModifier::String(StringMode::OneByte)),
+            (#[function]) => Some(AttributeModifier::Function),
+            (#[i32]) => Some(AttributeModifier::Number(NumberType::I32)),
+
+            // Other
+            (#[allow ($_rule:path)]) => None,
+            (#[doc = $_attr:literal]) => None,
+            (#[cfg $_cfg:tt]) => None,
+            (#[meta ($($_key: ident = $_value: literal),*)]) => None,
         })
     })
     .map_err(|_| AttributeError::InvalidAttribute(stringify_token(attr)))?;
@@ -481,38 +471,6 @@ pub enum ReturnValue {
     FutureResult(Arg),
     ResultFuture(Arg),
     ResultFutureResult(Arg),
-}
-
-impl ReturnValue {
-    pub fn is_async(&self) -> bool {
-        use ReturnValue::*;
-        matches!(
-            self,
-            Future(..) | FutureResult(..) | ResultFuture(..) | ResultFutureResult(..)
-        )
-    }
-
-    pub fn unwrap_result(&self) -> Option<ReturnValue> {
-        use ReturnValue::*;
-        Some(match self {
-            Result(arg) => Infallible(arg.clone()),
-            ResultFuture(arg) => Future(arg.clone()),
-            ResultFutureResult(arg) => FutureResult(arg.clone()),
-            _ => return None,
-        })
-    }
-
-    pub fn arg(&self) -> &Arg {
-        use ReturnValue::*;
-        match self {
-            Infallible(arg)
-            | Result(arg)
-            | Future(arg)
-            | FutureResult(arg)
-            | ResultFuture(arg)
-            | ResultFutureResult(arg) => arg,
-        }
-    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

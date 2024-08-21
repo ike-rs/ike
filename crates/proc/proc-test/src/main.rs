@@ -1,9 +1,8 @@
-use boa_engine::{js_string, Context, JsResult, JsValue};
+use boa_engine::{object::builtins::JsFunction, Context, JsResult, JsValue};
 use ike_function::ike_function;
 
 #[ike_function]
-fn test_func(#[string] name: String) {
-    println!("Hello, {}", name);
+fn test_func(#[function] name: JsFunction) {
     Ok(JsValue::undefined())
 }
 
