@@ -8,17 +8,14 @@ macro_rules! module {
         $(,)?
     ) => {
         use ike_core::exposed::ExposedFunction;
+        use ike_core::ModuleTrait;
 
         #[derive(Debug, Clone, Copy)]
-        pub struct $name {
-            pub js_files: &'static [(&'static str, &'static str)],
-            pub spec: &'static str,
-            pub exposed_functions: &'static [ExposedFunction],
-        }
+        pub struct $name;
 
         #[allow(dead_code)]
-        impl $name {
-            pub fn new() -> Self {
+        impl ModuleTrait for $name {
+            fn js_files(&self) -> &'static [(&'static str, &'static str)] {
                 const JS_FILES: &[(&'static str, &'static str)] = &[
                     $(
                         $(
@@ -26,7 +23,14 @@ macro_rules! module {
                         )*
                     )?
                 ];
+                JS_FILES
+            }
 
+            fn spec(&self) -> &'static str {
+                $spec
+            }
+
+            fn exposed_functions(&self) -> &'static [ExposedFunction] {
                 let exposed_functions: &'static [ExposedFunction] = &[
                     $(
                         $(
@@ -37,21 +41,7 @@ macro_rules! module {
                         )*
                     )?
                 ];
-
-                Self {
-                    js_files: JS_FILES,
-                    spec: $spec,
-                    exposed_functions,
-                }
-            }
-
-            #[inline(always)]
-            pub fn cwd(self) -> &'static str {
-                env!("CARGO_MANIFEST_DIR")
-            }
-
-            pub fn name_for(self, file: &'static str) -> String {
-                format!("module:{}/{}", self.spec, file)
+                exposed_functions
             }
         }
     };

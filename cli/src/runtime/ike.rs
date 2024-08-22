@@ -1,11 +1,5 @@
-use super::fs::dir::create_dir_async;
-use super::fs::files::{create_file_async, read_file_async, read_text_file_async};
-use super::fs::{remove_async, remove_sync};
 use super::meta::Meta;
 use crate::globals::ALLOWED_EXTENSIONS;
-use crate::runtime::fs::dir::create_dir_sync;
-use crate::runtime::fs::exists_sync;
-use crate::runtime::fs::files::{create_file_sync, read_file_sync, read_text_file_sync};
 use crate::runtime::toml::parse_toml;
 use crate::transpiler::{transpile, transpile_with_text};
 use crate::which::which;
@@ -45,67 +39,6 @@ impl IkeGlobalObject {
         obj.function(create_method!(Self::is_linux), js_string!("isLinux"), 0);
         obj.function(create_method!(Self::is_macos), js_string!("isMacOS"), 0);
         obj.function(create_method!(Self::cwd), js_string!("cwd"), 0);
-
-        obj.function(
-            NativeFunction::from_fn_ptr(read_text_file_sync),
-            js_string!("readTextFileSync"),
-            1,
-        );
-
-        obj.function(
-            NativeFunction::from_fn_ptr(read_text_file_async),
-            js_string!("readTextFile"),
-            1,
-        );
-
-        obj.function(
-            NativeFunction::from_fn_ptr(read_file_sync),
-            js_string!("readFileSync"),
-            1,
-        );
-
-        obj.function(
-            NativeFunction::from_fn_ptr(read_file_async),
-            js_string!("readFile"),
-            1,
-        );
-
-        obj.function(
-            NativeFunction::from_fn_ptr(create_file_sync),
-            js_string!("createFileSync"),
-            1,
-        );
-        obj.function(
-            NativeFunction::from_fn_ptr(create_file_async),
-            js_string!("createFile"),
-            1,
-        );
-        obj.function(
-            NativeFunction::from_fn_ptr(create_dir_sync),
-            js_string!("createDirSync"),
-            1,
-        );
-        obj.function(
-            NativeFunction::from_fn_ptr(create_dir_async),
-            js_string!("createDir"),
-            1,
-        );
-        obj.function(
-            NativeFunction::from_fn_ptr(exists_sync),
-            js_string!("existsSync"),
-            1,
-        );
-        obj.function(
-            NativeFunction::from_fn_ptr(remove_sync),
-            js_string!("removeSync"),
-            1,
-        );
-        obj.function(
-            NativeFunction::from_fn_ptr(remove_async),
-            js_string!("remove"),
-            1,
-        );
-
         obj.function(
             NativeFunction::from_fn_ptr(parse_toml),
             js_string!("parseToml"),

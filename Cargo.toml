@@ -9,6 +9,7 @@ members = [
     "modules/web",
     "crates/proc/ike-function",
     "crates/proc/proc-test",
+    "modules/fs",
 ]
 resolver = "1"
 
@@ -23,6 +24,8 @@ boa_engine = { git = "https://github.com/boa-dev/boa.git", features = [
 ] }
 smol = "2.0.1"
 futures-util = "0.3.30"
+tokio = { version = "1.39.3", features = ["full"] }
+winapi = { version = '0.3.9', features = ["winbase"] }
 
 # Creates
 ike-fs = { version = "0.1.0", path = "crates/ike-fs" }
@@ -33,3 +36,4 @@ ike-function = { version = "0.1.0", path = "crates/proc/ike-function" }
 
 # Modules
 web = { version = "0.1.0", path = "modules/web" }
+fs = { version = "0.1.0", path = "modules/fs" }

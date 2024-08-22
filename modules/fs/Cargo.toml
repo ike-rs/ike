@@ -1,0 +1,18 @@
+[package]
+name = "fs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ike-core = { workspace = true }
+ike-function = { workspace = true }
+boa_engine = { workspace = true }
+smol = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+winapi = { workspace = true }
+
+[lib]
+path = "lib.rs"

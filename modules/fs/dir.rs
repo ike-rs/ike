@@ -1,14 +1,13 @@
-use crate::runtime::{
-    fs::{resolve_path_from_args, FileSystem},
-    promise::base_promise,
-};
 use boa_engine::{
     builtins::promise::ResolvingFunctions, js_string, object::builtins::JsPromise, Context,
     JsNativeError, JsResult, JsValue,
 };
+use ike_core::promise::base_promise;
 use std::path::Path;
 
-pub fn create_dir_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+use crate::{resolve_path_from_args, FileSystem};
+
+pub fn create_dir_sync_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let (path, recursive, mode) = resolve_create_dir_args(args, ctx)?;
     let path = Path::new(&path);
     let result = FileSystem::create_dir(path, recursive, mode);
@@ -19,7 +18,7 @@ pub fn create_dir_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
     }
 }
 
-pub fn create_dir_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn create_dir_async_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let (path, recursive, mode) = resolve_create_dir_args(args, ctx)?;
     let path = Path::new(&path);
 

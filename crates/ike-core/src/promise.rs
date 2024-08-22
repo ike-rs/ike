@@ -3,8 +3,7 @@ use boa_engine::{
     NativeFunction,
 };
 
-use crate::get_prototype_name;
-use ike_core::js_str_to_string;
+use crate::{get_prototype_name, js_str_to_string};
 
 pub fn base_promise(promise: JsPromise, ctx: &mut Context) -> JsPromise {
     promise

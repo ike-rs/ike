@@ -1,20 +1,17 @@
-// Based on deno implementation
-
-use crate::fs::normalize_p;
 use anyhow::{anyhow, Result};
 use boa_engine::builtins::promise::ResolvingFunctions;
 use boa_engine::object::builtins::JsPromise;
 use boa_engine::{Context, JsNativeError, JsResult, JsString, JsValue};
 use dir::get_recursive_flag;
+use ike_core::module;
+use ike_core::promise::base_promise;
 use ike_core::throw;
 use smol::block_on;
 use std::env::current_dir;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 use std::{fs, io};
 use tokio::task::spawn_blocking;
-
-use super::promise::base_promise;
 
 pub mod dir;
 pub mod files;
@@ -110,7 +107,7 @@ impl FileSystem {
     }
 }
 
-pub fn remove_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn remove_sync_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -122,7 +119,7 @@ pub fn remove_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult
     }
 }
 
-pub fn remove_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn remove_async_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -155,7 +152,7 @@ pub fn remove_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResul
     result
 }
 
-pub fn exists_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn exists_sync_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -196,6 +193,34 @@ impl File {
     }
 }
 
+#[inline]
+pub fn normalize_p<P: AsRef<Path>>(path: P) -> PathBuf {
+    let mut components = path.as_ref().components().peekable();
+    let mut ret = if let Some(c @ Component::Prefix(..)) = components.peek().cloned() {
+        components.next();
+        PathBuf::from(c.as_os_str())
+    } else {
+        PathBuf::new()
+    };
+
+    for component in components {
+        match component {
+            Component::Prefix(..) => unreachable!(),
+            Component::RootDir => {
+                ret.push(component.as_os_str());
+            }
+            Component::CurDir => {}
+            Component::ParentDir => {
+                ret.pop();
+            }
+            Component::Normal(c) => {
+                ret.push(c);
+            }
+        }
+    }
+    ret
+}
+
 #[inline(always)]
 pub fn open_file(path: &Path) -> Result<std::fs::File> {
     let path_bytes = path.as_os_str().as_encoded_bytes();
@@ -229,3 +254,17 @@ pub fn open_file(path: &Path) -> Result<std::fs::File> {
 
     std::fs::File::open(&path).map_err(Into::into)
 }
+
+module!(FsModule, "fs", js = ["fs.js"], exposed = {
+    "remove_sync_ex" => remove_sync_ex,
+    "remove_async_ex" => remove_async_ex,
+    "exists_sync_ex" => exists_sync_ex,
+    "create_dir_sync_ex" => dir::create_dir_sync_ex,
+    "create_dir_async_ex" => dir::create_dir_async_ex,
+    "create_file_sync_ex" => files::create_file_sync_ex,
+    "create_file_async_ex" => files::create_file_async_ex,
+    "read_text_file_sync_ex" => files::read_text_file_sync_ex,
+    "read_text_file_async_ex" => files::read_text_file_async_ex,
+    "read_file_async_ex" => files::read_file_async_ex,
+    "read_file_sync_ex" => files::read_file_sync_ex,
+},);

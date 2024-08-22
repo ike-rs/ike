@@ -24,6 +24,14 @@ const registerGlobal = (name, value) => {
     });
 };
 
+const registerIkeGlobal = (name, value) => {
+    Object.defineProperty(globalThis.Ike, name, {
+        value,
+        writable: true,
+        configurable: true,
+    });
+};
+
 const exports = {
     ReadableStream,
     ReadableStreamDefaultController,
@@ -52,6 +60,40 @@ const exports = {
 for (const prop in exports) {
     if (Object.prototype.hasOwnProperty.call(exports, prop)) {
         registerGlobal(prop, exports[prop]);
+    }
+}
+
+import {
+    createDir,
+    createDirSync,
+    createFile,
+    createFileSync,
+    existsSync,
+    readFile,
+    readFileSync,
+    readTextFile,
+    readTextFileSync,
+    remove,
+    removeSync,
+} from "module:fs/fs.js";
+
+const ikeExports = {
+    createDir,
+    createDirSync,
+    createFile,
+    createFileSync,
+    existsSync,
+    readFile,
+    readFileSync,
+    readTextFile,
+    readTextFileSync,
+    remove,
+    removeSync,
+};
+
+for (const prop in ikeExports) {
+    if (Object.prototype.hasOwnProperty.call(ikeExports, prop)) {
+        registerIkeGlobal(prop, ikeExports[prop]);
     }
 }
 

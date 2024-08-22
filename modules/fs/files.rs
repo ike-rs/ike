@@ -1,15 +1,16 @@
-use crate::runtime::fs::{resolve_path_from_args, FileSystem};
-use crate::runtime::promise::base_promise;
 use boa_engine::builtins::promise::ResolvingFunctions;
 use boa_engine::object::builtins::{JsArrayBuffer, JsPromise, JsUint8Array};
 use boa_engine::{js_string, Context, JsNativeError, JsResult, JsValue};
+use ike_core::promise::base_promise;
 use smol::block_on;
 use std::path::Path;
+
+use crate::{resolve_path_from_args, FileSystem};
 
 use super::{open_file, File};
 use ike_core::throw;
 
-pub fn read_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn read_file_sync_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -43,7 +44,7 @@ pub async fn read_file_async_base(path: &Path, ctx: &mut Context) -> anyhow::Res
     Ok(uint8_array)
 }
 
-pub fn read_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn read_file_async_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -77,7 +78,11 @@ pub fn read_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
     result
 }
 
-pub fn read_text_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn read_text_file_sync_ex(
+    _: &JsValue,
+    args: &[JsValue],
+    ctx: &mut Context,
+) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -108,7 +113,11 @@ pub async fn read_text_file_async_base(path: &Path) -> anyhow::Result<String> {
     Ok(String::from_utf8(contents).unwrap())
 }
 
-pub fn read_text_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn read_text_file_async_ex(
+    _: &JsValue,
+    args: &[JsValue],
+    ctx: &mut Context,
+) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -145,7 +154,7 @@ pub fn read_text_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) ->
 
 // TODO: implement FsFile and return it in both create_file_sync and create_file_async
 
-pub fn create_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn create_file_sync_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = &str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);
@@ -156,7 +165,7 @@ pub fn create_file_sync(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsR
     }
 }
 
-pub fn create_file_async(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
+pub fn create_file_async_ex(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsValue> {
     let str_path = resolve_path_from_args(args, ctx)?;
     let str_path = str_path.to_std_string().unwrap();
     let path = Path::new(&str_path);

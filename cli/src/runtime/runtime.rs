@@ -10,13 +10,14 @@ use super::{
 };
 use crate::runtime::web::headers::Headers;
 use crate::runtime::web::url::{URLSearchParams, URL};
+use crate::testing::js::JsTest;
 use crate::transpiler::transpile;
-use crate::{get_prototype_name, testing::js::JsTest};
 use boa_engine::{
-    builtins::promise::PromiseState, js_str, js_string, property::Attribute, Context,
+    builtins::promise::PromiseState, js_str, js_string, module, property::Attribute, Context,
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
 };
-use ike_core::{js_str_to_string, throw};
+use fs::FsModule;
+use ike_core::{get_prototype_name, js_str_to_string, throw, ModuleTrait};
 use ike_logger::{cond_log, Logger};
 use smol::LocalExecutor;
 use std::{
@@ -57,30 +58,43 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
 }
 
 pub fn load_modules(ctx: &mut Context, module_loader: Rc<IkeModuleLoader>) -> JsResult<()> {
-    let modules = vec![WebModule::new()];
+    let modules: Vec<(&dyn ModuleTrait, Rc<IkeModuleLoader>)> = vec![
+        (&WebModule, Rc::clone(&module_loader)),
+        (&FsModule, module_loader),
+    ];
 
-    for module in modules {
-        let files = module.js_files;
-        let exposed = module.exposed_functions;
-        for exposed_fn in exposed.iter() {
-            ctx.register_global_builtin_callable(
-                js_string!(exposed_fn.name),
-                0,
-                NativeFunction::from_fn_ptr(exposed_fn.function),
-            )
-            .expect(&format!(
-                "Failed to set exposed function {:?}",
-                exposed_fn.name
-            ));
-        }
+    for (module, loader) in modules {
+        load_module(ctx, module, loader)?;
+    }
 
-        for (file, content) in files {
-            let path = Path::new(module.cwd()).join(file);
-            let result = Source::from_bytes(content.as_bytes()).with_path(&path);
+    Ok(())
+}
 
-            let parsed_module = Module::parse(result, None, ctx)?;
-            module_loader.insert(PathBuf::from(module.name_for(file)), parsed_module);
-        }
+pub fn load_module(
+    ctx: &mut Context,
+    module: &dyn ModuleTrait,
+    module_loader: Rc<IkeModuleLoader>,
+) -> JsResult<()> {
+    let files = module.js_files();
+    let exposed = module.exposed_functions();
+    for exposed_fn in exposed.iter() {
+        ctx.register_global_builtin_callable(
+            js_string!(exposed_fn.name),
+            0,
+            NativeFunction::from_fn_ptr(exposed_fn.function),
+        )
+        .expect(&format!(
+            "Failed to set exposed function {:?}",
+            exposed_fn.name
+        ));
+    }
+
+    for (file, content) in files {
+        let path = Path::new(module.cwd()).join(file);
+        let result = Source::from_bytes(content.as_bytes()).with_path(&path);
+
+        let parsed_module = Module::parse(result, None, ctx)?;
+        module_loader.insert(PathBuf::from(module.name_for(file)), parsed_module);
     }
 
     Ok(())

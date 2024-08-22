@@ -11,7 +11,7 @@ use boa_engine::{
     object::builtins::{JsArray, JsFunction},
     Context, JsNativeError, JsResult, JsValue, Module, Source,
 };
-use ike_core::{js_str_to_string, throw};
+use ike_core::{get_prototype_name, js_str_to_string, throw};
 use smol::LocalExecutor;
 
 use ike_logger::{cond_log, log, new_line, print_indent, Logger};
@@ -19,7 +19,6 @@ use ike_logger::{cond_log, log, new_line, print_indent, Logger};
 use crate::{
     cli::run_command::Entry,
     format::format_time,
-    get_prototype_name,
     runtime::{
         modules::IkeModuleLoader,
         queue::Queue,
