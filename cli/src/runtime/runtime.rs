@@ -6,7 +6,6 @@ use super::{
     modules::IkeModuleLoader,
     queue::Queue,
     terminal::{Terminal, TerminalStdin},
-    web::encoding::{TextDecoder, TextEncoder},
 };
 use crate::runtime::web::headers::Headers;
 use crate::runtime::web::url::{URLSearchParams, URL};
@@ -178,10 +177,6 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
         },
     ];
 
-    ctx.register_global_class::<TextEncoder>()
-        .expect("TextEncoder is already defined");
-    ctx.register_global_class::<TextDecoder>()
-        .expect("TextDecoder is already defined");
     ctx.register_global_class::<URL>()
         .expect("URL is already defined");
     ctx.register_global_class::<URLSearchParams>()

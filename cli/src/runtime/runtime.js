@@ -32,6 +32,8 @@ const registerIkeGlobal = (name, value) => {
     });
 };
 
+import { TextDecoder, TextEncoder } from "module:web/encoding.js";
+
 const exports = {
     ReadableStream,
     ReadableStreamDefaultController,
@@ -55,6 +57,9 @@ const exports = {
 
     atob,
     btoa,
+
+    TextDecoder,
+    TextEncoder,
 };
 
 for (const prop in exports) {

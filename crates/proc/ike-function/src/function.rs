@@ -148,6 +148,27 @@ pub fn macro_function(
                     };
                 }
             }
+            Arg::Bool => {
+                let msg = format!("Missing boolean argument: {}", name_in);
+                quote! {
+                    let #ident = match args.get(#index_out) {
+                        Some(arg) => arg.to_boolean(),
+                        None => {
+                            return Err(::boa_engine::JsError::from_native(
+                                ::boa_engine::JsNativeError::error().with_message(#msg),
+                            ));
+                        }
+                    };
+                }
+            }
+            Arg::OptionBool => {
+                quote! {
+                    let #ident = match args.get(#index_out) {
+                        Some(arg) => Some(arg.to_boolean()),
+                        None => None,
+                    };
+                }
+            }
             _ => {
                 return Err(MacroFunctionError::MappingError(
                     MappingError::NoArgMapping("context", arg.clone()),

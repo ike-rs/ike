@@ -33,3 +33,9 @@ export const assertNotEquals = (actual: any, expected: any, msg: string) => {
   }
   throw new AssertionError(`Values are the same for ${actualStr}. ${msg}`);
 };
+
+export const assertProto = (self: any, proto: any) => {
+  if (!(self instanceof proto)) {
+    throw new TypeError('Illegal invocation');
+  }
+};

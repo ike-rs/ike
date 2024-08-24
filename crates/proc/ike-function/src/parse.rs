@@ -106,6 +106,8 @@ pub enum Arg {
     OptionFunction,
     Number(NumberType),
     OptionNumber(NumberType),
+    Bool,
+    OptionBool,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -127,6 +129,8 @@ impl Arg {
             COption(TFunction) => Ok(Arg::OptionFunction),
             CBare(TNumber(typ)) => Ok(Arg::Number(typ)),
             COption(TNumber(typ)) => Ok(Arg::OptionNumber(typ)),
+            CBare(TBool) => Ok(Arg::Bool),
+            COption(TBool) => Ok(Arg::OptionBool),
             _ => unreachable!(),
         }
     }
@@ -150,6 +154,7 @@ pub enum ParsedType {
     TSpecial(Special),
     TFunction,
     TNumber(NumberType),
+    TBool,
 }
 
 impl ParsedType {
@@ -163,6 +168,7 @@ impl ParsedType {
                 _ => None,
             },
             TNumber(..) => Some(&[AttributeModifier::Number(NumberType::I32)]),
+            TBool => Some(&[AttributeModifier::Bool]),
             _ => None,
         }
     }
@@ -272,9 +278,7 @@ fn parse_type_path(
     use ParsedTypeContainer::*;
 
     let tokens = tp.clone().into_token_stream();
-    /** if let Ok(numeric) = parse_numeric_type(&tp.path) {
-        CBare(TNumeric(numeric))
-    } else **/
+
     let res = {
         std::panic::catch_unwind(|| {
       rules!(tokens => {
@@ -298,6 +302,7 @@ fn parse_type_path(
             Arg::String(string) => Ok(COption(TString(string))),
             Arg::Function => Ok(COption(TFunction)),
             Arg::Number(typ) => Ok(COption(TNumber(typ))),
+            Arg::Bool => Ok(COption(TBool)),
             _ => Err(ArgError::InvalidType(stringify_token(ty), "for option"))
           }
         }
@@ -305,6 +310,7 @@ fn parse_type_path(
         ( Option < i32 $(,)? > ) => Ok(COption(TNumber(NumberType::I32))),
         ( JsValue ) => Ok(CBare(TSpecial(Special::JsValue))),
         ( JsFunction ) => Ok(CBare(TFunction)),
+        ( bool ) => Ok(CBare(TBool)),
         ( $any:ty ) => {
           Err(ArgError::InvalidTypePath(stringify_token(any)))
         }
@@ -422,6 +428,7 @@ pub enum AttributeModifier {
     String(StringMode),
     Function,
     Number(NumberType),
+    Bool,
 }
 
 impl AttributeModifier {
@@ -432,6 +439,7 @@ impl AttributeModifier {
             AttributeModifier::Number(typ) => match typ {
                 NumberType::I32 => "i32",
             },
+            AttributeModifier::Bool => "bool",
         }
     }
 }
@@ -444,6 +452,7 @@ fn parse_attribute(attr: &Attribute) -> Result<Option<AttributeModifier>, Attrib
             (#[string(onebyte)]) => Some(AttributeModifier::String(StringMode::OneByte)),
             (#[function]) => Some(AttributeModifier::Function),
             (#[i32]) => Some(AttributeModifier::Number(NumberType::I32)),
+            (#[bool]) => Some(AttributeModifier::Bool),
 
             // Other
             (#[allow ($_rule:path)]) => None,

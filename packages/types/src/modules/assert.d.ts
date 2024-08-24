@@ -57,4 +57,13 @@ declare module '@std/assert' {
     expected: T,
     msg: string,
   ) => void;
+
+  /**
+   * Asserts that an object is an instance of a class.
+   *
+   * @param {any} self - The object to be tested.
+   * @param {any} proto - The class to test against.
+   * @throws {TypeError} If the object is not an instance of the class.
+   */
+  export const assertProto: (self: any, proto: any) => void;
 }

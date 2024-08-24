@@ -165,6 +165,14 @@ const toString = (val: unknown): string => {
   return String(val);
 };
 
+const isSharedArrayBuffer = (value: any): value is SharedArrayBuffer => {
+  return value instanceof SharedArrayBuffer;
+};
+
+const isDataView = (value: any): value is DataView => {
+  return value instanceof DataView || (isObject(value) && 'buffer' in value);
+};
+
 export {
   isTypedArray,
   isArrayBuffer,
@@ -173,4 +181,6 @@ export {
   getArgument,
   isObject,
   toString,
+  isSharedArrayBuffer,
+  isDataView,
 };

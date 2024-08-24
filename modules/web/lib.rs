@@ -4,6 +4,7 @@ use ike_core::throw;
 use ike_function::ike_function;
 use timeouts::{clear_timeout_ex, set_timeout_ex};
 
+pub mod encoding;
 pub mod timeouts;
 
 #[ike_function]
@@ -27,11 +28,14 @@ pub fn btoa(#[string] data: String) {
 ike_core::module!(
     WebModule,
     "web",
-    js = ["streams.js", "timeouts.js", "base64.js"],
+    js = ["streams.js", "timeouts.js", "base64.js", "encoding.js"],
     exposed = {
         "set_timeout_ex" => set_timeout_ex,
         "clear_timeout_ex" => clear_timeout_ex,
         "atob_ex" => atob,
         "btoa_ex" => btoa,
+        "decode_ex" => encoding::decode,
+        "encode_ex" => encoding::encode,
+        "encode_into_ex" => encoding::encode_into,
     }
 );
