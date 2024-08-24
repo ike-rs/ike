@@ -1,6 +1,6 @@
 use boa_engine::{
     object::builtins::{JsArrayBuffer, JsTypedArray},
-    Context, JsNativeError, JsResult, JsString, JsValue,
+    Context, JsNativeError, JsResult, JsValue,
 };
 use ike_core::throw;
 use simdutf::{validate_ascii, validate_utf8};
@@ -13,13 +13,19 @@ pub fn is_ascii_string(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsRe
     let obj = args.first().unwrap().as_object();
 
     if obj.is_none() {
-        throw!(err, "Expected ArrayBuffer, TypedArray");
+        throw!(
+            err,
+            "Expected argument in isAscii to be ArrayBuffer, TypedArray"
+        );
     }
     let obj = obj.unwrap();
     let typed_arr = JsTypedArray::from_object(obj.clone());
 
     if typed_arr.is_err() {
-        throw!(err, "Expected ArrayBuffer, TypedArray");
+        throw!(
+            err,
+            "Expected argument in isAscii to be ArrayBuffer, TypedArray"
+        );
     }
 
     let typed_arr = typed_arr.unwrap();
@@ -41,16 +47,21 @@ pub fn is_utf8(_: &JsValue, args: &[JsValue], ctx: &mut Context) -> JsResult<JsV
     }
 
     let obj = args.first().unwrap().as_object();
-
     if obj.is_none() {
-        throw!(err, "Expected ArrayBuffer, TypedArray");
+        throw!(
+            err,
+            "Expected argument in isUtf8 to be ArrayBuffer or TypedArray"
+        );
     }
 
     let obj = obj.unwrap();
     let typed_arr = JsTypedArray::from_object(obj.clone());
 
     if typed_arr.is_err() {
-        throw!(err, "Expected ArrayBuffer, TypedArray");
+        throw!(
+            err,
+            "Expected argument in isUtf8 to be ArrayBuffer or TypedArray"
+        );
     }
 
     let typed_arr = typed_arr.unwrap();

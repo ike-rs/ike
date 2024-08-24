@@ -1,7 +1,6 @@
 use anyhow::Result;
 use ike_fs::FsError::{FailedToReadFile, FailedToReadFileWithError, FileNotFound};
 use regex::Regex;
-use std::path::Component;
 use std::{
     fs::File,
     io::{ErrorKind, Read},
