@@ -1,9 +1,3 @@
-/**
- * Checks if a value is a typed array.
- *
- * @param value - The value to check.
- * @returns `true` if the value is a typed array, `false` otherwise.
- */
 const isTypedArray = (value: any): value is TypedArray => {
   return (
     value instanceof Int8Array ||

@@ -1,105 +1,108 @@
 import {
-    ByteLengthQueuingStrategy,
-    CountQueuingStrategy,
-    ReadableByteStreamController,
-    ReadableStream,
-    ReadableStreamBYOBReader,
-    ReadableStreamBYOBRequest,
-    ReadableStreamDefaultController,
-    ReadableStreamDefaultReader,
-    TransformStream,
-    TransformStreamDefaultController,
-    WritableStream,
-    WritableStreamDefaultController,
-    WritableStreamDefaultWriter,
-} from "@std/streams";
-import { clearTimeout, setTimeout } from "module:web/timeouts.js";
-import { atob, btoa } from "module:web/base64.js";
+  ByteLengthQueuingStrategy,
+  CountQueuingStrategy,
+  ReadableByteStreamController,
+  ReadableStream,
+  ReadableStreamBYOBReader,
+  ReadableStreamBYOBRequest,
+  ReadableStreamDefaultController,
+  ReadableStreamDefaultReader,
+  TransformStream,
+  TransformStreamDefaultController,
+  WritableStream,
+  WritableStreamDefaultController,
+  WritableStreamDefaultWriter,
+} from '@std/streams';
+import { clearTimeout, setTimeout } from 'module:web/timeouts.js';
+import { atob, btoa } from 'module:web/base64.js';
 
 const registerGlobal = (name, value) => {
-    Object.defineProperty(globalThis, name, {
-        value,
-        writable: true,
-        configurable: true,
-    });
+  Object.defineProperty(globalThis, name, {
+    value,
+    writable: true,
+    configurable: true,
+  });
 };
 
 const registerIkeGlobal = (name, value) => {
-    Object.defineProperty(globalThis.Ike, name, {
-        value,
-        writable: true,
-        configurable: true,
-    });
+  Object.defineProperty(globalThis.Ike, name, {
+    value,
+    writable: true,
+    configurable: true,
+  });
 };
 
-import { TextDecoder, TextEncoder } from "module:web/encoding.js";
+import { TextDecoder, TextEncoder } from 'module:web/encoding.js';
+import { Headers } from 'module:web/headers.js';
 
 const exports = {
-    ReadableStream,
-    ReadableStreamDefaultController,
-    ReadableByteStreamController,
-    ReadableStreamBYOBRequest,
-    ReadableStreamDefaultReader,
-    ReadableStreamBYOBReader,
+  ReadableStream,
+  ReadableStreamDefaultController,
+  ReadableByteStreamController,
+  ReadableStreamBYOBRequest,
+  ReadableStreamDefaultReader,
+  ReadableStreamBYOBReader,
 
-    WritableStream,
-    WritableStreamDefaultController,
-    WritableStreamDefaultWriter,
+  WritableStream,
+  WritableStreamDefaultController,
+  WritableStreamDefaultWriter,
 
-    ByteLengthQueuingStrategy,
-    CountQueuingStrategy,
+  ByteLengthQueuingStrategy,
+  CountQueuingStrategy,
 
-    TransformStream,
-    TransformStreamDefaultController,
+  TransformStream,
+  TransformStreamDefaultController,
 
-    setTimeout,
-    clearTimeout,
+  setTimeout,
+  clearTimeout,
 
-    atob,
-    btoa,
+  atob,
+  btoa,
 
-    TextDecoder,
-    TextEncoder,
+  TextDecoder,
+  TextEncoder,
+
+  Headers,
 };
 
 for (const prop in exports) {
-    if (Object.prototype.hasOwnProperty.call(exports, prop)) {
-        registerGlobal(prop, exports[prop]);
-    }
+  if (Object.prototype.hasOwnProperty.call(exports, prop)) {
+    registerGlobal(prop, exports[prop]);
+  }
 }
 
 import {
-    createDir,
-    createDirSync,
-    createFile,
-    createFileSync,
-    existsSync,
-    readFile,
-    readFileSync,
-    readTextFile,
-    readTextFileSync,
-    remove,
-    removeSync,
-} from "module:fs/fs.js";
+  createDir,
+  createDirSync,
+  createFile,
+  createFileSync,
+  existsSync,
+  readFile,
+  readFileSync,
+  readTextFile,
+  readTextFileSync,
+  remove,
+  removeSync,
+} from 'module:fs/fs.js';
 
 const ikeExports = {
-    createDir,
-    createDirSync,
-    createFile,
-    createFileSync,
-    existsSync,
-    readFile,
-    readFileSync,
-    readTextFile,
-    readTextFileSync,
-    remove,
-    removeSync,
+  createDir,
+  createDirSync,
+  createFile,
+  createFileSync,
+  existsSync,
+  readFile,
+  readFileSync,
+  readTextFile,
+  readTextFileSync,
+  remove,
+  removeSync,
+
+  path: await import('@std/path'),
 };
 
 for (const prop in ikeExports) {
-    if (Object.prototype.hasOwnProperty.call(ikeExports, prop)) {
-        registerIkeGlobal(prop, ikeExports[prop]);
-    }
+  if (Object.prototype.hasOwnProperty.call(ikeExports, prop)) {
+    registerIkeGlobal(prop, ikeExports[prop]);
+  }
 }
-
-globalThis.Ike.path = await import("@std/path");

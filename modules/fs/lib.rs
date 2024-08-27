@@ -17,10 +17,11 @@ pub mod dir;
 pub mod files;
 
 pub fn resolve_path_from_args(args: &[JsValue], ctx: &mut Context) -> JsResult<JsString> {
-    if args.is_empty() {
+    let path = args.first();
+    if path.is_none() || path.unwrap().is_undefined() {
         throw!(err, "Expected a path in fs function");
     }
-    let path = args.first().unwrap();
+    let path = path.unwrap();
     let path = path.to_string(ctx)?;
     Ok(path)
 }

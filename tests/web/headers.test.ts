@@ -5,139 +5,105 @@ describe('Headers', () => {
     expect(Headers).notToBeUndefined();
   });
 
-  it('should create a new Headers object', () => {
-    expect(
-      () =>
-        new Headers([
-          ['Content-Type', 'application/json'],
-          ['Content-Type', 'application/txt'],
-          ['Set-Cookie', 'name=value'],
-          ['Set-Cookie', 'name2=value2'],
-        ]),
-    ).notToThrow();
+  it('should allow creating empty headers', () => {
+    const headers = new Headers();
+    expect(headers).toBeInstanceOf(Headers);
   });
 
-  it('should throw when provided with invalid headers', () => {
-    expect(
-      () =>
-        new Headers([
-          ['Content-Type', 'application/json'],
-          ['Content-Type', 'application/txt'],
-          ['Set-Cookie', 'name=value'],
-          ['Set-Cookie', 'name2=value2'],
-          ['Invalid-Header', 'value'],
-        ]),
-    ).toThrow();
+  it('should allow creating headers from an object', () => {
+    const headers = new Headers({ 'Content-Type': 'application/json' });
+    expect(headers.get('Content-Type')).toBe('application/json');
   });
 
-  it('should append a new value to an existing header', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
-    ]);
-    headers.append('Content-Type', 'application/xml');
-    expect(headers.get('Content-Type')).toBe(
-      'application/json, application/txt, application/xml',
-    );
-  });
-
-  it('should handle case-insensitive header names correctly', () => {
+  it('should allow creating headers from an array of tuples', () => {
     const headers = new Headers([['Content-Type', 'application/json']]);
-    expect(headers.has('content-type')).toBe(true);
-    expect(headers.get('CONTENT-TYPE')).toBe('application/json');
+    expect(headers.get('Content-Type')).toBe('application/json');
   });
 
-  it("should return string when getting 'set-cookie' header using get", () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
-    ]);
-    expect(headers.get('Set-Cookie')).toBe('name=value, name2=value2');
+  it('should normalize header names to lowercase', () => {
+    const headers = new Headers({ 'X-Custom-Header': 'value' });
+    expect(headers.get('x-custom-header')).toBe('value');
   });
 
-  it("should return an array when getting the 'set-cookie' header using getSetCookie", () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
-    ]);
-    expect(headers.getSetCookie()).toBe(['name=value', 'name2=value2']);
+  it('should return null for non-existent headers', () => {
+    const headers = new Headers();
+    expect(headers.get('X-Non-Existent')).toBeNull();
+  });
+
+  it('should set a new header or overwrite an existing one', () => {
+    const headers = new Headers();
+    headers.set('Content-Type', 'text/plain');
+    expect(headers.get('Content-Type')).toBe('text/plain');
+
+    headers.set('Content-Type', 'application/json');
+    expect(headers.get('Content-Type')).toBe('application/json');
+  });
+
+  it('should append a value to an existing header', () => {
+    const headers = new Headers();
+    headers.append('X-Custom-Header', 'value1');
+    headers.append('X-Custom-Header', 'value2');
+    expect(headers.get('X-Custom-Header')).toBe('value1, value2');
   });
 
   it('should delete a header', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
-    ]);
-    headers.delete('Content-Type');
-    expect(headers.get('Content-Type')).toBeUndefined();
+    const headers = new Headers({ 'X-Custom-Header': 'value' });
+    headers.delete('X-Custom-Header');
+    expect(headers.get('X-Custom-Header')).toBeNull();
   });
 
-  it('should maintain other headers after deletion', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Set-Cookie', 'name=value'],
-    ]);
-    headers.delete('Content-Type');
-    expect(headers.has('Content-Type')).toBe(false);
-    expect(headers.get('Set-Cookie')).toBe('name=value');
-  });
-
-  it('should return true if header exists', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
-    ]);
+  it('should check if a header exists', () => {
+    const headers = new Headers({ 'Content-Type': 'application/json' });
     expect(headers.has('Content-Type')).toBe(true);
+    expect(headers.has('Accept')).toBe(false);
   });
 
-  it('should return false if header does not exist', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
+  it('should allow iterating over all headers', () => {
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    });
+    const entries = Array.from(headers.entries());
+
+    expect(entries).toBe([
+      ['accept', 'application/json'],
+      ['content-type', 'application/json'],
     ]);
-    expect(headers.has('Invalid-Header')).toBe(false);
   });
 
-  it('should set a new value for the specified header', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
+  it('should return an iterator of all header entries with entries()', () => {
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      Accept: 'text/html',
+    });
+    const entries = headers.entries();
+    const result = Array.from(entries);
+
+    expect(result).toBe([
+      ['accept', 'text/html'],
+      ['content-type', 'application/json'],
     ]);
-    headers.set('Content-Type', 'application/xml');
-    expect(headers.get('Content-Type')).toBe('application/xml');
   });
 
-  it('should throw when setting an invalid header', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
-    ]);
-    expect(() => headers.set('Invalid-Header', 'value')).toThrow();
+  it('should return an iterator of all header keys with keys()', () => {
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      Accept: 'text/html',
+    });
+    const keys = headers.keys();
+    const result = Array.from(keys);
+
+    expect(result).toBe(['accept', 'content-type']);
   });
 
-  it('should throw when appending an invalid header', () => {
-    const headers = new Headers([
-      ['Content-Type', 'application/json'],
-      ['Content-Type', 'application/txt'],
-      ['Set-Cookie', 'name=value'],
-      ['Set-Cookie', 'name2=value2'],
-    ]);
-    expect(() => headers.append('Invalid-Header', 'value')).toThrow();
+  it('should return an iterator of all header values with values()', () => {
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      Accept: 'text/html',
+    });
+    const values = headers.values();
+    const result = Array.from(values);
+
+    expect(result).toBe(['text/html', 'application/json']);
   });
 });

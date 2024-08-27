@@ -28,7 +28,7 @@ pub fn btoa(#[string] data: String) {
 ike_core::module!(
     WebModule,
     "web",
-    js = ["streams.js", "timeouts.js", "base64.js", "encoding.js"],
+    js = ["streams.js", "timeouts.js", "base64.js", "encoding.js", "headers.js", "main.js"],
     exposed = {
         "set_timeout_ex" => set_timeout_ex,
         "clear_timeout_ex" => clear_timeout_ex,

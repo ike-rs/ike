@@ -1,8 +1,8 @@
-import { assertEquals } from '@std/assert';
+import x from '@std/_internal_';
 
-const fixture = '𝓽𝓮𝔁𝓽';
-const encoder = new TextEncoder();
-const bytes = new Uint8Array(5);
-const result = encoder.encodeInto(fixture, bytes);
-assertEquals(result.read, 2, 'read should be 2');
-assertEquals(result.written, 4, 'written should be 4');
+const headers = new Headers();
+const headers1 = new Headers({
+  'Content-Type': 'application/json',
+});
+
+const headers2 = new Headers([['Content-Type', 'application/json']]);
