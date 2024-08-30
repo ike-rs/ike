@@ -7,7 +7,6 @@ use super::{
     queue::Queue,
     terminal::{Terminal, TerminalStdin},
 };
-use crate::runtime::web::url::{URLSearchParams, URL};
 use crate::testing::js::JsTest;
 use crate::transpiler::transpile;
 use boa_engine::{
@@ -175,11 +174,6 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
             length: None,
         },
     ];
-
-    ctx.register_global_class::<URL>()
-        .expect("URL is already defined");
-    ctx.register_global_class::<URLSearchParams>()
-        .expect("URLSearchParams is already defined");
 
     for entry in entries.iter() {
         match entry.setup_type {

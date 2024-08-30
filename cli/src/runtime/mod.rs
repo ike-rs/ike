@@ -9,4 +9,3 @@ pub mod runtime;
 pub mod terminal;
 pub mod toml;
 pub mod uuid;
-pub mod web;

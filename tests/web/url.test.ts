@@ -50,7 +50,7 @@ describe('URL', () => {
 
   it('should correctly stringify the URL', () => {
     const url = new URL('http://www.example.com');
-    expect(`URL: ${url}`).toBe('URL: http://www.example.com');
+    expect(`${url}`).toBe('http://www.example.com/');
   });
 
   it('URL.parse should return the correct URL object', () => {
@@ -70,6 +70,16 @@ describe('URL', () => {
 
   it('URL.canParse should return false for an invalid URL', () => {
     expect(URL.canParse('http://[:::1]')).toBe(false);
+  });
+
+  it("url.searchParams.get('query') should return 'string'", () => {
+    const url = new URL('http://www.example.com?query=string');
+    expect(url.searchParams.get('query')).toBe('string');
+  });
+
+  it("url.searchParams.get('nonexistent') should return null", () => {
+    const url = new URL('http://www.example.com?query=string');
+    expect(url.searchParams.get('nonexistent')).toBe(null);
   });
 });
 
@@ -145,14 +155,62 @@ describe('URLSearchParams', () => {
 
   it('should encode special characters', () => {
     const params = new URLSearchParams('value=hello world&key=hello+world');
-    expect(params.toString()).toBe('value=hello%20world&key=hello%2Bworld');
+    expect(params.toString()).toBe('value=hello+world&key=hello+world');
     const params1 = new URLSearchParams('val=👾 Exterminate!');
-    expect(params1.toString()).toBe('val=%F0%9F%91%BE%20Exterminate%21');
+    expect(params1.toString()).toBe('val=%F0%9F%91%BE+Exterminate%21');
   });
 
   it('should decode special characters', () => {
     const params = new URLSearchParams('value=hello%20world&key=hello%2Bworld');
     expect(params.get('value')).toBe('hello world');
     expect(params.get('key')).toBe('hello+world');
+  });
+
+  it('should sort parameters by name', () => {
+    const params = new URLSearchParams('key2=value2&key1=value1');
+    params.sort();
+    expect(params.toString()).toBe('key1=value1&key2=value2');
+  });
+
+  it('should iterate over all parameters', () => {
+    const params = new URLSearchParams('key1=value1&key2=value2');
+    const entries: any[] = [];
+    for (const [key, value] of params) {
+      entries.push([key, value]);
+    }
+    expect(entries).toBe([
+      ['key1', 'value1'],
+      ['key2', 'value2'],
+    ]);
+  });
+
+  it('should iterate over all keys', () => {
+    const params = new URLSearchParams('key1=value1&key2=value2');
+    const keys: any[] = [];
+    for (const key of params.keys()) {
+      keys.push(key);
+    }
+    expect(keys).toBe(['key1', 'key2']);
+  });
+
+  it('should iterate over all values', () => {
+    const params = new URLSearchParams('key1=value1&key2=value2');
+    const values: any[] = [];
+    for (const value of params.values()) {
+      values.push(value);
+    }
+    expect(values).toBe(['value1', 'value2']);
+  });
+
+  it('should iterate over all entries', () => {
+    const params = new URLSearchParams('key1=value1&key2=value2');
+    const entries: any[] = [];
+    for (const entry of params.entries()) {
+      entries.push(entry);
+    }
+    expect(entries).toBe([
+      ['key1', 'value1'],
+      ['key2', 'value2'],
+    ]);
   });
 });

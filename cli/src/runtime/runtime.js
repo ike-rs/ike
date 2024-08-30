@@ -12,9 +12,9 @@ import {
   WritableStream,
   WritableStreamDefaultController,
   WritableStreamDefaultWriter,
-} from '@std/streams';
-import { clearTimeout, setTimeout } from 'module:web/timeouts.js';
-import { atob, btoa } from 'module:web/base64.js';
+} from "@std/streams";
+import { clearTimeout, setTimeout } from "module:web/timeouts.js";
+import { atob, btoa } from "module:web/base64.js";
 
 const registerGlobal = (name, value) => {
   Object.defineProperty(globalThis, name, {
@@ -32,8 +32,9 @@ const registerIkeGlobal = (name, value) => {
   });
 };
 
-import { TextDecoder, TextEncoder } from 'module:web/encoding.js';
-import { Headers } from 'module:web/headers.js';
+import { TextDecoder, TextEncoder } from "module:web/encoding.js";
+import { Headers } from "module:web/headers.js";
+import { URL, URLSearchParams } from "module:web/url.js";
 
 const exports = {
   ReadableStream,
@@ -63,6 +64,9 @@ const exports = {
   TextEncoder,
 
   Headers,
+
+  URLSearchParams,
+  URL,
 };
 
 for (const prop in exports) {
@@ -83,7 +87,7 @@ import {
   readTextFileSync,
   remove,
   removeSync,
-} from 'module:fs/fs.js';
+} from "module:fs/fs.js";
 
 const ikeExports = {
   createDir,
@@ -98,7 +102,7 @@ const ikeExports = {
   remove,
   removeSync,
 
-  path: await import('@std/path'),
+  path: await import("@std/path"),
 };
 
 for (const prop in ikeExports) {

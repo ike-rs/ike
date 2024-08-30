@@ -1,8 +1,4 @@
-import x from '@std/_internal_';
+// url with hash
+const url = new URL('https://example.com?query=string&name=John#hash');
 
-const headers = new Headers();
-const headers1 = new Headers({
-  'Content-Type': 'application/json',
-});
-
-const headers2 = new Headers([['Content-Type', 'application/json']]);
+console.log(url.searchParams.get('query')); // 'string'

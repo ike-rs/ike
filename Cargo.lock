@@ -1281,7 +1281,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "toml",
- "url",
  "urlencoding",
  "uuid",
  "web",
@@ -2846,6 +2845,7 @@ dependencies = [
  "form_urlencoded",
  "idna",
  "percent-encoding",
+ "serde",
 ]
 
 [[package]]
@@ -2978,7 +2978,9 @@ dependencies = [
  "futures-util",
  "ike-core",
  "ike-function",
+ "serde_json",
  "smol",
+ "url",
 ]
 
 [[package]]

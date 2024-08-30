@@ -154,7 +154,11 @@ const isObject = (x: any): x is object => {
 };
 
 const toString = (val: unknown): string => {
-  if (typeof val === 'string') return val;
+  if (typeof val === 'string') {
+    return val;
+  } else if (typeof val === 'symbol') {
+    throw new TypeError('Cannot convert a Symbol value to a string');
+  }
 
   return String(val);
 };
