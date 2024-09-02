@@ -49,11 +49,13 @@ uuid = { version = "1.10.0", features = [
 ] }
 rustc-hash = "2.0.0"
 
+
 ike-core = { workspace = true }
 
 # Modules
 web = { workspace = true }
 fs = { workspace = true }
+http = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 winapi = { workspace = true }

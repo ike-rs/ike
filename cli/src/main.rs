@@ -19,7 +19,7 @@ use cli::cli::Cli;
 use ike_logger::{elog, Logger};
 use panic_handler::setup_panic_handler;
 
-#[tokio::main]
+#[tokio::main(worker_threads = 16)]
 async fn main() -> Result<()> {
     setup_panic_handler();
 

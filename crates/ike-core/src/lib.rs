@@ -1,4 +1,7 @@
-use exposed::ExposedFunction;
+#![feature(type_alias_impl_trait)]
+
+use boa_engine::{JsResult, JsValue};
+use exposed::{ExposedAsyncFunction, ExposedFunction};
 
 pub mod exposed;
 pub mod macros;
@@ -15,4 +18,5 @@ pub trait ModuleTrait {
     fn name_for(&self, file: &'static str) -> String {
         format!("module:{}/{}", self.spec(), file)
     }
+    fn exposed_async_functions(&self) -> &'static [ExposedAsyncFunction];
 }

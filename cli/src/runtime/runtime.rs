@@ -14,6 +14,8 @@ use boa_engine::{
     JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
 };
 use fs::FsModule;
+
+use http::HttpModule;
 use ike_core::{get_prototype_name, js_str_to_string, throw, ModuleTrait};
 use ike_logger::{cond_log, Logger};
 use smol::LocalExecutor;
@@ -57,7 +59,8 @@ pub fn start_runtime(file: &PathBuf, context: Option<&mut Context>) -> JsResult<
 pub fn load_modules(ctx: &mut Context, module_loader: Rc<IkeModuleLoader>) -> JsResult<()> {
     let modules: Vec<(&dyn ModuleTrait, Rc<IkeModuleLoader>)> = vec![
         (&WebModule, Rc::clone(&module_loader)),
-        (&FsModule, module_loader),
+        (&FsModule, Rc::clone(&module_loader)),
+        (&HttpModule, Rc::clone(&module_loader)),
     ];
 
     for (module, loader) in modules {

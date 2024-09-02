@@ -88,6 +88,7 @@ import {
   remove,
   removeSync,
 } from "module:fs/fs.js";
+import { serve } from "module:http/serve.js";
 
 const ikeExports = {
   createDir,
@@ -103,6 +104,8 @@ const ikeExports = {
   removeSync,
 
   path: await import("@std/path"),
+
+  serve,
 };
 
 for (const prop in ikeExports) {

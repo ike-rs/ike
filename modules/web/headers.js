@@ -1,31 +1,31 @@
 // Based on Deno implementation:
 
-import { getArgument, toString } from '@std/_internal_';
-import { assertProto } from '@std/assert';
+import { getArgument, toString } from "@std/_internal_";
+import { assertProto } from "@std/assert";
 import {
   addWebIterators,
   checkForInvalidValueChars,
   checkHeaderNameForHttpTokenCodePoint,
   normalizeHeaderValue,
-} from 'module:web/main.js';
+} from "module:web/main.js";
 
-const _guard = Symbol('guard');
-const _headers = Symbol('headers');
-const _iterableHeaders = Symbol('iterableHeaders');
-const _iterableHeadersCache = Symbol('iterableHeadersCache');
+const _guard = Symbol("guard");
+const _headers = Symbol("headers");
+const _iterableHeaders = Symbol("iterableHeaders");
+const _iterableHeadersCache = Symbol("iterableHeadersCache");
 
 const appendHeader = (headers, name, value) => {
   value = normalizeHeaderValue(value);
 
   if (!checkHeaderNameForHttpTokenCodePoint(name)) {
-    throw new TypeError('Header name is not valid.');
+    throw new TypeError("Header name is not valid.");
   }
   if (!checkForInvalidValueChars(value)) {
-    throw new TypeError('Header value is not valid.');
+    throw new TypeError("Header value is not valid.");
   }
 
-  if (headers[_guard] == 'immutable') {
-    throw new TypeError('Headers are immutable.');
+  if (headers[_guard] == "immutable") {
+    throw new TypeError("Headers are immutable.");
   }
 
   const list = headers[_headers];
@@ -46,7 +46,7 @@ const getHeader = (headers, name) => {
     .filter((header) => header[0].toLowerCase() === lowercaseName)
     .map((header) => header[1]);
 
-  return entries.length === 0 ? null : entries.join(', ');
+  return entries.length === 0 ? null : entries.join(", ");
 };
 
 class Headers {
@@ -74,7 +74,7 @@ class Headers {
             appendHeader(this, name, value);
           }
         }
-      } else if (typeof input === 'object' && input !== null) {
+      } else if (typeof input === "object" && input !== null) {
         for (const key in input) {
           if (!Object.hasOwn(input, key)) {
             continue;
@@ -89,18 +89,18 @@ class Headers {
           }
         }
       } else {
-        throw new TypeError('Headers: Invalid input type provided for init');
+        throw new TypeError("Headers: Invalid input type provided for init");
       }
     }
 
-    this._guard = 'none';
+    this._guard = "none";
   }
 
   get [_iterableHeaders]() {
     const list = this[_headers];
 
     if (
-      this[_guard] === 'immutable' &&
+      this[_guard] === "immutable" &&
       this[_iterableHeadersCache] !== undefined
     ) {
       return this[_iterableHeadersCache];
@@ -112,15 +112,16 @@ class Headers {
       const entry = list[i];
       const name = entry[0].toLowerCase();
       const value = entry[1];
-      if (value === null) throw new TypeError('Unreachable');
-      if (name === 'set-cookie') {
+      if (value === null) throw new TypeError("Unreachable");
+      if (name === "set-cookie") {
         entries.push([name, value]);
       } else {
         const seenHeaderIndex = seenHeaders[name];
         if (seenHeaderIndex !== undefined) {
           const entryValue = entries[seenHeaderIndex][1];
-          entries[seenHeaderIndex][1] =
-            entryValue.length > 0 ? entryValue + '\x2C\x20' + value : value;
+          entries[seenHeaderIndex][1] = entryValue.length > 0
+            ? entryValue + "\x2C\x20" + value
+            : value;
         } else {
           seenHeaders[name] = entries.length;
           entries.push([name, value]);
@@ -144,8 +145,8 @@ class Headers {
   append(name, value) {
     assertProto(this, Headers);
 
-    // let name = getArgument(name, "Headers.append", "name");
-    // let value = getArgument(name, "Headers.append", "value");
+    let name = getArgument(name, "Headers.append", "name");
+    let value = getArgument(name, "Headers.append", "value");
 
     name = toString(name);
     value = toString(value);
@@ -161,11 +162,11 @@ class Headers {
     name = toString(name);
 
     if (!checkHeaderNameForHttpTokenCodePoint(name)) {
-      throw new TypeError('Header name is not valid.');
+      throw new TypeError("Header name is not valid.");
     }
 
-    if (this[_guard] == 'immutable') {
-      throw new TypeError('Headers are immutable.');
+    if (this[_guard] == "immutable") {
+      throw new TypeError("Headers are immutable.");
     }
 
     const list = this[_headers];
@@ -185,7 +186,7 @@ class Headers {
     name = toString(name);
 
     if (!checkHeaderNameForHttpTokenCodePoint(name)) {
-      throw new TypeError('Header name is not valid.');
+      throw new TypeError("Header name is not valid.");
     }
 
     return getHeader(this[_headers], name);
@@ -196,7 +197,7 @@ class Headers {
     const list = this[_headers];
 
     const cookies = list
-      .filter((header) => header[0].toLowerCase() === 'set-cookie')
+      .filter((header) => header[0].toLowerCase() === "set-cookie")
       .map((header) => header[1]);
 
     return cookies;
@@ -209,7 +210,7 @@ class Headers {
     name = toString(name);
 
     if (!checkHeaderNameForHttpTokenCodePoint(name)) {
-      throw new TypeError('Header name is not valid.');
+      throw new TypeError("Header name is not valid.");
     }
 
     return this[_headers].some(
@@ -226,14 +227,14 @@ class Headers {
     value = toString(value);
 
     if (!checkHeaderNameForHttpTokenCodePoint(name)) {
-      throw new TypeError('Header name is not valid.');
+      throw new TypeError("Header name is not valid.");
     }
     if (!checkForInvalidValueChars(value)) {
-      throw new TypeError('Header value is not valid.');
+      throw new TypeError("Header value is not valid.");
     }
 
-    if (this[_guard] == 'immutable') {
-      throw new TypeError('Headers are immutable.');
+    if (this[_guard] == "immutable") {
+      throw new TypeError("Headers are immutable.");
     }
 
     const list = this[_headers];
@@ -258,6 +259,6 @@ class Headers {
   }
 }
 
-addWebIterators('Headers', Headers, _iterableHeaders);
+addWebIterators("Headers", Headers, _iterableHeaders);
 
 export { Headers };

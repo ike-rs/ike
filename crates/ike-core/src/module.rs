@@ -5,9 +5,10 @@ macro_rules! module {
         $spec:expr
         $(, js = [ $($js:expr),* ] )?
         $(, exposed = { $($exposed_name:expr => $exposed_fn:expr),* $(,)? } )?
+        $(, exposed_async = { $($exposed_async_name:expr => $exposed_async_fn:expr),* } )?
         $(,)?
     ) => {
-        use ike_core::exposed::ExposedFunction;
+        use ike_core::exposed::{ExposedFunction, ExposedAsyncFunction};
         use ike_core::ModuleTrait;
 
         #[derive(Debug, Clone, Copy)]
@@ -43,6 +44,16 @@ macro_rules! module {
                 ];
                 exposed_functions
             }
+
+            fn exposed_async_functions(&self) -> &'static [ExposedAsyncFunction] {
+                $(
+                    $(
+                        ExposedAsyncFunction::create($exposed_async_name, $exposed_async_fn)
+                    )*
+                )?
+                &[]
+            }
+
         }
     };
 }

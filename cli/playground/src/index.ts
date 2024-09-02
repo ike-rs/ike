@@ -1,4 +1,10 @@
-// url with hash
-const url = new URL('https://example.com?query=string&name=John#hash');
+// const app = Ike.serve({
+//   port: 3001,
+//   handler: (req) => {},
+// });
 
-console.log(url.searchParams.get('query')); // 'string'
+const params = new URLSearchParams();
+params.append('name', 'John Doe');
+
+const headers = new Headers();
+headers.append('Content-Type', 'application/json');
