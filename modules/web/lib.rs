@@ -1,4 +1,10 @@
+use std::io::stderr;
+use std::io::stdout;
+use std::io::Write;
+
 use base64::prelude::*;
+use boa_engine::builtins::promise::PromiseState;
+use boa_engine::object::builtins::JsPromise;
 use boa_engine::{
     builtins::string, js_string, object::builtins::JsArray, value::TryFromJs, Context,
     JsNativeError, JsObject, JsResult, JsValue,
@@ -232,10 +238,40 @@ fn make_object(url: Url, obj: JsObject, ctx: &mut Context) -> JsResult<()> {
     Ok(())
 }
 
+#[ike_function]
+pub fn print(#[string] content: String, #[i32] level: i32) {
+    let is_err = level > 1;
+
+    if is_err {
+        stderr().write_all(content.as_bytes()).unwrap();
+        stderr().flush().unwrap();
+    } else {
+        stdout().write_all(content.as_bytes()).unwrap();
+        stdout().flush().unwrap();
+    }
+
+    Ok(JsValue::undefined())
+}
+
+#[ike_function]
+pub fn get_promise_state() {
+    let arg = args.get(0).unwrap();
+    let promise: JsPromise = arg.try_js_into(ctx)?;
+
+    let state = promise.state();
+    let string_state = match state {
+        PromiseState::Pending => "pending",
+        PromiseState::Fulfilled(_) => "fulfilled",
+        PromiseState::Rejected(_) => "rejected",
+    };
+
+    Ok(js_string!(string_state).into())
+}
+
 ike_core::module!(
     WebModule,
     "web",
-    js = ["streams.js", "timeouts.js", "base64.js", "encoding.js", "headers.js", "main.js", "url.js"],
+    js = ["streams.js", "timeouts.js", "base64.js", "encoding.js", "headers.js", "main.js", "url.js", "console.js"],
     exposed = {
         "set_timeout_ex" => set_timeout_ex,
         "clear_timeout_ex" => clear_timeout_ex,
@@ -249,5 +285,7 @@ ike_core::module!(
         "parse_url_ex" => parse_url,
         "update_url_ex" => update_url,
         "parse_url_with_base_ex" => parse_url_with_base,
+        "print_ex" => print,
+        "get_promise_state_ex" => get_promise_state,
     }
 );

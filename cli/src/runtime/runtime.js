@@ -35,6 +35,7 @@ const registerIkeGlobal = (name, value) => {
 import { TextDecoder, TextEncoder } from "module:web/encoding.js";
 import { Headers } from "module:web/headers.js";
 import { URL, URLSearchParams } from "module:web/url.js";
+import { Console } from "module:web/console.js";
 
 const exports = {
   ReadableStream,
@@ -67,6 +68,8 @@ const exports = {
 
   URLSearchParams,
   URL,
+
+  console: new Console(),
 };
 
 for (const prop in exports) {

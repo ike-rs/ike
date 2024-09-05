@@ -7,10 +7,7 @@ const glob = new Glob('**/*.ts');
 const paths = [];
 
 for await (const file of glob.scan('cli/src/runtime/ts')) {
-  if (
-    file.includes('index.ts')
-    // (file.includes('polyfill.ts') && !file.includes('test'))
-  ) {
+  if (file.includes('index.ts')) {
     paths.push(path.join(process.cwd(), 'cli/src/runtime/ts', file));
   }
 }

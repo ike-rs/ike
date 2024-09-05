@@ -11,7 +11,7 @@ use crate::testing::js::JsTest;
 use crate::transpiler::transpile;
 use boa_engine::{
     builtins::promise::PromiseState, js_str, js_string, module, property::Attribute, Context,
-    JsNativeError, JsObject, JsResult, JsStr, JsValue, Module, NativeFunction, Source,
+    JsNativeError, JsObject, JsResult, JsStr, JsString, JsValue, Module, NativeFunction, Source,
 };
 use fs::FsModule;
 use ike_core::{get_prototype_name, js_str_to_string, throw, ModuleTrait};
@@ -155,12 +155,6 @@ pub fn setup_context(ctx: &mut Context, file: Option<&PathBuf>) {
     JsTest::init(ctx);
 
     let entries = [
-        SetupEntry {
-            setup_type: SetupType::Property,
-            value: SetupValue::Object(Console::init(ctx)),
-            name: js_str!("console"),
-            length: None,
-        },
         SetupEntry {
             setup_type: SetupType::Property,
             value: SetupValue::Object(ike),

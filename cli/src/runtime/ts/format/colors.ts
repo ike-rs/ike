@@ -1,13 +1,21 @@
-const CODES: Record<string, [number, number]> = {
+export const CODES: Record<string, [number, number]> = {
   // Modifiers
   b: [1, 22], // bold
+  bold: [1, 22], // bold
   d: [2, 22], // dim
+  dim: [2, 22], // dim
   i: [3, 23], // italic
+  italic: [3, 23], // italic
   u: [4, 24], // underline
+  underline: [4, 24], // underline
   o: [53, 55], // overline
+  overline: [53, 55], // overline
   inv: [7, 27], // inverse
+  inverse: [7, 27], // inverse
   h: [8, 28], // hidden
+  hidden: [8, 28], // hidden
   s: [9, 29], // strikethrough
+  strikethrough: [9, 29], // strikethrough
 
   // Colors
   black: [30, 39],
@@ -53,6 +61,8 @@ const CODES: Record<string, [number, number]> = {
   bgCyanBright: [106, 49],
   bgWhiteBright: [107, 49],
 };
+
+export const colorCodes = CODES;
 
 export const RESET = '\x1b[0m';
 

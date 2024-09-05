@@ -82,7 +82,7 @@ declare module '@std/format' {
    * @param {string} fmtStr - The string containing custom format markers.
    * @returns {string} The formatted string with ANSI escape codes.
    */
-  export const prettyFmt: (fmtStr: string) => string;
+  export function prettyFmt(fmtStr: string): string;
 
   /**
    * Applies an ANSI style (modifier, color, or background color) to a string.
@@ -102,7 +102,7 @@ declare module '@std/format' {
    * @param {string} str - The string to which the style will be applied.
    * @returns {string} The string wrapped in the appropriate ANSI escape codes.
    */
-  export const applyStyle: (style: string, str: string) => string;
+  export function applyStyle(style: string, str: string): string;
 
   export const colors: {
     reset: (str: string) => string;
@@ -170,7 +170,7 @@ declare module '@std/format' {
    * @param rgb The RGB color.
    * @returns The text with the applied RGB color.
    */
-  export const textRgb: (text: string, rgb: Rgb) => string;
+  export function textRgb(text: string, rgb: Rgb): string;
 
   /**
    * Sets the background color using an RGB color.
@@ -179,7 +179,7 @@ declare module '@std/format' {
    * @param rgb The RGB color.
    * @returns The text with the applied RGB background color.
    */
-  export const backgroundRgb: (text: string, rgb: Rgb) => string;
+  export function backgroundRgb(text: string, rgb: Rgb): string;
 
   /**
    * Converts a HEX color to an RGB color.
@@ -187,7 +187,7 @@ declare module '@std/format' {
    * @param hex The HEX color string.
    * @returns The corresponding RGB color.
    */
-  export const hexToRgb: (hex: string) => Rgb;
+  export function hexToRgb(hex: string): Rgb;
 
   /**
    * Colors the text using a HEX color.
@@ -196,7 +196,7 @@ declare module '@std/format' {
    * @param hex The HEX color string.
    * @returns The text with the applied HEX color.
    */
-  export const textHex: (text: string, hex: string) => string;
+  export function textHex(text: string, hex: string): string;
 
   /**
    * Sets the background color using a HEX color.
@@ -205,5 +205,7 @@ declare module '@std/format' {
    * @param hex The HEX color string.
    * @returns The text with the applied HEX background color.
    */
-  export const backgroundHex: (text: string, hex: string) => string;
+  export function backgroundHex(text: string, hex: string): string;
+
+  export const colorCodes: Record<string, [number, number]>;
 }
