@@ -108,3 +108,7 @@ console.log(
 );
 
 console.log(new Error('test'), new TypeError('test'), new RangeError('test'));
+
+const dataView = new DataView(new ArrayBuffer(8));
+
+console.log(dataView);

@@ -303,9 +303,28 @@ const actualFormat = (ctx, value, recurseTimes) => {
         } else if (value instanceof Error) {
             let name = value.name || "Error";
 
-            return `\n${colors.red(`${name === "Error" ? "error" : name}`)}${
+            return `${colors.red(`${name === "Error" ? "error" : name}`)}${
                 colors.dim(`:`)
             } ${value.message}`;
+        } else if (value instanceof DataView) {
+            braces = ["DataView {", "}"];
+
+            fn = (ctx, value, recurseTimes) => {
+                let buffer = value.buffer;
+                let byteOffset = value.byteOffset;
+                let byteLength = value.byteLength;
+                let output = [
+                    `byteLength: ${formatValue(ctx, byteLength, recurseTimes)}`,
+                    `byteOffset: ${formatValue(ctx, byteOffset, recurseTimes)}`,
+                ];
+                ctx.indentationLvl += 2;
+                output.push(
+                    `buffer: ${formatValue(ctx, buffer, recurseTimes)}`,
+                );
+                ctx.indentationLvl -= 2;
+
+                return output;
+            };
         }
     }
 
