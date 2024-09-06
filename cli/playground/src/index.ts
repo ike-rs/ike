@@ -81,3 +81,28 @@ console.log(uint8);
 const typedarrayoverlimit = new Uint8Array(1001);
 
 console.log(typedarrayoverlimit);
+
+const fn = () => {
+  console.log('xd');
+};
+
+const generator = function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+};
+
+const asyncGenerator = async function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+};
+
+console.log(
+  function () {
+    return 'dwa';
+  },
+  fn,
+  generator,
+  asyncGenerator,
+);

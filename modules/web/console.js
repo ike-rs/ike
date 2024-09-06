@@ -291,6 +291,15 @@ const actualFormat = (ctx, value, recurseTimes) => {
             braces = [`${bufferName} {`, "}"];
 
             fn = formatAnyArrayBuffer;
+        } else if (typeof value === "function" || value instanceof Function) {
+            let name = value.name;
+            let constructorName = value.constructor
+                ? value.constructor.name
+                : "";
+
+            return colors.cyan(
+                `[${constructorName}${name ? `: ${name}` : ""}]`,
+            );
         }
     }
 
