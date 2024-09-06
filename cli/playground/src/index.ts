@@ -124,3 +124,12 @@ const weakSet = new WeakSet();
 weakSet.add({ foo: 'bar' });
 
 console.log(weakSet);
+
+console.log({
+  test: 'test',
+  123: 123,
+  items: {
+    test: [123, 123],
+    [Symbol.for('foo')]: 'symbol',
+  },
+});

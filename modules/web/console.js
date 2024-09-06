@@ -329,6 +329,14 @@ const actualFormat = (ctx, value, recurseTimes) => {
             return `WeakMap { <${colors.cyan("items")}> }`;
         } else if (value instanceof WeakSet) {
             return `WeakSet { <${colors.cyan("items")}> }`;
+        } else if (typeof value === "object" || value instanceof Object) {
+            keys = getKeys(value, false);
+
+            if (keys.length === 0) {
+                return "{}";
+            }
+
+            fn = formatObject;
         }
     }
 
@@ -362,6 +370,57 @@ const actualFormat = (ctx, value, recurseTimes) => {
         value,
         type,
     );
+};
+
+const formatObject = (ctx, value, recurseTimes) => {
+    ctx.indentationLvl += 2;
+
+    let keys = getKeys(value, false);
+    let entries = keys.map((key) => {
+        let desc = Object.getOwnPropertyDescriptor(value, key) || {
+            value: value[key],
+            enumerable: true,
+        };
+
+        return [key, desc.value];
+    });
+
+    let entriesLen = entries.length;
+    const len = Math.min(
+        Math.max(0, ctx.iterableLimit),
+        entriesLen,
+    );
+
+    let output = [];
+    let remaining = entriesLen - len;
+
+    for (let i = 0; i < len; i++) {
+        const [key, val] = entries[i];
+        output.push(
+            `${formatKey(ctx, key, recurseTimes)}: ${
+                formatVal(
+                    ctx,
+                    val,
+                    recurseTimes,
+                    key,
+                )
+            }`,
+        );
+    }
+
+    if (remaining > 0) {
+        output.push(
+            colors.dim(
+                `... ${entriesLen - len} more item${
+                    entriesLen - len > 1 ? "s" : ""
+                }`,
+            ),
+        );
+    }
+
+    ctx.indentationLvl -= 2;
+
+    return output;
 };
 
 const isTypedArray = (value) => {
@@ -483,6 +542,8 @@ const formatKey = (ctx, key, recurseTimes) => {
 
     if (typeof key === "symbol") {
         name = colors.blue(`[${key.toString()}]`);
+    } else if (/^[a-zA-Z_][a-zA-Z_0-9]*$/u.test(key)) {
+        name = name;
     } else if (typeof key === "string") {
         name = colors.green('"' + key + '"');
     } else {
