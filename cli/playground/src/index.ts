@@ -112,3 +112,15 @@ console.log(new Error('test'), new TypeError('test'), new RangeError('test'));
 const dataView = new DataView(new ArrayBuffer(8));
 
 console.log(dataView);
+
+const weakMap = new WeakMap();
+
+weakMap.set({ foo: 'bar' }, { hello: 'world' });
+
+console.log(weakMap);
+
+const weakSet = new WeakSet();
+
+weakSet.add({ foo: 'bar' });
+
+console.log(weakSet);

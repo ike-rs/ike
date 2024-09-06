@@ -325,6 +325,10 @@ const actualFormat = (ctx, value, recurseTimes) => {
 
                 return output;
             };
+        } else if (value instanceof WeakMap) {
+            return `WeakMap { <${colors.cyan("items")}> }`;
+        } else if (value instanceof WeakSet) {
+            return `WeakSet { <${colors.cyan("items")}> }`;
         }
     }
 
