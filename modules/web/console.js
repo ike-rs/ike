@@ -300,6 +300,12 @@ const actualFormat = (ctx, value, recurseTimes) => {
             return colors.cyan(
                 `[${constructorName}${name ? `: ${name}` : ""}]`,
             );
+        } else if (value instanceof Error) {
+            let name = value.name || "Error";
+
+            return `\n${colors.red(`${name === "Error" ? "error" : name}`)}${
+                colors.dim(`:`)
+            } ${value.message}`;
         }
     }
 

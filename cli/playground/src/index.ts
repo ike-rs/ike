@@ -35,17 +35,17 @@ map.set('daw', new Set([1, 2, 3, 4, 5]));
 
 console.log(map);
 
-class xd {
+class test {
   constructor() {
-    console.log('xd');
+    console.log('test');
   }
 
-  get xd() {
-    return 'xd';
+  get test() {
+    return 'test';
   }
 }
 
-const x = new xd();
+const x = new test();
 
 console.log(x);
 
@@ -57,12 +57,12 @@ console.log(dataview);
 
 const pending = new Promise((resolve, reject) => {
   setTimeout(() => {
-    resolve('xd');
+    resolve('test');
   }, 1000);
 });
 
 const resolved = new Promise((resolve, reject) => {
-  resolve('xd');
+  resolve('test');
 });
 
 console.log(pending, resolved);
@@ -83,7 +83,7 @@ const typedarrayoverlimit = new Uint8Array(1001);
 console.log(typedarrayoverlimit);
 
 const fn = () => {
-  console.log('xd');
+  console.log('test');
 };
 
 const generator = function* () {
@@ -106,3 +106,5 @@ console.log(
   generator,
   asyncGenerator,
 );
+
+console.log(new Error('test'), new TypeError('test'), new RangeError('test'));
