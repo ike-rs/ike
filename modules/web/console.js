@@ -78,33 +78,24 @@ const inspectArgs = (args, ctx = {}) => {
     return string;
 };
 
-const getKeys = (value, showHidden) => {
+const getKeys = (value) => {
     let keys;
     const symbols = Object.getOwnPropertySymbols(value);
 
-    if (showHidden) {
-        keys = Object.getOwnPropertyNames(value);
-        if (symbols.length) {
-            keys.push(...symbols);
+    try {
+        keys = Object.keys(value);
+    } catch (err) {
+        if (err.name === "ReferenceError" && typeof value === "object") {
+            keys = Object.getOwnPropertyNames(value);
+        } else {
+            throw err;
         }
-    } else {
-        try {
-            keys = value.values !== undefined
-                ? [...value.values()]
-                : Object.keys(value);
-        } catch (err) {
-            if (err.name === "ReferenceError" && typeof value === "object") {
-                keys = Object.getOwnPropertyNames(value);
-            } else {
-                throw err;
-            }
-        }
+    }
 
-        if (symbols.length) {
-            keys.push(
-                ...symbols.filter((key) => value.propertyIsEnumerable(key)),
-            );
-        }
+    if (symbols.length) {
+        keys.push(
+            ...symbols.filter((key) => value.propertyIsEnumerable(key)),
+        );
     }
 
     return keys;
@@ -232,6 +223,11 @@ const formatSet = (ctx, value, recurseTimes) => {
     return output;
 };
 
+const isPlainObject = (value) => {
+    return value &&
+        (value.constructor === Object || value.constructor === undefined);
+};
+
 const actualFormat = (ctx, value, recurseTimes) => {
     let fn = () => [];
     let braces = ["{", "}"];
@@ -241,7 +237,7 @@ const actualFormat = (ctx, value, recurseTimes) => {
     if (Reflect.has(value, Symbol.iterator)) {
         if (value instanceof Set) {
             const size = value.size;
-            keys = getKeys(value, false);
+            keys = getKeys(value);
 
             if (size === 0 && keys.length === 0) {
                 return "Set {}";
@@ -251,7 +247,7 @@ const actualFormat = (ctx, value, recurseTimes) => {
             braces = [`Set(${size}) {`, "}"];
         } else if (value instanceof Map) {
             const size = value.size;
-            keys = getKeys(value, false);
+            keys = getKeys(value);
 
             if (size === 0 && keys.length === 0) {
                 return "Map {}";
@@ -330,13 +326,23 @@ const actualFormat = (ctx, value, recurseTimes) => {
         } else if (value instanceof WeakSet) {
             return `WeakSet { <${colors.cyan("items")}> }`;
         } else if (typeof value === "object" || value instanceof Object) {
-            keys = getKeys(value, false);
+            // if (isPlainObject(value)) {
+            //     keys = getKeys(value);
 
-            if (keys.length === 0) {
-                return "{}";
-            }
+            //     if (keys.length === 0) {
+            //         return "{}";
+            //     }
 
-            fn = formatObject;
+            //     fn = formatPlainObject;
+            // } else {
+            //     let name = value.constructor
+            //         ? value.constructor.name
+            //         : "Object";
+
+            //     braces = [`${name} {`, "}"];
+
+            //     fn = formatObject;
+            // }
         }
     }
 
@@ -372,10 +378,10 @@ const actualFormat = (ctx, value, recurseTimes) => {
     );
 };
 
-const formatObject = (ctx, value, recurseTimes) => {
+const formatPlainObject = (ctx, value, recurseTimes) => {
     ctx.indentationLvl += 2;
 
-    let keys = getKeys(value, false);
+    let keys = getKeys(value);
     let entries = keys.map((key) => {
         let desc = Object.getOwnPropertyDescriptor(value, key) || {
             value: value[key],
@@ -422,6 +428,90 @@ const formatObject = (ctx, value, recurseTimes) => {
 
     return output;
 };
+
+// const getAllProperties = (obj) => {
+//     let properties = new Set();
+
+//     do {
+//         Object.getOwnPropertyNames(obj).forEach((prop) =>
+//             prop !== "constructor" && properties.add(prop)
+//         );
+//         Object.getOwnPropertySymbols(obj).forEach((sym) => properties.add(sym));
+//     } while ((obj = Object.getPrototypeOf(obj)) && obj !== Object.prototype);
+
+//     return properties;
+// };
+
+// const formatObject = (ctx, value, recurseTimes) => {
+//     try {
+//         ctx.indentationLvl += 2;
+
+//         let properties = [...getAllProperties(value)];
+
+//         let entries = properties.map((key) => {
+//             let desc = Object.getOwnPropertyDescriptor(value, key) || {
+//                 value: value[key],
+//                 enumerable: true,
+//             };
+
+//             return [key, desc.value];
+//         });
+
+//         let entriesLen = entries.length;
+//         const len = Math.min(
+//             Math.max(0, ctx.iterableLimit),
+//             entriesLen,
+//         );
+
+//         let output = [];
+//         let remaining = entriesLen - len;
+
+//         for (let i = 0; i < len; i++) {
+//             const [key, val] = entries[i];
+//             output.push(
+//                 `${formatKey(ctx, key, recurseTimes)}: ${
+//                     formatSpecialVal(
+//                         ctx,
+//                         val,
+//                         recurseTimes,
+//                         key,
+//                     )
+//                 }`,
+//             );
+//         }
+
+//         if (remaining > 0) {
+//             output.push(
+//                 colors.dim(
+//                     `... ${entriesLen - len} more item${
+//                         entriesLen - len > 1 ? "s" : ""
+//                     }`,
+//                 ),
+//             );
+//         }
+//         ctx.indentationLvl -= 2;
+//         return output;
+//     } catch (err) {
+//         print_ex("Error: " + err + "\n", 1);
+//     }
+// };
+
+// const formatSpecialVal = (ctx, value, recurseTimes, key) => {
+//     let val = null;
+//     if (!value) {
+//         return colors.dim("null");
+//     }
+
+//     print_ex("value: " + value + "\n", 1);
+
+//     // if (typeof value === "string") {
+//     //     val = colors.green('"' + value + '"');
+//     // } else {
+//     //     val = formatValue(ctx, value, recurseTimes);
+//     // }
+
+//     return formatValue(ctx, value, recurseTimes);
+// };
 
 const isTypedArray = (value) => {
     return value instanceof Int8Array ||
