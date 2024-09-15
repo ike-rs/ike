@@ -21,7 +21,7 @@ In the future, we plan to make our own package manager
 4. Bundle ts code
 
 ```sh
-bun unbuild
+bun run build.ts
 ```
 
 This will output js files in ike/src/runtime/js
