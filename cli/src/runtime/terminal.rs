@@ -16,7 +16,7 @@ pub struct TerminalStdin {}
 
 impl Terminal for TerminalStdin {
     fn init(ctx: &mut Context) -> JsObject {
-        let mut obj =  ObjectInitializer::with_native_data(Self::default(), ctx);
+        let mut obj = ObjectInitializer::with_native_data(Self::default(), ctx);
         obj.build()
     }
 

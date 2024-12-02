@@ -2,6 +2,9 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
+
 pub fn which(command: &str, path: Option<String>, cwd: Option<PathBuf>) -> Option<PathBuf> {
     let path = path.unwrap_or_else(|| env::var("PATH").unwrap());
 
