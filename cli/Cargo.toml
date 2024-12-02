@@ -23,7 +23,6 @@ boa_gc = { git = "https://github.com/boa-dev/boa.git" }
 simdutf = "0.4.17"
 lazy_static = "1.5.0"
 glob = "0.3.1"
-smol = { workspace = true }
 oxc_resolver = "1.10.2"
 once_cell = "1.19.0"
 futures-util = { workspace = true }
@@ -54,6 +53,7 @@ ike-core = { workspace = true }
 # Modules
 web = { workspace = true }
 fs = { workspace = true }
+smol.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 winapi = { workspace = true }

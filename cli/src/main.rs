@@ -1,6 +1,3 @@
-#![feature(let_chains)]
-#![feature(async_closure)]
-
 pub mod cli;
 mod error;
 pub mod format;

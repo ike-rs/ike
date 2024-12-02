@@ -22,15 +22,15 @@ pub struct IkeModuleLoader {
 lazy_static::lazy_static! {
     static ref BUILTIN_MODULES: HashMap<&'static str, String> = {
         let mut m = HashMap::new();
-        m.insert("@std/buffer", include_str!("js\\buffer\\index.js").to_string());
-        m.insert("@std/test", include_str!("js\\test\\index.js").to_string());
-        m.insert("@std/assert", include_str!("js\\assert\\index.js").to_string());
-        m.insert("@std/inspect", include_str!("js\\inspect\\index.js").to_string());
-        m.insert("@std/_internal_", include_str!("js\\_internal_\\index.js").to_string());
-        m.insert("@std/path", include_str!("js\\path\\index.js").to_string());
-        m.insert("@std/format", include_str!("js\\format\\index.js").to_string());
-        m.insert("@std/streams", include_str!("js\\streams\\index.js").to_string());
-        m.insert("@std/uuid", include_str!("js\\uuid\\index.js").to_string());
+        m.insert("@std/buffer", include_str!("js/buffer/index.js").to_string());
+        m.insert("@std/test", include_str!("js/test/index.js").to_string());
+        m.insert("@std/assert", include_str!("js/assert/index.js").to_string());
+        m.insert("@std/inspect", include_str!("js/inspect/index.js").to_string());
+        m.insert("@std/_internal_", include_str!("js/_internal_/index.js").to_string());
+        m.insert("@std/path", include_str!("js/path/index.js").to_string());
+        m.insert("@std/format", include_str!("js/format/index.js").to_string());
+        m.insert("@std/streams", include_str!("js/streams/index.js").to_string());
+        m.insert("@std/uuid", include_str!("js/uuid/index.js").to_string());
         m
     };
 }
